@@ -1,0 +1,22 @@
+{
+  "name": "reliquary",
+  "private": true,
+  "version": "0.1.0",
+  "description": "A skeleton kit for resurrecting dead software — and proving nothing was lost.",
+  "license": "MIT",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev:cards": "npm run dev -w apps/card-catalogue",
+    "dev:parts": "npm run dev -w apps/parts-ledger",
+    "test": "vitest run",
+    "test:pbt": "PBT_RUNS=1000 vitest run",
+    "build": "npm run build -w apps/card-catalogue && npm run build -w apps/parts-ledger",
+    "typecheck": "tsc -b --pretty"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
