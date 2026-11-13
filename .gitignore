@@ -1,0 +1,12 @@
+node_modules/
+dist/
+build/
+.next/
+coverage/
+.DS_Store
+*.log
+.env
+.env.local
+
+# NOTE: .kiro/ is intentionally NOT ignored.
+# The hackathon requires the .kiro directory at the repository root.
