@@ -1,2 +1,7 @@
-// Import pipeline is implemented in Task 3.
-export {}
+export type { PipelineResult } from './pipeline.js'
+export { runPipeline } from './pipeline.js'
+
+export type { ReportInput } from './report.js'
+export { buildReport, isLossless } from './report.js'
+
+export { publish, InconsistentReportError } from './publish.js'

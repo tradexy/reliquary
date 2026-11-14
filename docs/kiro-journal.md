@@ -54,3 +54,29 @@ implemented exactly Task 1 and stopped — and the mistakes it made were all in 
 build configuration, the one area the spec did not specify. That's a clean example
 of specs covering behaviour well and infrastructure poorly, which is worth saying
 plainly in the submission rather than pretending the first pass was flawless.
+
+---
+
+## 2026-11-14 — Tasks 2 and 3, contract and pipeline (Kiro CLI)
+
+One headless run, scoped to Tasks 2 and 3 only. Kiro designed the module split
+itself: `pipeline.ts` (drain and separate), `report.ts` (compute status),
+`publish.ts` (refuse to publish an inconsistent report). It chose a Result-shaped
+`ValidationResult` that never throws, plus a separate throwing `assertValidSource`
+at the pipeline entry — a better split than the spec asked for, and it explained
+why.
+
+It also caught a real bug in its own Task 1 output: `vitest.setup.ts` called
+`configureGlobalConfig`, which does not exist in fast-check 3.x. It found this by
+running the suite, not by reading its own code. 45 tests, 11 of them property-based.
+
+What I corrected afterwards: the PBT file used `{ maxSize: n }` for array
+constraints. That is the string constraint name; fast-check arrays take
+`maxLength`. Tests passed at runtime because the extra key was ignored, and only
+`tsc` caught it. Worth noting: **the tests were green while the types were wrong.**
+
+**Observation to write up later:** the division of labour that worked was — Kiro
+implements and self-corrects at runtime, the human runs the static checks. Neither
+side caught everything alone. That is a more honest account of agentic development
+than "the agent wrote it and it just worked", and judges are explicitly asked
+whether there was a *strategy* to the AI development.
