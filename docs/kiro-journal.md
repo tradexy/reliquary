@@ -80,3 +80,34 @@ implements and self-corrects at runtime, the human runs the static checks. Neith
 side caught everything alone. That is a more honest account of agentic development
 than "the agent wrote it and it just worked", and judges are explicitly asked
 whether there was a *strategy* to the AI development.
+
+---
+
+## 2026-11-14 — Tasks 4 and 5, repository and UI shell (Kiro CLI)
+
+One run, Tasks 4 and 5. Output: `createRepository` with pre-lowercased haystacks
+built once at construction, multi-word AND search, frozen results; then the full
+shell — `Search`, `Record`, `Report`, `App` — with URL-driven routing (`?q=`, `?id=`,
+`/report`), CSS custom-property theming from a single token object, `role="status"`
+vs `role="alert"` for the reconciliation badge, and the provenance disclosure kept
+in the DOM rather than conditionally mounted.
+
+Kiro hit a type error on its own `T extends object` constraint and fixed it by
+loosening to `object` and dropping a now-redundant `@ts-expect-error`. Two things
+were left behind that I removed: four `index.js` files emitted into `src/` by a
+`tsc` run without `noEmit`, and one of them sat next to its `.ts` twin, which is
+exactly the kind of thing that resolves differently in Vite and Vitest.
+
+Verified independently: 97 tests, 0 type errors, both apps build.
+
+**Observation to write up later:** the constraint change is the interesting bit.
+The agent removed a `@ts-expect-error` because the compiler stopped complaining —
+not because the test changed. That is a small, real example of a type system and a
+test suite disagreeing about what "correct" means, and of the agent trusting the
+compiler over its own earlier reasoning.
+
+### Status checkpoint
+
+Kit is complete: contract, pipeline, report, publish guard, repository, UI shell.
+97 tests green, typecheck clean, both placeholders build. Still to do: the two app
+adapters and datasets (Tasks 6–7), then evidence and submission (Task 8).

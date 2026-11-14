@@ -1,2 +1,2 @@
-// Repository is implemented in Task 4.
-export {}
+export type { Repository } from './memory.js'
+export { createRepository } from './memory.js'
