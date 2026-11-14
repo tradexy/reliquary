@@ -14,7 +14,18 @@
     "test": "vitest run",
     "test:pbt": "PBT_RUNS=1000 vitest run",
     "build": "npm run build -w apps/card-catalogue && npm run build -w apps/parts-ledger",
-    "typecheck": "tsc -b --pretty"
+    "typecheck": "tsc -p packages/reliquary && tsc -p apps/card-catalogue && tsc -p apps/parts-ledger"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.4.6",
+    "@testing-library/react": "^16.0.0",
+    "@testing-library/user-event": "^14.5.2",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "fast-check": "^3.19.0",
+    "jsdom": "^24.1.0",
+    "typescript": "^5.4.5",
+    "vitest": "^1.6.0"
   },
   "engines": {
     "node": ">=20"
