@@ -1,0 +1,16 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Adapter contract tests on adapter edit",
+      "description": "Any change to a legacy source adapter re-runs the suite immediately, so a broken rejection rule cannot travel further into a task.",
+      "trigger": "PostFileSave",
+      "matcher": "apps/.*/src/(source|stocktake)/.*\\.(ts|tsx)$",
+      "action": {
+        "type": "command",
+        "command": "npx vitest run --reporter=dot"
+      },
+      "timeout": 180
+    }
+  ]
+}

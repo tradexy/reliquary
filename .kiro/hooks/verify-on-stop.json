@@ -1,0 +1,15 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Verify before the agent stops",
+      "description": "Typecheck, static security scan and the full test suite must pass before a turn is considered finished. A failure returns exit code 1, which makes Kiro continue working with the failure as context.",
+      "trigger": "Stop",
+      "action": {
+        "type": "command",
+        "command": "npm run verify"
+      },
+      "timeout": 300
+    }
+  ]
+}

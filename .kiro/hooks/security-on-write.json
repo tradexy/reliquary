@@ -1,0 +1,16 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Security scan after every write",
+      "description": "Enforces the mechanical rules in .kiro/steering/security.md: no eval, no HTML injection sinks, no web storage, no credentials in source.",
+      "trigger": "PostToolUse",
+      "matcher": "write",
+      "action": {
+        "type": "command",
+        "command": "node scripts/security-check.mjs"
+      },
+      "timeout": 60
+    }
+  ]
+}

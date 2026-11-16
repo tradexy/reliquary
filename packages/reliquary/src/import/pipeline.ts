@@ -19,6 +19,7 @@ import type {
   ResurrectionReport,
 } from '../contract/types.js'
 import { assertValidSource } from '../contract/validate.js'
+import { unsafeKeys } from './guard.js'
 import { buildReport } from './report.js'
 
 export interface PipelineResult<T> {
@@ -60,6 +61,18 @@ export async function runPipeline<T>(
   const synthesisedFieldSet = new Set<string>()
 
   for await (const raw of source.scan()) {
+    // Untrusted input guard: refuse rows carrying prototype-polluting field
+    // names. Rejecting is deliberate — a rewritten column would be silent loss.
+    const unsafe = unsafeKeys(raw)
+    if (unsafe.length > 0) {
+      rejected.push({
+        kind: 'rejected',
+        sourceRef: `row ${records.length + rejected.length + 1}`,
+        reason: `Unsafe field name(s) in source row: ${unsafe.join(', ')}`,
+      })
+      continue
+    }
+
     const outcome = source.normalise(raw)
 
     if (outcome.kind === 'rejected') {
