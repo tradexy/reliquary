@@ -44,8 +44,8 @@ type Route =
 function parseRoute(location: { pathname: string; search: string }): Route {
   const params = new URLSearchParams(location.search)
 
-  // /report  (exact match, no query params needed)
-  if (location.pathname.endsWith('/report')) {
+  // /report or ?view=report
+  if (params.get('view') === 'report' || location.pathname.endsWith('/report')) {
     return { screen: 'report' }
   }
 
@@ -240,7 +240,7 @@ function AppHeader({ title, subtitle }: { title: string; subtitle: string }) {
 
         <nav aria-label="Site navigation">
           <a
-            href="/report"
+            href="?view=report"
             style={{
               fontFamily: 'var(--font-mono)',
               fontSize: '0.8125rem',

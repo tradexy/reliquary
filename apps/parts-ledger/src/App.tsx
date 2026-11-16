@@ -259,7 +259,7 @@ export function App() {
         color: 'var(--color-ink)',
       }}
     >
-      <LedgerHeader onSearchClick={() => { window.history.pushState({}, '', '/?q='); setScreen('kit') }} />
+      <LedgerHeader onSearchClick={() => { window.history.pushState({}, '', '?q='); setScreen('kit') }} />
 
       <main
         id="main-content"
@@ -318,7 +318,7 @@ function LedgerHeader({ onSearchClick }: { onSearchClick(): void }) {
       <div>
         <button
           type="button"
-          onClick={() => { window.history.pushState({}, '', '/'); window.dispatchEvent(new PopStateEvent('popstate')) }}
+          onClick={() => { window.history.pushState({}, '', '?'); window.dispatchEvent(new PopStateEvent('popstate')) }}
           style={{
             background: 'none',
             border: 'none',

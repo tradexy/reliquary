@@ -344,10 +344,10 @@ describe('Record', () => {
     expect(link.getAttribute('href')).toBe('?q=copper')
   })
 
-  it('back link returns to / when no returnQuery', () => {
+  it('back link returns to the same document when no returnQuery', () => {
     render(<Record sections={sections} report={LOSSLESS_REPORT} returnQuery="" />)
     const link = screen.getByRole('link', { name: /back to search results/i })
-    expect(link.getAttribute('href')).toBe('/')
+    expect(link.getAttribute('href')).toBe('?')
   })
 })
 
@@ -440,7 +440,7 @@ describe('App routing', () => {
     expect(hasFailureText).toBe(true)
   })
 
-  it('header contains a link to /report', () => {
+  it('header contains a link to the report view', () => {
     render(
       <App
         config={config}
@@ -450,6 +450,6 @@ describe('App routing', () => {
       />,
     )
     const reportLink = screen.getByRole('link', { name: /view resurrection report/i })
-    expect(reportLink.getAttribute('href')).toBe('/report')
+    expect(reportLink.getAttribute('href')).toBe('?view=report')
   })
 })

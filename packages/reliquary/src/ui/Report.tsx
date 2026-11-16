@@ -45,7 +45,7 @@ export function Report({ report }: ReportProps) {
       {/* Back link ──────────────────────────────────────────────────────── */}
       <nav aria-label="Breadcrumb" style={{ marginBottom: 'var(--density)' }}>
         <a
-          href="/"
+          href="?"
           style={{
             fontFamily: 'var(--font-mono)',
             fontSize: '0.8125rem',

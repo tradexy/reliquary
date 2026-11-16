@@ -39,7 +39,7 @@ interface RecordProps {
 }
 
 export function Record({ sections, report, returnQuery, headerAction, shelfmark }: RecordProps) {
-  const backHref = returnQuery.trim() !== '' ? `?q=${encodeURIComponent(returnQuery)}` : '/'
+  const backHref = returnQuery.trim() !== '' ? `?q=${encodeURIComponent(returnQuery)}` : '?'
 
   return (
     <article

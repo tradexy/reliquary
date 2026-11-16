@@ -1,0 +1,62 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Test
+        run: npx vitest run
+
+      - name: Build both apps
+        run: |
+          npm run build -w apps/card-catalogue
+          npm run build -w apps/parts-ledger
+
+      - name: Assemble site
+        run: |
+          mkdir -p _site/cards _site/parts
+          cp -R apps/card-catalogue/dist/. _site/cards/
+          cp -R apps/parts-ledger/dist/. _site/parts/
+          cp site/index.html _site/index.html
+          # SPA-ish fallback for direct links to a route
+          cp _site/cards/index.html _site/cards/404.html
+          cp _site/parts/index.html _site/parts/404.html
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

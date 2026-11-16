@@ -3,6 +3,8 @@ import react from '@vitejs/plugin-react'
 import { resolve } from 'path'
 
 export default defineConfig({
+  // Relative base so the build works from any subdirectory (GitHub Pages).
+  base: './',
   plugins: [react()],
   resolve: {
     alias: {

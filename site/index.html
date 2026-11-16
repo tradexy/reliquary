@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Reliquary — two apps, one skeleton</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #0d1a12;
+        --surface: #152118;
+        --ink: #e8dfc8;
+        --muted: #8a9e8d;
+        --bone: #d4c9a8;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: 'EB Garamond', Georgia, serif;
+        background-image: repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 3px,
+          rgba(212, 201, 168, 0.012) 3px,
+          rgba(212, 201, 168, 0.012) 4px
+        );
+      }
+      .wrap {
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 4rem 2rem 5rem;
+      }
+      .eyebrow {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.7rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      h1 {
+        font-family: 'Playfair Display', Georgia, serif;
+        font-weight: 400;
+        font-size: clamp(2.4rem, 5vw, 3.4rem);
+        margin: 0.6rem 0 0.75rem;
+      }
+      .lede {
+        font-size: 1.15rem;
+        line-height: 1.55;
+        max-width: 62ch;
+        color: var(--ink);
+        margin: 0 0 0.5rem;
+      }
+      .note {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.78rem;
+        color: var(--muted);
+        line-height: 1.7;
+        max-width: 70ch;
+      }
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+        gap: 1.25rem;
+        margin: 3rem 0 0;
+      }
+      a.card {
+        display: block;
+        border: 1px solid rgba(212, 201, 168, 0.25);
+        padding: 1.5rem 1.5rem 1.75rem;
+        text-decoration: none;
+        color: var(--ink);
+        background: var(--surface);
+        transition: border-color 160ms ease, transform 160ms ease;
+      }
+      a.card:hover,
+      a.card:focus-visible {
+        border-color: var(--bone);
+        transform: translateY(-2px);
+        outline: none;
+      }
+      a.card.rust { background: #241c16; border-color: rgba(200, 186, 168, 0.22); }
+      a.card.rust:hover, a.card.rust:focus-visible { border-color: #c8baa8; }
+      .card h2 {
+        font-family: 'Playfair Display', Georgia, serif;
+        font-weight: 400;
+        font-size: 1.6rem;
+        margin: 0 0 0.35rem;
+      }
+      .card p { margin: 0 0 1rem; line-height: 1.5; }
+      .card .meta {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.72rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      .repo {
+        margin-top: 3rem;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.78rem;
+      }
+      .repo a { color: #7eb87e; }
+    </style>
+  </head>
+  <body>
+    <main class="wrap">
+      <p class="eyebrow">Kiroween 2026 · Skeleton Crew</p>
+      <h1>Reliquary</h1>
+      <p class="lede">
+        A skeleton kit for resurrecting dead software — and proving nothing was lost.
+        Two applications, one contract, one reconciliation report.
+      </p>
+      <p class="note">
+        Both apps are built from the same package. Each imports exactly one adapter that maps a
+        legacy export onto the kit's contract, then supplies its own theme and screens.
+      </p>
+
+      <div class="cards">
+        <a class="card" href="./cards/">
+          <p class="meta">Search-first · 2,000 cards</p>
+          <h2>Card Catalogue</h2>
+          <p>
+            A volunteer archive's 1994 dBase export, resurrected for public search. Every field
+            carries its provenance.
+          </p>
+          <p class="meta">Open the catalogue →</p>
+        </a>
+        <a class="card rust" href="./parts/">
+          <p class="meta">Task-first · 1,200 ledger lines</p>
+          <h2>Parts Ledger</h2>
+          <p>
+            A scrapyard ledger inherited in an acquisition. Walk the bins, count what is there,
+            and reconcile it against the paper.
+          </p>
+          <p class="meta">Begin a stocktake →</p>
+        </a>
+      </div>
+
+      <p class="repo">
+        Source: <a href="https://github.com/tradexy/reliquary">github.com/tradexy/reliquary</a>
+        &nbsp;·&nbsp; MIT
+      </p>
+    </main>
+  </body>
+</html>
