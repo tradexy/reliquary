@@ -6,6 +6,9 @@
  * anchor elements so it is keyboard-navigable without custom JS.
  *
  * Empty state is intentional: a zero-result message, not a blank page.
+ *
+ * Layout: a single bordered container, 1px dividers between rows, no card
+ * gaps. Hover/focus shows surface background and a 2px accent left border.
  */
 
 import React, { useCallback } from 'react'
@@ -54,23 +57,26 @@ export function Search<T extends object>({
       : `${results.length} of ${total} record${total === 1 ? '' : 's'}`
 
   return (
-    <div className="search-screen" style={{ padding: 'var(--density)' }}>
+    <div className="search-screen" style={{ padding: 'var(--density) 0' }}>
       {/* Search input ─────────────────────────────────────────────────── */}
       <div
         className="search-field"
         style={{
-          marginBottom: 'var(--density)',
+          marginBottom: '0.5rem',
           display: 'flex',
           flexDirection: 'column',
-          gap: '0.5rem',
+          gap: '0.4rem',
+          maxWidth: '48rem',
         }}
       >
         <label
           htmlFor="reliquary-search"
           style={{
-            fontFamily: 'var(--font-body)',
+            fontFamily: 'var(--font-mono)',
             color: 'var(--color-muted)',
-            fontSize: '0.875rem',
+            fontSize: '0.7rem',
+            textTransform: 'uppercase',
+            letterSpacing: '0.1em',
           }}
         >
           Search
@@ -86,15 +92,22 @@ export function Search<T extends object>({
           placeholder="Type to filter…"
           style={{
             fontFamily: 'var(--font-mono)',
-            fontSize: '1rem',
-            padding: '0.5rem 0.75rem',
+            fontSize: '1.05rem',
+            padding: '0.8rem',
             background: 'var(--color-surface)',
             color: 'var(--color-ink)',
-            border: '1px solid var(--color-bone)',
+            border: '1px solid rgba(212,201,168,0.25)',
             borderRadius: 'var(--radius)',
             outline: 'none',
             width: '100%',
             boxSizing: 'border-box',
+          }}
+          onFocus={(e) => {
+            e.currentTarget.style.outlineOffset = '2px'
+            e.currentTarget.style.outline = '2px solid var(--color-accent)'
+          }}
+          onBlur={(e) => {
+            e.currentTarget.style.outline = 'none'
           }}
         />
       </div>
@@ -108,6 +121,7 @@ export function Search<T extends object>({
           fontSize: '0.8125rem',
           color: 'var(--color-muted)',
           margin: '0 0 var(--density)',
+          fontVariantNumeric: 'tabular-nums',
         }}
       >
         {resultLabel}
@@ -117,102 +131,121 @@ export function Search<T extends object>({
       {results.length === 0 ? (
         <EmptyState query={query} />
       ) : (
+        /* Single bordered container; rows separated by 1px dividers */
         <ol
           aria-label="Search results"
           style={{
             listStyle: 'none',
             padding: 0,
             margin: 0,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '0.5rem',
+            border: '1px solid rgba(212,201,168,0.18)',
+            borderRadius: 'var(--radius)',
+            overflow: 'hidden',
           }}
         >
-          {results.map((record) => {
+          {results.map((record, index) => {
             const id = getId(record)
             const summary = renderSummary(record)
+            const isLast = index === results.length - 1
             return (
-              <li key={id}>
-                <a
-                  href={`?id=${encodeURIComponent(id)}`}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'baseline',
-                    gap: '0.75rem',
-                    padding: 'var(--density)',
-                    background: 'var(--color-surface)',
-                    borderRadius: 'var(--radius)',
-                    border: '1px solid transparent',
-                    color: 'var(--color-ink)',
-                    textDecoration: 'none',
-                    fontFamily: 'var(--font-body)',
-                    transition: 'border-color var(--motion-duration, 150ms) ease',
-                    overflow: 'hidden',
-                  }}
-                  onFocus={(e) => {
-                    e.currentTarget.style.borderColor = 'var(--color-accent)'
-                  }}
-                  onBlur={(e) => {
-                    e.currentTarget.style.borderColor = 'transparent'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = 'var(--color-accent)'
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = 'transparent'
-                  }}
-                >
-                  {/* Primary + secondary stack */}
-                  <div style={{ flex: '1 1 0', minWidth: 0 }}>
-                    <div
-                      style={{
-                        fontFamily: 'var(--font-body)',
-                        fontSize: '1rem',
-                        color: 'var(--color-ink)',
-                        whiteSpace: 'nowrap',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                      }}
-                    >
-                      {summary.primary}
-                    </div>
-                    {summary.secondary !== undefined && (
-                      <div
-                        style={{
-                          fontFamily: 'var(--font-body)',
-                          fontSize: '0.8125rem',
-                          color: 'var(--color-muted)',
-                          marginTop: '0.15rem',
-                          whiteSpace: 'nowrap',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                        }}
-                      >
-                        {summary.secondary}
-                      </div>
-                    )}
-                  </div>
-                  {/* Meta — right-aligned mono */}
-                  {summary.meta !== undefined && (
-                    <div
-                      style={{
-                        fontFamily: 'var(--font-mono)',
-                        fontSize: '0.8125rem',
-                        color: 'var(--color-muted)',
-                        whiteSpace: 'nowrap',
-                        flexShrink: 0,
-                      }}
-                    >
-                      {summary.meta}
-                    </div>
-                  )}
-                </a>
+              <li
+                key={id}
+                style={{
+                  borderBottom: isLast ? 'none' : '1px solid rgba(212,201,168,0.12)',
+                }}
+              >
+                <ResultRow id={id} summary={summary} />
               </li>
             )
           })}
         </ol>
       )}
     </div>
+  )
+}
+
+function ResultRow({ id, summary }: { id: string; summary: RecordSummary }) {
+  const setHover = (el: HTMLAnchorElement, on: boolean) => {
+    el.style.background = on ? 'var(--color-surface)' : 'transparent'
+    el.style.borderLeftColor = on ? 'var(--color-accent)' : 'transparent'
+  }
+
+  return (
+    <a
+      href={`?id=${encodeURIComponent(id)}`}
+      style={{
+        display: 'flex',
+        alignItems: 'baseline',
+        gap: '0.75rem',
+        padding: '0.85rem var(--density)',
+        background: 'transparent',
+        color: 'var(--color-ink)',
+        textDecoration: 'none',
+        fontFamily: 'var(--font-body)',
+        borderLeft: '2px solid transparent',
+        transition:
+          'background var(--motion-duration, 150ms) ease, border-color var(--motion-duration, 150ms) ease',
+        overflow: 'hidden',
+        outline: 'none',
+      }}
+      onFocus={(e) => {
+        setHover(e.currentTarget, true)
+        e.currentTarget.style.outlineOffset = '-2px'
+        e.currentTarget.style.outline = '2px solid var(--color-accent)'
+      }}
+      onBlur={(e) => {
+        setHover(e.currentTarget, false)
+        e.currentTarget.style.outline = 'none'
+      }}
+      onMouseEnter={(e) => setHover(e.currentTarget, true)}
+      onMouseLeave={(e) => setHover(e.currentTarget, false)}
+    >
+      {/* Primary + secondary stack */}
+      <div style={{ flex: '1 1 0', minWidth: 0 }}>
+        <div
+          style={{
+            fontFamily: 'var(--font-body)',
+            fontSize: '1.05rem',
+            color: 'var(--color-ink)',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}
+        >
+          {summary.primary}
+        </div>
+        {summary.secondary !== undefined && (
+          <div
+            style={{
+              fontFamily: 'var(--font-body)',
+              fontSize: '0.875rem',
+              color: 'var(--color-muted)',
+              marginTop: '0.1rem',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+          >
+            {summary.secondary}
+          </div>
+        )}
+      </div>
+      {/* Meta — right-aligned mono tabular */}
+      {summary.meta !== undefined && (
+        <div
+          style={{
+            fontFamily: 'var(--font-mono)',
+            fontSize: '0.8rem',
+            color: 'var(--color-muted)',
+            whiteSpace: 'nowrap',
+            flexShrink: 0,
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          {summary.meta}
+        </div>
+      )}
+    </a>
   )
 }
 

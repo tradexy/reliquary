@@ -13,12 +13,11 @@
  *   Description     — title, year, subject
  *   Notes           — notes
  *
- * A "Print slip" button is overlaid on the Record screen by reading the
- * URL's ?id= param directly — the kit's App shell owns the routing, so we
- * render the slip as a sibling portal rather than fighting the routing layer.
+ * The "Print slip" button is placed inside the index card's top band via
+ * renderHeaderAction. The kit renders it in-band; no floating overlay needed.
  */
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { App as ReliquaryApp } from '@reliquary/kit/ui'
 import { ossuary } from '@reliquary/kit/ui'
 import type { AppConfig, RecordSection } from '@reliquary/kit/ui'
@@ -79,41 +78,16 @@ function toTitleCase(str: string): string {
     .join('')
 }
 
-const appConfig: AppConfig<CatalogueCard> = {
-  title: 'Card Catalogue',
-  subtitle: 'Ashworth Local History Society — Index resurrected from the 1994 dBase export',
-  searchFields: ['surname', 'title', 'shelfmark', 'subject'],
-  renderRecord,
-  renderSummary(card: CatalogueCard) {
-    const primary = toTitleCase(card.title)
-    const secondary =
-      card.surname || card.forenames
-        ? [card.surname, card.forenames].filter(Boolean).join(', ')
-        : undefined
-    const meta = card.year !== null ? String(card.year) : 'n.d.'
-    return { primary, secondary, meta }
-  },
-  theme: ossuary,
-}
-
 /** Loading / error states before the repository is ready. */
 type State =
   | { phase: 'loading' }
   | { phase: 'ready'; repository: Repository<CatalogueCard> }
   | { phase: 'error'; message: string }
 
-/**
- * Read the current record id from the URL, if any.
- * Returns null when not on a record page.
- */
-function getCurrentRecordId(): string | null {
-  const params = new URLSearchParams(window.location.search)
-  return params.get('id')
-}
-
 export function App() {
   const [state, setState] = useState<State>({ phase: 'loading' })
   const [slipCard, setSlipCard] = useState<CatalogueCard | null>(null)
+  const closeSlip = useCallback(() => setSlipCard(null), [])
 
   useEffect(() => {
     const rows = rawCards as RawRow[]
@@ -125,7 +99,7 @@ export function App() {
           records,
           report,
           'shelfmark',
-          appConfig.searchFields,
+          ['surname', 'title', 'shelfmark', 'subject'],
         )
         setState({ phase: 'ready', repository })
       })
@@ -179,49 +153,68 @@ export function App() {
   const { repository } = state
 
   /**
-   * "Print slip" button — rendered as a fixed overlay on record pages only.
-   * It reads the URL to find the current record id, looks it up in the
-   * repository, and shows the slip modal on click.
+   * Request-slip button rendered inside the card top band via renderHeaderAction.
+   * Keeps the action co-located with the record — no floating overlay.
    */
-  function PrintSlipTrigger() {
-    const id = getCurrentRecordId()
-    if (!id) return null
-    const card = repository.byId(id)
-    if (!card) return null
-
+  function SlipButton({ card }: { card: CatalogueCard }) {
     return (
-      <div
+      <button
+        type="button"
+        aria-label="Print a request slip for this record"
+        onClick={() => setSlipCard(card)}
         style={{
-          position: 'fixed',
-          bottom: 'var(--density)',
-          right: 'var(--density)',
-          zIndex: 9,
+          fontFamily: 'var(--font-mono)',
+          fontSize: '0.75rem',
+          padding: '0.25rem 0.65rem',
+          background: 'transparent',
+          color: 'var(--color-muted)',
+          border: '1px solid rgba(212,201,168,0.3)',
+          borderRadius: 'var(--radius)',
+          cursor: 'pointer',
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '0.35rem',
+          outline: 'none',
+          transition: 'color var(--motion-duration, 150ms) ease, border-color var(--motion-duration, 150ms) ease',
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.color = 'var(--color-ink)'
+          e.currentTarget.style.borderColor = 'var(--color-accent)'
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.color = 'var(--color-muted)'
+          e.currentTarget.style.borderColor = 'rgba(212,201,168,0.3)'
+        }}
+        onFocus={(e) => {
+          e.currentTarget.style.outlineOffset = '2px'
+          e.currentTarget.style.outline = '2px solid var(--color-accent)'
+        }}
+        onBlur={(e) => {
+          e.currentTarget.style.outline = 'none'
         }}
       >
-        <button
-          type="button"
-          aria-label="Print a request slip for this record"
-          onClick={() => setSlipCard(card)}
-          style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: '0.8125rem',
-            padding: '0.5rem 1rem',
-            background: 'var(--color-surface)',
-            color: 'var(--color-muted)',
-            border: '1px solid var(--color-bone)',
-            borderRadius: 'var(--radius)',
-            cursor: 'pointer',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '0.4rem',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.4)',
-          }}
-        >
-          <span aria-hidden="true">⎙</span>
-          Request slip
-        </button>
-      </div>
+        <span aria-hidden="true">⎙</span>
+        Request slip
+      </button>
     )
+  }
+
+  const appConfig: AppConfig<CatalogueCard> = {
+    title: 'Card Catalogue',
+    subtitle: 'Ashworth Local History Society — Index resurrected from the 1994 dBase export',
+    searchFields: ['surname', 'title', 'shelfmark', 'subject'],
+    renderRecord,
+    renderSummary(card: CatalogueCard) {
+      const primary = toTitleCase(card.title)
+      const secondary =
+        card.surname || card.forenames
+          ? [card.surname, card.forenames].filter(Boolean).join(', ')
+          : undefined
+      const meta = card.year !== null ? String(card.year) : 'n.d.'
+      return { primary, secondary, meta }
+    },
+    renderHeaderAction: (card: CatalogueCard) => <SlipButton card={card} />,
+    theme: ossuary,
   }
 
   return (
@@ -232,14 +225,11 @@ export function App() {
         getId={(card) => card.shelfmark}
       />
 
-      {/* Print slip trigger — only visible on record pages */}
-      <PrintSlipTrigger />
-
       {/* Print slip modal — rendered when a card is selected */}
       {slipCard && (
         <PrintRequestSlip
           card={slipCard}
-          onClose={() => setSlipCard(null)}
+          onClose={closeSlip}
         />
       )}
     </>

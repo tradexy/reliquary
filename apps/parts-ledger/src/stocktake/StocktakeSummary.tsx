@@ -7,6 +7,9 @@
  * The kit's Report component is embedded below the discrepancy table so the
  * Resurrection Report is always reachable from this screen in one click.
  *
+ * Greenbar effect: alternating row background at 4% bone opacity on the
+ * discrepancy table.
+ *
  * No new kit components are forked — Report is imported directly.
  */
 
@@ -200,7 +203,9 @@ function SummaryCount({
       <div
         style={{
           fontFamily: 'var(--font-mono)',
-          fontSize: '0.75rem',
+          fontSize: '0.65rem',
+          textTransform: 'uppercase',
+          letterSpacing: '0.08em',
           color: 'var(--color-muted)',
           marginBottom: '0.25rem',
         }}
@@ -211,7 +216,7 @@ function SummaryCount({
         style={{
           fontFamily: 'var(--font-mono)',
           fontSize: '1.75rem',
-          fontWeight: 'bold',
+          fontVariantNumeric: 'tabular-nums',
           color: danger
             ? 'var(--color-danger)'
             : accent
@@ -298,23 +303,29 @@ function DiscrepancyTable({ disc }: { disc: CheckedItem[] }) {
             </tr>
           </thead>
           <tbody>
-            {disc.map((item) => {
+            {disc.map((item, idx) => {
               if (item.outcome.kind !== 'discrepant') return null
               const delta = item.outcome.counted - item.entry.qty
               return (
-                <tr key={item.entry.partNo}>
+                <tr
+                  key={item.entry.partNo}
+                  style={{
+                    // Greenbar: alternating 4% bone opacity
+                    background: idx % 2 === 0 ? 'rgba(200, 186, 168, 0.04)' : 'transparent',
+                  }}
+                >
                   <td style={tdStyle}>{item.entry.partNo}</td>
                   <td style={tdStyle}>{item.entry.bin}</td>
                   <td style={{ ...tdStyle, color: 'var(--color-ink)', maxWidth: '16rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {item.entry.description}
                   </td>
-                  <td style={tdStyle}>{item.entry.qty}</td>
-                  <td style={tdStyle}>{item.outcome.counted}</td>
+                  <td style={{ ...tdStyle, fontVariantNumeric: 'tabular-nums' }}>{item.entry.qty}</td>
+                  <td style={{ ...tdStyle, fontVariantNumeric: 'tabular-nums' }}>{item.outcome.counted}</td>
                   <td
                     style={{
                       ...tdStyle,
                       color: delta < 0 ? 'var(--color-danger)' : 'var(--color-accent)',
-                      fontWeight: 'bold',
+                      fontVariantNumeric: 'tabular-nums',
                     }}
                   >
                     {delta > 0 ? '+' : ''}{delta}
@@ -334,7 +345,6 @@ function DiscrepancyTable({ disc }: { disc: CheckedItem[] }) {
 const tdStyle: React.CSSProperties = {
   padding: '0.4rem 0.5rem',
   color: 'var(--color-muted)',
-  borderBottom: '1px solid var(--color-surface)',
 }
 
 // ── PrintableSheet ────────────────────────────────────────────────────────────
@@ -382,7 +392,7 @@ function PrintableSheet({
           </tr>
         </thead>
         <tbody>
-          {Array.from(session.checked.values()).map((item) => {
+          {Array.from(session.checked.values()).map((item, idx) => {
             const outcome = item.outcome
             const isDisc = outcome.kind === 'discrepant'
             const counted = outcome.kind === 'discrepant' ? outcome.counted : item.entry.qty
@@ -390,7 +400,13 @@ function PrintableSheet({
             const note = outcome.kind === 'discrepant' ? outcome.note : ''
             const initials = outcome.kind === 'discrepant' ? outcome.initials : ''
             return (
-              <tr key={item.entry.partNo} className={isDisc ? 'print-row--discrepant' : ''}>
+              <tr
+                key={item.entry.partNo}
+                className={[
+                  isDisc ? 'print-row--discrepant' : '',
+                  idx % 2 === 0 ? 'print-row--even' : '',
+                ].filter(Boolean).join(' ')}
+              >
                 <td>{item.entry.partNo}</td>
                 <td>{item.entry.bin}</td>
                 <td>{item.entry.description}</td>
@@ -406,10 +422,16 @@ function PrintableSheet({
         </tbody>
       </table>
 
-      {/* Summary footer */}
+      {/* Summary footer — bin range, date, signature lines */}
       <div className="print-sheet__footer">
-        <p>Matched: {tally.matched} · Discrepant: {tally.discrepant}</p>
-        <p>Checker signature: _______________________</p>
+        <div className="print-sheet__footer-left">
+          <p>Bins: {session.binRange.from}–{session.binRange.to} · Date: {checkedDate}</p>
+          <p>Matched: {tally.matched} · Discrepant: {tally.discrepant}</p>
+        </div>
+        <div className="print-sheet__footer-right">
+          <p>Checker: _______________________</p>
+          <p>Signature: _______________________</p>
+        </div>
       </div>
     </div>
   )

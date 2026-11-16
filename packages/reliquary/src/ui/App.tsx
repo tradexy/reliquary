@@ -126,43 +126,62 @@ export function App<T extends object>({
 
   const route = parseRoute(locationState)
 
+  const report = repository.report()
+
   return (
     <div
       style={{
         minHeight: '100vh',
         background: 'var(--color-bg)',
         color: 'var(--color-ink)',
+        // Barely-there grain via repeating-linear-gradient — no image files.
+        backgroundImage:
+          'repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(212,201,168,0.012) 3px, rgba(212,201,168,0.012) 4px)',
+        display: 'flex',
+        flexDirection: 'column',
       }}
     >
       <AppHeader title={config.title} subtitle={config.subtitle} />
 
-      <main id="main-content">
-        {route.screen === 'report' && <Report report={repository.report()} />}
+      <main id="main-content" style={{ flex: '1 0 auto' }}>
+        <div
+          style={{
+            maxWidth: '1120px',
+            margin: '0 auto',
+            padding: '0 2rem',
+          }}
+        >
+          {route.screen === 'report' && <Report report={report} />}
 
-        {route.screen === 'record' && (() => {
-          const record = repository.byId(route.id)
-          if (record === undefined) {
-            return <RecordNotFound id={route.id} returnQuery={route.returnQuery} />
-          }
-          return (
-            <Record
-              sections={config.renderRecord(record)}
-              report={repository.report()}
-              returnQuery={route.returnQuery}
+          {route.screen === 'record' && (() => {
+            const record = repository.byId(route.id)
+            if (record === undefined) {
+              return <RecordNotFound id={route.id} returnQuery={route.returnQuery} />
+            }
+            return (
+              <Record
+                sections={config.renderRecord(record)}
+                report={report}
+                returnQuery={route.returnQuery}
+                headerAction={config.renderHeaderAction?.(record)}
+                shelfmark={getId(record)}
+              />
+            )
+          })()}
+
+          {route.screen === 'search' && (
+            <Search
+              repository={repository}
+              query={route.query}
+              onQueryChange={handleQueryChange}
+              renderSummary={(record) => config.renderSummary(record)}
+              getId={getId}
             />
-          )
-        })()}
-
-        {route.screen === 'search' && (
-          <Search
-            repository={repository}
-            query={route.query}
-            onQueryChange={handleQueryChange}
-            renderSummary={(record) => config.renderSummary(record)}
-            getId={getId}
-          />
-        )}
+          )}
+        </div>
       </main>
+
+      <AppFooter report={report} />
     </div>
   )
 }
@@ -173,59 +192,124 @@ function AppHeader({ title, subtitle }: { title: string; subtitle: string }) {
   return (
     <header
       style={{
-        padding: 'calc(var(--density) * 1.5) var(--density)',
-        borderBottom: '1px solid var(--color-bone)',
-        display: 'flex',
-        alignItems: 'baseline',
-        justifyContent: 'space-between',
-        gap: '1rem',
-        flexWrap: 'wrap',
+        borderBottom: '1px solid rgba(212,201,168,0.18)',
+        padding: '1.75rem 0',
       }}
     >
-      <div>
-        <a
-          href="/"
-          style={{ textDecoration: 'none', color: 'inherit' }}
-          aria-label={`${title} — go to search`}
-        >
-          <h1
+      <div
+        style={{
+          maxWidth: '1120px',
+          margin: '0 auto',
+          padding: '0 2rem',
+          display: 'flex',
+          alignItems: 'baseline',
+          justifyContent: 'space-between',
+          gap: '1rem',
+          flexWrap: 'wrap',
+        }}
+      >
+        <div>
+          <a
+            href="/"
+            style={{ textDecoration: 'none', color: 'inherit' }}
+            aria-label={`${title} — go to search`}
+          >
+            <h1
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontSize: '1.375rem',
+                margin: 0,
+                color: 'var(--color-bone)',
+              }}
+            >
+              {title}
+            </h1>
+          </a>
+          <p
             style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: '1.375rem',
-              margin: 0,
-              color: 'var(--color-bone)',
+              fontFamily: 'var(--font-mono)',
+              fontSize: '0.8rem',
+              color: 'var(--color-muted)',
+              margin: '0.2rem 0 0',
+              letterSpacing: '0.01em',
             }}
           >
-            {title}
-          </h1>
-        </a>
-        <p
-          style={{
-            fontFamily: 'var(--font-body)',
-            fontSize: '0.875rem',
-            color: 'var(--color-muted)',
-            margin: '0.2rem 0 0',
-          }}
-        >
-          {subtitle}
-        </p>
-      </div>
+            {subtitle}
+          </p>
+        </div>
 
-      <nav aria-label="Site navigation">
-        <a
-          href="/report"
+        <nav aria-label="Site navigation">
+          <a
+            href="/report"
+            style={{
+              fontFamily: 'var(--font-mono)',
+              fontSize: '0.8125rem',
+              color: 'var(--color-muted)',
+              textDecoration: 'none',
+              outline: 'none',
+            }}
+            aria-label="View resurrection report"
+            onFocus={(e) => {
+              e.currentTarget.style.outlineOffset = '2px'
+              e.currentTarget.style.outline = '2px solid var(--color-accent)'
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.outline = 'none'
+            }}
+          >
+            Report
+          </a>
+        </nav>
+      </div>
+    </header>
+  )
+}
+
+function AppFooter({ report }: { report: import('../contract/types.js').ResurrectionReport }) {
+  return (
+    <footer
+      style={{
+        borderTop: '1px solid rgba(212,201,168,0.18)',
+        padding: '0.75rem 0',
+        marginTop: 'auto',
+      }}
+    >
+      <div
+        style={{
+          maxWidth: '1120px',
+          margin: '0 auto',
+          padding: '0 2rem',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '1rem',
+          flexWrap: 'wrap',
+        }}
+      >
+        <span
           style={{
             fontFamily: 'var(--font-mono)',
-            fontSize: '0.8125rem',
+            fontSize: '0.75rem',
             color: 'var(--color-muted)',
-            textDecoration: 'none',
           }}
-          aria-label="View resurrection report"
         >
-          Report
-        </a>
-      </nav>
-    </header>
+          Reliquary — Kiroween 2026
+        </span>
+        <span
+          style={{
+            fontFamily: 'var(--font-mono)',
+            fontSize: '0.75rem',
+            color: 'var(--color-muted)',
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          {report.rowsOut} record{report.rowsOut === 1 ? '' : 's'}
+          {report.rejected.length > 0
+            ? ` · ${report.rejected.length} rejection${report.rejected.length === 1 ? '' : 's'}`
+            : ''}
+        </span>
+      </div>
+    </footer>
   )
 }
 
@@ -239,6 +323,7 @@ function RecordNotFound({ id, returnQuery }: { id: string; returnQuery: string }
         fontFamily: 'var(--font-body)',
         color: 'var(--color-muted)',
         fontStyle: 'italic',
+        maxWidth: '72ch',
       }}
     >
       <p>Record "{id}" was not found in this repository.</p>

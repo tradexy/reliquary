@@ -261,10 +261,14 @@ export function App() {
     >
       <LedgerHeader onSearchClick={() => { window.history.pushState({}, '', '/?q='); setScreen('kit') }} />
 
-      <main id="main-content">
+      <main
+        id="main-content"
+        style={{ maxWidth: '1120px', margin: '0 auto', padding: '0 2rem', width: '100%', boxSizing: 'border-box' }}
+      >
         {screen === 'picker' && (
           <BinPicker
             availableBins={repository.all().map((e) => e.bin)}
+            report={report}
             onStart={handleStartWalk}
           />
         )}
@@ -298,7 +302,11 @@ function LedgerHeader({ onSearchClick }: { onSearchClick(): void }) {
   return (
     <header
       style={{
-        padding: 'calc(var(--density) * 1.5) var(--density)',
+        padding: 'calc(var(--density) * 1.5) 2rem',
+        maxWidth: '1120px',
+        margin: '0 auto',
+        width: '100%',
+        boxSizing: 'border-box',
         borderBottom: '1px solid var(--color-bone)',
         display: 'flex',
         alignItems: 'baseline',

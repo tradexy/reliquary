@@ -5,6 +5,7 @@
  * domain shapes. The kit never knows what a catalogue card or ledger entry is.
  */
 
+import React from 'react'
 import type { Theme } from './theme.js'
 import type { Repository } from '../repository/memory.js'
 
@@ -50,6 +51,11 @@ export interface AppConfig<T> {
    * primary is required; secondary and meta are optional.
    */
   renderSummary(record: T): RecordSummary
+  /**
+   * Optional action rendered in the index card's top band (e.g. a print-slip
+   * button). Keeps app-specific actions out of the floating-overlay pattern.
+   */
+  renderHeaderAction?(record: T): React.ReactNode
   /** Visual theme applied to the entire app. */
   theme: Theme
 }

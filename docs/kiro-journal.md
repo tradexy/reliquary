@@ -162,3 +162,34 @@ Then I opened both apps in a browser and took screenshots. That found three thin
 and invisible to the test suite. If there is a single honest lesson from this build,
 it is that agent-written code passes its own tests and still ships an unusable
 screen.
+
+---
+
+## 2026-11-16 — Design pass
+
+Two Kiro runs: kit shell + Card Catalogue, then Parts Ledger. The brief was very
+specific — container widths, type sizes, border opacities, leader dots, stamp
+treatment — because "make it look better" produces exactly the generic result you
+were trying to avoid.
+
+What changed: centred 1120px container with 72ch reading measure, header and footer
+with counts, index-card record view with dotted leaders and a rotated rubber-stamp
+provenance block, pill reconciliation badge with 2.4rem tabular figures, zebra
+mapping table. Parts Ledger became a two-column landing with a context panel and
+live stats, then a 46rem centred walk card with stepper buttons, a visible progress
+rail, and an inline discrepancy form with danger border.
+
+Then I fixed, by hand, what the screenshots exposed:
+
+- The grain gradient was a visible CRT stripe at 3% opacity. Dropped to 1.2%.
+- The record card sat left-aligned in a 1120px container and truncated the title.
+  Centred it and allowed values to wrap.
+- The ledger landing reported "Rejected 0" and "Bins 4" because it derived stats
+  from readable rows only. It now takes the report and shows 1200 / 1197 / 3 / 48.
+- Custom screens bypassed the shell, so nothing was constrained: full-bleed text at
+  8px from the edge. Wrapped main and header in the container.
+
+**Observation to write up later:** every one of these was a *layout* bug that the
+type system and 194 tests were indifferent to. The design brief improved the look;
+looking at the rendered page found the errors. Those are different activities, and
+only one of them can be delegated to a prompt.

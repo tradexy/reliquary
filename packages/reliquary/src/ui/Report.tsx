@@ -2,13 +2,15 @@
  * Report screen — a first-class screen, not a console log.
  *
  * Shows:
- *   - Reconciliation badge: lossless (green) or inconsistent (danger, loud).
- *   - Counts: rowsIn, rowsOut, rejected.
- *   - Field mapping table.
+ *   - Reconciliation badge: lossless (bordered pill) or inconsistent
+ *     (danger-filled pill, loud).
+ *   - Counts: rowsIn, rowsOut, rejected — as a three-column figure row with
+ *     tabular mono numerals at 2.4rem, labels uppercase 0.7rem.
+ *   - Field mapping table, zebra-striped at 4% opacity.
  *   - Unmapped and synthesised field lists.
  *   - Rejected rows with their sourceRef and reason.
  *
- * An inconsistent report is impossible to miss: the badge is styled in the
+ * An inconsistent report is impossible to miss: the badge is filled in the
  * danger colour, an alert role announces it to screen readers, and a prominent
  * warning message explains what it means.
  */
@@ -34,9 +36,10 @@ export function Report({ report }: ReportProps) {
   return (
     <div
       style={{
-        padding: 'var(--density)',
+        padding: 'var(--density) 0',
         fontFamily: 'var(--font-body)',
         color: 'var(--color-ink)',
+        maxWidth: '72ch',
       }}
     >
       {/* Back link ──────────────────────────────────────────────────────── */}
@@ -48,6 +51,14 @@ export function Report({ report }: ReportProps) {
             fontSize: '0.8125rem',
             color: 'var(--color-accent)',
             textDecoration: 'none',
+            outline: 'none',
+          }}
+          onFocus={(e) => {
+            e.currentTarget.style.outlineOffset = '2px'
+            e.currentTarget.style.outline = '2px solid var(--color-accent)'
+          }}
+          onBlur={(e) => {
+            e.currentTarget.style.outline = 'none'
           }}
         >
           ← Back to search
@@ -86,13 +97,14 @@ export function Report({ report }: ReportProps) {
             padding: '0.35rem 0.75rem',
             background: 'var(--color-surface)',
             color: 'var(--color-muted)',
-            border: '1px solid var(--color-bone)',
+            border: '1px solid rgba(212,201,168,0.25)',
             borderRadius: 'var(--radius)',
             cursor: 'pointer',
             display: 'inline-flex',
             alignItems: 'center',
             gap: '0.4rem',
             transition: 'color var(--motion-duration, 150ms) ease, border-color var(--motion-duration, 150ms) ease',
+            outline: 'none',
           }}
           onMouseEnter={(e) => {
             const el = e.currentTarget
@@ -102,7 +114,14 @@ export function Report({ report }: ReportProps) {
           onMouseLeave={(e) => {
             const el = e.currentTarget
             el.style.color = 'var(--color-muted)'
-            el.style.borderColor = 'var(--color-bone)'
+            el.style.borderColor = 'rgba(212,201,168,0.25)'
+          }}
+          onFocus={(e) => {
+            e.currentTarget.style.outlineOffset = '2px'
+            e.currentTarget.style.outline = '2px solid var(--color-accent)'
+          }}
+          onBlur={(e) => {
+            e.currentTarget.style.outline = 'none'
           }}
         >
           <span aria-hidden="true">↓</span>
@@ -116,7 +135,7 @@ export function Report({ report }: ReportProps) {
       {/* Inconsistency warning — only rendered when needed ───────────────── */}
       {isInconsistent && <InconsistencyWarning report={report} />}
 
-      {/* Counts ──────────────────────────────────────────────────────────── */}
+      {/* Counts — three-column figure row ───────────────────────────────── */}
       <CountPanel report={report} />
 
       {/* Field mappings ──────────────────────────────────────────────────── */}
@@ -150,13 +169,14 @@ function ReconciliationBadge({ report }: ReportProps) {
         gap: '0.5rem',
         padding: '0.4rem 0.9rem',
         marginBottom: 'var(--density)',
-        borderRadius: 'var(--radius)',
+        // Lossless = bordered pill; inconsistent = danger-filled pill.
+        borderRadius: '999px',
         border: `2px solid ${isInconsistent ? 'var(--color-danger)' : 'var(--color-accent)'}`,
-        background: 'var(--color-surface)',
+        background: isInconsistent ? 'var(--color-danger)' : 'transparent',
         fontFamily: 'var(--font-mono)',
         fontSize: '0.9rem',
         fontWeight: 'bold',
-        color: isInconsistent ? 'var(--color-danger)' : 'var(--color-accent)',
+        color: isInconsistent ? '#fff' : 'var(--color-accent)',
       }}
     >
       <span aria-hidden="true">{isInconsistent ? '✕' : '✓'}</span>
@@ -205,29 +225,32 @@ function CountPanel({ report }: ReportProps) {
     <div
       aria-label="Import counts"
       style={{
-        display: 'flex',
-        gap: '1rem',
-        flexWrap: 'wrap',
+        display: 'grid',
+        gridTemplateColumns: 'repeat(3, 1fr)',
+        gap: '0',
         marginBottom: 'var(--density)',
+        border: '1px solid rgba(212,201,168,0.18)',
+        borderRadius: 'var(--radius)',
+        overflow: 'hidden',
       }}
     >
-      {stats.map(({ label, value, danger }) => (
+      {stats.map(({ label, value, danger }, index) => (
         <div
           key={label}
           style={{
-            padding: '0.75rem 1rem',
+            padding: '1rem 1.25rem',
             background: 'var(--color-surface)',
-            borderRadius: 'var(--radius)',
-            border: '1px solid var(--color-bone)',
-            minWidth: '7rem',
+            borderRight: index < 2 ? '1px solid rgba(212,201,168,0.12)' : 'none',
           }}
         >
           <div
             style={{
               fontFamily: 'var(--font-mono)',
-              fontSize: '0.75rem',
+              fontSize: '0.7rem',
               color: 'var(--color-muted)',
-              marginBottom: '0.25rem',
+              textTransform: 'uppercase',
+              letterSpacing: '0.08em',
+              marginBottom: '0.4rem',
             }}
           >
             {label}
@@ -235,8 +258,10 @@ function CountPanel({ report }: ReportProps) {
           <div
             style={{
               fontFamily: 'var(--font-mono)',
-              fontSize: '1.75rem',
+              fontSize: '2.4rem',
               fontWeight: 'bold',
+              fontVariantNumeric: 'tabular-nums',
+              lineHeight: 1,
               color: danger ? 'var(--color-danger)' : 'var(--color-ink)',
             }}
           >
@@ -271,6 +296,9 @@ function FieldMappingTable({ report }: ReportProps) {
           borderCollapse: 'collapse',
           fontFamily: 'var(--font-mono)',
           fontSize: '0.8125rem',
+          border: '1px solid rgba(212,201,168,0.18)',
+          borderRadius: 'var(--radius)',
+          overflow: 'hidden',
         }}
       >
         <thead>
@@ -283,8 +311,9 @@ function FieldMappingTable({ report }: ReportProps) {
                   textAlign: 'left',
                   padding: '0.4rem 0.75rem',
                   color: 'var(--color-muted)',
-                  borderBottom: '1px solid var(--color-bone)',
+                  borderBottom: '1px solid rgba(212,201,168,0.18)',
                   fontWeight: 'normal',
+                  background: 'var(--color-surface)',
                 }}
               >
                 {h}
@@ -293,28 +322,39 @@ function FieldMappingTable({ report }: ReportProps) {
           </tr>
         </thead>
         <tbody>
-          {report.fieldMappings.map((m) => (
-            <tr key={m.sourceField}>
-              <td
+          {report.fieldMappings.map((m, index) => {
+            // Zebra stripe at 4% opacity using rgba overlay on background.
+            const isEven = index % 2 === 0
+            return (
+              <tr
+                key={m.sourceField}
                 style={{
-                  padding: '0.4rem 0.75rem',
-                  color: 'var(--color-muted)',
-                  borderBottom: '1px solid var(--color-surface)',
+                  background: isEven
+                    ? 'rgba(212,201,168,0.04)'
+                    : 'transparent',
                 }}
               >
-                {m.sourceField}
-              </td>
-              <td
-                style={{
-                  padding: '0.4rem 0.75rem',
-                  color: 'var(--color-ink)',
-                  borderBottom: '1px solid var(--color-surface)',
-                }}
-              >
-                {m.normalisedField}
-              </td>
-            </tr>
-          ))}
+                <td
+                  style={{
+                    padding: '0.4rem 0.75rem',
+                    color: 'var(--color-muted)',
+                    borderBottom: '1px solid rgba(212,201,168,0.06)',
+                  }}
+                >
+                  {m.sourceField}
+                </td>
+                <td
+                  style={{
+                    padding: '0.4rem 0.75rem',
+                    color: 'var(--color-ink)',
+                    borderBottom: '1px solid rgba(212,201,168,0.06)',
+                  }}
+                >
+                  {m.normalisedField}
+                </td>
+              </tr>
+            )
+          })}
         </tbody>
       </table>
     </section>
@@ -356,7 +396,7 @@ function UnmappedFields({ report }: ReportProps) {
               fontSize: '0.8125rem',
               padding: '0.2rem 0.6rem',
               background: 'var(--color-surface)',
-              border: '1px solid var(--color-bone)',
+              border: '1px solid rgba(212,201,168,0.25)',
               borderRadius: 'var(--radius)',
               color: 'var(--color-muted)',
             }}
