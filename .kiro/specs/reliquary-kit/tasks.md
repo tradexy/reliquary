@@ -37,12 +37,16 @@ Kiro; each task should be one spec execution, not one prompt.
   - [ ] 6.2 Sample dataset committed as JSON, with three deliberately broken rows
   - [ ] 6.3 Vite app wiring the kit with `ossuary` theme
   - [ ] 6.4 End-to-end manual pass: search, open, report
+  - [ ] 6.5 CSV export of the Resurrection Report, downloadable
+  - [ ] 6.6 Print stylesheet for a request slip
 
 - [ ] 7. Parts Ledger app
   - [ ] 7.1 Second adapter over a dot-matrix stock ledger export
   - [ ] 7.2 Different data shape: quantities, bin locations, discontinued parts
   - [ ] 7.3 `foundry` theme, compact density
   - [ ] 7.4 Confirm zero duplicate components with the first app
+  - [ ] 7.5 Stocktake screen: pick a bin range, confirm counts, record discrepancies
+  - [ ] 7.6 Printable stocktake sheet and CSV export
 
 - [ ] 8. Evidence
   - [ ] 8.1 `docs/kiro-journal.md` updated per spec execution

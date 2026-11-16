@@ -111,3 +111,26 @@ compiler over its own earlier reasoning.
 Kit is complete: contract, pipeline, report, publish guard, repository, UI shell.
 97 tests green, typecheck clean, both placeholders build. Still to do: the two app
 adapters and datasets (Tasks 6–7), then evidence and submission (Task 8).
+
+---
+
+## 2026-11-16 — Task 6, Card Catalogue (Kiro CLI)
+
+One run, items 6.1–6.6. The interesting decision was how to represent the legacy
+source: Kiro kept the fixed-width trailing spaces in the JSON rather than
+pre-trimming it, so the adapter has to do the trimming the way a real dBase export
+forces you to. That is the difference between a demo and a plausible artefact.
+
+Rejection rules are narrow and defensible: missing shelfmark, blank title, and a
+purely numeric date that isn't four digits. Documentary forms — `c.1893`,
+`1893-1901`, `1893?` — are parsed, not rejected. A stricter adapter would have
+thrown away real records, which is precisely the failure mode the report exists to
+catch.
+
+137 tests, typecheck clean, both apps build. Dataset is 2,000 records, 727 KB,
+deterministic from seed `0xc0ffee42`, with the three broken rows always last.
+
+**Observation to write up later:** the seed is committed and the generator is
+committed, which means a judge can regenerate the dataset and get byte-identical
+data. For a project whose entire claim is "you can verify this", reproducible input
+data is not a nicety.

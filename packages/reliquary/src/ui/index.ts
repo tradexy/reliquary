@@ -7,3 +7,5 @@ export { Search } from './Search.js'
 export { Record } from './Record.js'
 export { Report } from './Report.js'
 export { App } from './App.js'
+
+export { escapeCsvField, reportToCsv, downloadReportCsv } from './export.js'

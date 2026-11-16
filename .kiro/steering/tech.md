@@ -17,8 +17,10 @@ inclusion: always
 ## Rules
 
 1. `packages/reliquary` must not import from `apps/*`. Ever.
-2. Apps may only extend the kit through the adapter contract and a theme object.
-   If an app needs to fork a kit component, the component is wrong — fix the kit.
+2. Apps extend the kit in exactly three ways: the adapter contract, a theme object,
+   and additional screens composed from kit primitives. Forking or copying a kit
+   component is not allowed — if an app needs different behaviour from a kit
+   component, fix the kit so both apps benefit.
 3. All data access goes through the `Repository` interface. Components never read
    JSON directly.
 4. No `localStorage` for anything a judge would need to see. State is in the URL

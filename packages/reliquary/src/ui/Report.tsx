@@ -13,8 +13,9 @@
  * warning message explains what it means.
  */
 
-import React from 'react'
+import React, { useCallback } from 'react'
 import type { ResurrectionReport } from '../contract/types.js'
+import { downloadReportCsv } from './export.js'
 
 interface ReportProps {
   report: ResurrectionReport
@@ -22,6 +23,13 @@ interface ReportProps {
 
 export function Report({ report }: ReportProps) {
   const isInconsistent = report.status === 'inconsistent'
+
+  const handleDownload = useCallback(() => {
+    downloadReportCsv(
+      report,
+      `resurrection-report-${report.sourceName.replace(/\s+/g, '-').toLowerCase()}.csv`,
+    )
+  }, [report])
 
   return (
     <div
@@ -46,16 +54,61 @@ export function Report({ report }: ReportProps) {
         </a>
       </nav>
 
-      <h1
+      <div
         style={{
-          fontFamily: 'var(--font-display)',
-          fontSize: '1.5rem',
-          margin: '0 0 var(--density)',
-          color: 'var(--color-bone)',
+          display: 'flex',
+          alignItems: 'baseline',
+          justifyContent: 'space-between',
+          gap: '1rem',
+          flexWrap: 'wrap',
+          marginBottom: 'var(--density)',
         }}
       >
-        Resurrection Report
-      </h1>
+        <h1
+          style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: '1.5rem',
+            margin: 0,
+            color: 'var(--color-bone)',
+          }}
+        >
+          Resurrection Report
+        </h1>
+
+        {/* CSV export button ────────────────────────────────────────────── */}
+        <button
+          type="button"
+          onClick={handleDownload}
+          aria-label="Download resurrection report as CSV"
+          style={{
+            fontFamily: 'var(--font-mono)',
+            fontSize: '0.8125rem',
+            padding: '0.35rem 0.75rem',
+            background: 'var(--color-surface)',
+            color: 'var(--color-muted)',
+            border: '1px solid var(--color-bone)',
+            borderRadius: 'var(--radius)',
+            cursor: 'pointer',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.4rem',
+            transition: 'color var(--motion-duration, 150ms) ease, border-color var(--motion-duration, 150ms) ease',
+          }}
+          onMouseEnter={(e) => {
+            const el = e.currentTarget
+            el.style.color = 'var(--color-ink)'
+            el.style.borderColor = 'var(--color-accent)'
+          }}
+          onMouseLeave={(e) => {
+            const el = e.currentTarget
+            el.style.color = 'var(--color-muted)'
+            el.style.borderColor = 'var(--color-bone)'
+          }}
+        >
+          <span aria-hidden="true">↓</span>
+          Export CSV
+        </button>
+      </div>
 
       {/* Reconciliation badge ────────────────────────────────────────────── */}
       <ReconciliationBadge report={report} />
