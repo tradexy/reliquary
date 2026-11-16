@@ -10,6 +10,7 @@
 
 import React, { useCallback } from 'react'
 import type { Repository } from '../repository/memory.js'
+import type { RecordSummary } from './types.js'
 
 interface SearchProps<T extends object> {
   /** Pre-built repository for the current dataset. */
@@ -22,11 +23,10 @@ interface SearchProps<T extends object> {
   /** Called when the user changes the input; parent updates the URL. */
   onQueryChange(query: string): void
   /**
-   * Render one result row. Receives the record and must return a React node.
-   * The shell wraps it in an `<li>` with a navigable anchor; the app supplies
-   * the content.
+   * Produce a three-part summary for one record. Replaces the former
+   * renderResult callback so the kit can own the row layout and truncation.
    */
-  renderResult(record: T, id: string): React.ReactNode
+  renderSummary(record: T): RecordSummary
   /** Derive the unique id from a record (matches the Repository's idField). */
   getId(record: T): string
 }
@@ -35,7 +35,7 @@ export function Search<T extends object>({
   repository,
   query,
   onQueryChange,
-  renderResult,
+  renderSummary,
   getId,
 }: SearchProps<T>) {
   const results = repository.search(query)
@@ -130,12 +130,15 @@ export function Search<T extends object>({
         >
           {results.map((record) => {
             const id = getId(record)
+            const summary = renderSummary(record)
             return (
               <li key={id}>
                 <a
                   href={`?id=${encodeURIComponent(id)}`}
                   style={{
-                    display: 'block',
+                    display: 'flex',
+                    alignItems: 'baseline',
+                    gap: '0.75rem',
                     padding: 'var(--density)',
                     background: 'var(--color-surface)',
                     borderRadius: 'var(--radius)',
@@ -143,7 +146,8 @@ export function Search<T extends object>({
                     color: 'var(--color-ink)',
                     textDecoration: 'none',
                     fontFamily: 'var(--font-body)',
-                    transition: 'border-color 150ms ease',
+                    transition: 'border-color var(--motion-duration, 150ms) ease',
+                    overflow: 'hidden',
                   }}
                   onFocus={(e) => {
                     e.currentTarget.style.borderColor = 'var(--color-accent)'
@@ -158,7 +162,50 @@ export function Search<T extends object>({
                     e.currentTarget.style.borderColor = 'transparent'
                   }}
                 >
-                  {renderResult(record, id)}
+                  {/* Primary + secondary stack */}
+                  <div style={{ flex: '1 1 0', minWidth: 0 }}>
+                    <div
+                      style={{
+                        fontFamily: 'var(--font-body)',
+                        fontSize: '1rem',
+                        color: 'var(--color-ink)',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                      }}
+                    >
+                      {summary.primary}
+                    </div>
+                    {summary.secondary !== undefined && (
+                      <div
+                        style={{
+                          fontFamily: 'var(--font-body)',
+                          fontSize: '0.8125rem',
+                          color: 'var(--color-muted)',
+                          marginTop: '0.15rem',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                        }}
+                      >
+                        {summary.secondary}
+                      </div>
+                    )}
+                  </div>
+                  {/* Meta — right-aligned mono */}
+                  {summary.meta !== undefined && (
+                    <div
+                      style={{
+                        fontFamily: 'var(--font-mono)',
+                        fontSize: '0.8125rem',
+                        color: 'var(--color-muted)',
+                        whiteSpace: 'nowrap',
+                        flexShrink: 0,
+                      }}
+                    >
+                      {summary.meta}
+                    </div>
+                  )}
                 </a>
               </li>
             )

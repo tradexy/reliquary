@@ -134,3 +134,31 @@ deterministic from seed `0xc0ffee42`, with the three broken rows always last.
 committed, which means a judge can regenerate the dataset and get byte-identical
 data. For a project whose entire claim is "you can verify this", reproducible input
 data is not a nicety.
+
+---
+
+## 2026-11-16 — Task 7, Parts Ledger (Kiro CLI)
+
+The category requires "two distinct applications", so this one had to differ by
+task, not palette. It lands on a bin-range picker, not a search box: choose the row
+you are walking, then step through 228 entries in A1–A9 counting each. Discrepancies
+need a note and initials before they commit. The Report component is reused inline,
+unforked.
+
+Three broken rows: `QTY = 'n/a'`, a blank `BIN`, `STATUS = 'Z'`. 1,200 entries,
+seed `0xdeadbe42`, generator committed.
+
+Then I opened both apps in a browser and took screenshots. That found three things
+194 green tests and a clean typecheck did not:
+
+1. **The Search list showed only the record id.** Rows read `MAP/0001` with no
+   title, author or year. Fixed in the kit by adding `renderSummary(record)` to
+   `AppConfig`, so every app must say how a record presents in a list.
+2. **The bin picker looked filled in but was empty.** `A1` and `A9` were
+   placeholders, so the default state failed validation on first click.
+3. **Title casing mangled names** — "ERNEST Of Wood Lane". Added a small-words list.
+
+**Observation to write up later:** every one of those was visible in one screenshot
+and invisible to the test suite. If there is a single honest lesson from this build,
+it is that agent-written code passes its own tests and still ships an unusable
+screen.

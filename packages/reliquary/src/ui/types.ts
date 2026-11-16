@@ -20,6 +20,16 @@ export interface RecordSection {
   fields: RecordField[]
 }
 
+/** The three-part summary rendered in each Search result row. */
+export interface RecordSummary {
+  /** Row title — the primary identifying text. Truncated if long. */
+  primary: string
+  /** Supporting identity line shown beneath primary in muted ink. Optional. */
+  secondary?: string
+  /** Right-aligned meta value rendered in mono (e.g. year, quantity). Optional. */
+  meta?: string
+}
+
 /**
  * Configuration for a Reliquary app instance.
  *
@@ -35,6 +45,11 @@ export interface AppConfig<T> {
   searchFields: Array<keyof T & string>
   /** Convert one domain record into sections of label/value pairs for display. */
   renderRecord(record: T): RecordSection[]
+  /**
+   * Produce a three-part summary for one record as rendered in the Search list.
+   * primary is required; secondary and meta are optional.
+   */
+  renderSummary(record: T): RecordSummary
   /** Visual theme applied to the entire app. */
   theme: Theme
 }

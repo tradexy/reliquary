@@ -73,6 +73,7 @@ function makeAppConfig() {
     renderRecord: (w: Widget): RecordSection[] => [
       { heading: 'Identity', fields: [{ label: 'Name', value: w.name }, { label: 'Category', value: w.category }] },
     ],
+    renderSummary: (w: Widget) => ({ primary: w.name, secondary: w.category }),
     theme: ossuary,
   }
 }
@@ -87,7 +88,7 @@ describe('Search', () => {
         repository={repo}
         query={query}
         onQueryChange={onQueryChange}
-        renderResult={(record) => <span>{record.name}</span>}
+        renderSummary={(record) => ({ primary: record.name, secondary: record.category })}
         getId={(w) => w.id}
       />,
     )
@@ -141,6 +142,72 @@ describe('Search', () => {
     renderSearch('')
     const link = screen.getByText('Copper Gear').closest('a')
     expect(link?.getAttribute('href')).toBe('?id=W-001')
+  })
+})
+
+// ── Search summary rendering ──────────────────────────────────────────────────
+
+describe('Search — summary layout', () => {
+  it('renders primary text as the row title', () => {
+    const repo = makeRepo()
+    render(
+      <Search
+        repository={repo}
+        query=""
+        onQueryChange={vi.fn()}
+        renderSummary={(w) => ({ primary: w.name, secondary: w.category })}
+        getId={(w) => w.id}
+      />,
+    )
+    expect(screen.getByText('Copper Gear')).toBeInTheDocument()
+  })
+
+  it('renders secondary text beneath primary', () => {
+    const repo = makeRepo()
+    render(
+      <Search
+        repository={repo}
+        query=""
+        onQueryChange={vi.fn()}
+        renderSummary={(w) => ({ primary: w.name, secondary: w.category })}
+        getId={(w) => w.id}
+      />,
+    )
+    // All three category values should appear as secondary lines
+    expect(screen.getByText('Mechanical')).toBeInTheDocument()
+    expect(screen.getByText('Fastener')).toBeInTheDocument()
+    expect(screen.getByText('Optical')).toBeInTheDocument()
+  })
+
+  it('renders meta text when provided', () => {
+    const repo = makeRepo()
+    render(
+      <Search
+        repository={repo}
+        query=""
+        onQueryChange={vi.fn()}
+        renderSummary={(w) => ({ primary: w.name, meta: w.id })}
+        getId={(w) => w.id}
+      />,
+    )
+    // id doubles as meta here — should appear in the row
+    expect(screen.getByText('W-001')).toBeInTheDocument()
+  })
+
+  it('omits secondary element when not provided', () => {
+    const repo = makeRepo()
+    const { container } = render(
+      <Search
+        repository={repo}
+        query="copper"
+        onQueryChange={vi.fn()}
+        renderSummary={(w) => ({ primary: w.name })}
+        getId={(w) => w.id}
+      />,
+    )
+    // Only the primary div inside the first result — no sibling secondary div
+    const primaryEl = screen.getByText('Copper Gear')
+    expect(primaryEl.parentElement?.children.length).toBe(1)
   })
 })
 

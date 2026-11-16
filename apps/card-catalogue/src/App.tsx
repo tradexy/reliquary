@@ -63,11 +63,36 @@ function renderRecord(card: CatalogueCard): RecordSection[] {
   ]
 }
 
+/** Convert a string to title case (each word's first letter uppercased). */
+const SMALL_WORDS = new Set(['of', 'the', 'and', 'in', 'on', 'at', 'to', 'for', 'a', 'an'])
+
+function toTitleCase(str: string): string {
+  return str
+    .toLowerCase()
+    .split(/(\s+)/)
+    .map((word, i) => {
+      if (i === 0 || !SMALL_WORDS.has(word)) {
+        return word.charAt(0).toUpperCase() + word.slice(1)
+      }
+      return word
+    })
+    .join('')
+}
+
 const appConfig: AppConfig<CatalogueCard> = {
   title: 'Card Catalogue',
   subtitle: 'Ashworth Local History Society — Index resurrected from the 1994 dBase export',
   searchFields: ['surname', 'title', 'shelfmark', 'subject'],
   renderRecord,
+  renderSummary(card: CatalogueCard) {
+    const primary = toTitleCase(card.title)
+    const secondary =
+      card.surname || card.forenames
+        ? [card.surname, card.forenames].filter(Boolean).join(', ')
+        : undefined
+    const meta = card.year !== null ? String(card.year) : 'n.d.'
+    return { primary, secondary, meta }
+  },
   theme: ossuary,
 }
 

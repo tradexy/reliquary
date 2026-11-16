@@ -158,10 +158,7 @@ export function App<T extends object>({
             repository={repository}
             query={route.query}
             onQueryChange={handleQueryChange}
-            renderResult={(record, id) => config.renderRecord(record)[0]?.fields[0]?.value != null
-              ? String(config.renderRecord(record)[0]?.fields[0]?.value)
-              : id
-            }
+            renderSummary={(record) => config.renderSummary(record)}
             getId={getId}
           />
         )}
