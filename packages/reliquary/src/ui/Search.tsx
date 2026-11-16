@@ -14,6 +14,7 @@
 import React, { useCallback } from 'react'
 import type { Repository } from '../repository/memory.js'
 import type { RecordSummary } from './types.js'
+import type { ResurrectionReport } from '../contract/types.js'
 
 interface SearchProps<T extends object> {
   /** Pre-built repository for the current dataset. */
@@ -32,6 +33,8 @@ interface SearchProps<T extends object> {
   renderSummary(record: T): RecordSummary
   /** Derive the unique id from a record (matches the Repository's idField). */
   getId(record: T): string
+  /** Report to display in the status strip above the search field. */
+  report: ResurrectionReport
 }
 
 export function Search<T extends object>({
@@ -40,6 +43,7 @@ export function Search<T extends object>({
   onQueryChange,
   renderSummary,
   getId,
+  report,
 }: SearchProps<T>) {
   const results = repository.search(query)
   const total = repository.all().length
@@ -58,6 +62,9 @@ export function Search<T extends object>({
 
   return (
     <div className="search-screen" style={{ padding: 'var(--density) 0' }}>
+      {/* Resurrection report status strip ──────────────────────────────── */}
+      <ReportStrip report={report} />
+
       {/* Search input ─────────────────────────────────────────────────── */}
       <div
         className="search-field"
@@ -265,6 +272,85 @@ function EmptyState({ query }: { query: string }) {
       {query.trim() === ''
         ? 'No records in this repository.'
         : `No records match "${query}".`}
+    </div>
+  )
+}
+
+function ReportStrip({ report }: { report: ResurrectionReport }) {
+  const isLossless = report.status === 'lossless'
+
+  return (
+    <div
+      aria-label="Resurrection report summary"
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.75rem',
+        flexWrap: 'wrap',
+        marginBottom: '0.75rem',
+        padding: '0.5rem 0.75rem',
+        background: 'var(--color-surface)',
+        border: '1px solid rgba(212,201,168,0.18)',
+        borderRadius: 'var(--radius)',
+        fontFamily: 'var(--font-mono)',
+        fontSize: '0.75rem',
+      }}
+    >
+      {/* Label */}
+      <span
+        style={{
+          color: 'var(--color-muted)',
+          textTransform: 'uppercase',
+          letterSpacing: '0.08em',
+        }}
+      >
+        Resurrection report
+      </span>
+
+      {/* Counts */}
+      <span
+        style={{
+          color: 'var(--color-ink)',
+          fontVariantNumeric: 'tabular-nums',
+        }}
+      >
+        {report.rowsIn} in · {report.rowsOut} out · {report.rejected.length} rejected
+      </span>
+
+      {/* Status pill */}
+      <span
+        style={{
+          padding: '0.15rem 0.55rem',
+          borderRadius: '999px',
+          border: `1px solid ${isLossless ? 'var(--color-accent)' : 'var(--color-danger)'}`,
+          color: isLossless ? 'var(--color-accent)' : 'var(--color-danger)',
+          fontSize: '0.7rem',
+          fontWeight: 'bold',
+          letterSpacing: '0.06em',
+        }}
+      >
+        {isLossless ? 'LOSSLESS' : 'INCONSISTENT'}
+      </span>
+
+      {/* View report link */}
+      <a
+        href="?view=report"
+        style={{
+          color: 'var(--color-accent)',
+          textDecoration: 'none',
+          marginLeft: 'auto',
+          outline: 'none',
+        }}
+        onFocus={(e) => {
+          e.currentTarget.style.outlineOffset = '2px'
+          e.currentTarget.style.outline = '2px solid var(--color-accent)'
+        }}
+        onBlur={(e) => {
+          e.currentTarget.style.outline = 'none'
+        }}
+      >
+        View report
+      </a>
     </div>
   )
 }

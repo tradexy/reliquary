@@ -193,3 +193,28 @@ Then I fixed, by hand, what the screenshots exposed:
 type system and 194 tests were indifferent to. The design brief improved the look;
 looking at the rendered page found the errors. Those are different activities, and
 only one of them can be delegated to a prompt.
+
+---
+
+## 2026-11-16 — The publish gate, made demonstrable
+
+Feedback that mattered: the apps read as "plain CRUD" and the one novel idea — a
+migration that refuses to publish unless it can prove losslessness — was hidden
+behind a nav link.
+
+So: `simulateLossyImport(report)` drops one row and recomputes status from the same
+equation as the real pipeline. The Report screen gains a **Publish gate** panel: one
+button breaks the data on camera, the badge flips to `INCONSISTENT` (role=alert), the
+delta appears, the export disables, and the panel names `InconsistentReportError` and
+what it would refuse. A second button restores the verified report.
+
+The Search screen gained a status strip — rows in, rows out, rejected, pill, link —
+so the claim is visible before you click anything.
+
+219 tests, security scan clean, typecheck clean, build clean.
+
+**Observation for the write-up:** none of this added capability. It added
+*legibility*. The guard, the equation and the error class already existed and were
+already tested; the only change was letting a judge see the refusal in four seconds
+instead of reading the pipeline source. That is the difference between a correct
+project and a winning entry, and it cost an afternoon.

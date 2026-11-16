@@ -176,6 +176,7 @@ export function App<T extends object>({
               onQueryChange={handleQueryChange}
               renderSummary={(record) => config.renderSummary(record)}
               getId={getId}
+              report={report}
             />
           )}
         </div>

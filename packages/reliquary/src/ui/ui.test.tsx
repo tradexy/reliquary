@@ -90,6 +90,7 @@ describe('Search', () => {
         onQueryChange={onQueryChange}
         renderSummary={(record) => ({ primary: record.name, secondary: record.category })}
         getId={(w) => w.id}
+        report={LOSSLESS_REPORT}
       />,
     )
   }
@@ -157,6 +158,7 @@ describe('Search — summary layout', () => {
         onQueryChange={vi.fn()}
         renderSummary={(w) => ({ primary: w.name, secondary: w.category })}
         getId={(w) => w.id}
+        report={LOSSLESS_REPORT}
       />,
     )
     expect(screen.getByText('Copper Gear')).toBeInTheDocument()
@@ -171,6 +173,7 @@ describe('Search — summary layout', () => {
         onQueryChange={vi.fn()}
         renderSummary={(w) => ({ primary: w.name, secondary: w.category })}
         getId={(w) => w.id}
+        report={LOSSLESS_REPORT}
       />,
     )
     // All three category values should appear as secondary lines
@@ -188,6 +191,7 @@ describe('Search — summary layout', () => {
         onQueryChange={vi.fn()}
         renderSummary={(w) => ({ primary: w.name, meta: w.id })}
         getId={(w) => w.id}
+        report={LOSSLESS_REPORT}
       />,
     )
     // id doubles as meta here — should appear in the row
@@ -203,6 +207,7 @@ describe('Search — summary layout', () => {
         onQueryChange={vi.fn()}
         renderSummary={(w) => ({ primary: w.name })}
         getId={(w) => w.id}
+        report={LOSSLESS_REPORT}
       />,
     )
     // Only the primary div inside the first result — no sibling secondary div
@@ -451,5 +456,124 @@ describe('App routing', () => {
     )
     const reportLink = screen.getByRole('link', { name: /view resurrection report/i })
     expect(reportLink.getAttribute('href')).toBe('?view=report')
+  })
+})
+
+// ── Report — publish gate panel ───────────────────────────────────────────────
+
+import { simulateLossyImport } from '../import/simulate.js'
+import { fireEvent as fe } from '@testing-library/react'
+
+describe('Report — publish gate panel (verified state)', () => {
+  it('renders the "Simulate a lossy adapter" button', () => {
+    render(<Report report={LOSSLESS_REPORT} />)
+    expect(screen.getByRole('button', { name: /simulate a lossy adapter/i })).toBeInTheDocument()
+  })
+
+  it('Export CSV button is enabled for the verified report', () => {
+    render(<Report report={LOSSLESS_REPORT} />)
+    const exportBtn = screen.getByRole('button', { name: /download resurrection report as csv/i })
+    expect(exportBtn).not.toBeDisabled()
+  })
+
+  it('does not show INCONSISTENT badge before simulation', () => {
+    render(<Report report={LOSSLESS_REPORT} />)
+    // Should show LOSSLESS, not INCONSISTENT in the main badge
+    const badge = screen.getByRole('status', { name: /report status: lossless/i })
+    expect(badge).toBeInTheDocument()
+  })
+})
+
+describe('Report — publish gate panel (simulated state)', () => {
+  function renderAndSimulate() {
+    const { getByRole } = render(<Report report={LOSSLESS_REPORT} />)
+    fe.click(getByRole('button', { name: /simulate a lossy adapter/i }))
+    return { getByRole }
+  }
+
+  it('badge shows INCONSISTENT with role=alert after simulation', () => {
+    renderAndSimulate()
+    const badge = screen.getByRole('alert', { name: /report status: inconsistent/i })
+    expect(badge).toBeInTheDocument()
+    expect(badge.textContent).toMatch(/INCONSISTENT/)
+  })
+
+  it('count panel shows the reduced rowsOut', () => {
+    renderAndSimulate()
+    // LOSSLESS_REPORT has rowsOut=3; simulated is 2
+    // Count figures: "3" (rowsIn), "2" (rowsOut), "0" (rejected)
+    // Find the Rows out figure: its sibling label is "Rows out"
+    const rowsOutLabel = screen.getByText('Rows out')
+    const figure = rowsOutLabel.nextElementSibling
+    expect(figure?.textContent).toBe('2')
+  })
+
+  it('displays the delta and InconsistentReportError message', () => {
+    renderAndSimulate()
+    // Should mention InconsistentReportError
+    const panel = screen.getByText(/InconsistentReportError/i)
+    expect(panel).toBeInTheDocument()
+    // Delta is 1 (rowsIn=3, rowsOut=2, rejected=0 → delta=1)
+    expect(panel.closest('[aria-labelledby="publish-gate-heading"]')?.textContent).toMatch(
+      /reduced by 1/i,
+    )
+  })
+
+  it('Export CSV button is disabled in simulated state', () => {
+    renderAndSimulate()
+    const exportBtn = screen.getByRole('button', { name: /download resurrection report as csv/i })
+    expect(exportBtn).toBeDisabled()
+  })
+
+  it('"Restore verified report" button returns to the real data', () => {
+    renderAndSimulate()
+    fe.click(screen.getByRole('button', { name: /restore verified report/i }))
+    // Badge should return to LOSSLESS
+    expect(screen.getByRole('status', { name: /report status: lossless/i })).toBeInTheDocument()
+    // Export CSV re-enabled
+    expect(
+      screen.getByRole('button', { name: /download resurrection report as csv/i }),
+    ).not.toBeDisabled()
+  })
+})
+
+// ── Search — report status strip ─────────────────────────────────────────────
+
+describe('Search — report status strip', () => {
+  function renderSearchWithReport(report: ResurrectionReport) {
+    const repo = makeRepo(report)
+    return render(
+      <Search
+        repository={repo}
+        query=""
+        onQueryChange={vi.fn()}
+        renderSummary={(w) => ({ primary: w.name })}
+        getId={(w) => w.id}
+        report={report}
+      />,
+    )
+  }
+
+  it('renders counts in the status strip', () => {
+    renderSearchWithReport(LOSSLESS_REPORT)
+    // rowsIn=3, rowsOut=3, rejected=0
+    expect(screen.getByText(/3 in · 3 out · 0 rejected/i)).toBeInTheDocument()
+  })
+
+  it('shows lossless pill when report is lossless', () => {
+    renderSearchWithReport(LOSSLESS_REPORT)
+    expect(screen.getByText('LOSSLESS')).toBeInTheDocument()
+  })
+
+  it('shows inconsistent pill when report is inconsistent', () => {
+    renderSearchWithReport(INCONSISTENT_REPORT)
+    expect(screen.getByText('INCONSISTENT')).toBeInTheDocument()
+  })
+
+  it('renders a "View report" link pointing to ?view=report', () => {
+    renderSearchWithReport(LOSSLESS_REPORT)
+    const link = screen.getByRole('link', { name: /view report/i })
+    expect(link).toBeInTheDocument()
+    expect(link.getAttribute('href')).toBe('?view=report')
   })
 })

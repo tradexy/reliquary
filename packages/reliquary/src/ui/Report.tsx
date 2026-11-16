@@ -15,23 +15,26 @@
  * warning message explains what it means.
  */
 
-import React, { useCallback } from 'react'
+import React, { useCallback, useState } from 'react'
 import type { ResurrectionReport } from '../contract/types.js'
 import { downloadReportCsv } from './export.js'
+import { simulateLossyImport } from '../import/simulate.js'
 
 interface ReportProps {
   report: ResurrectionReport
 }
 
-export function Report({ report }: ReportProps) {
+export function Report({ report: realReport }: ReportProps) {
+  const [simulated, setSimulated] = useState(false)
+  const report = simulated ? simulateLossyImport(realReport) : realReport
   const isInconsistent = report.status === 'inconsistent'
 
   const handleDownload = useCallback(() => {
     downloadReportCsv(
-      report,
-      `resurrection-report-${report.sourceName.replace(/\s+/g, '-').toLowerCase()}.csv`,
+      realReport,
+      `resurrection-report-${realReport.sourceName.replace(/\s+/g, '-').toLowerCase()}.csv`,
     )
-  }, [report])
+  }, [realReport])
 
   return (
     <div
@@ -86,20 +89,21 @@ export function Report({ report }: ReportProps) {
           Resurrection Report
         </h1>
 
-        {/* CSV export button ────────────────────────────────────────────── */}
+        {/* CSV export button — only enabled for the verified report ───── */}
         <button
           type="button"
           onClick={handleDownload}
           aria-label="Download resurrection report as CSV"
+          disabled={simulated}
           style={{
             fontFamily: 'var(--font-mono)',
             fontSize: '0.8125rem',
             padding: '0.35rem 0.75rem',
             background: 'var(--color-surface)',
-            color: 'var(--color-muted)',
-            border: '1px solid rgba(212,201,168,0.25)',
+            color: simulated ? 'rgba(138,158,141,0.4)' : 'var(--color-muted)',
+            border: `1px solid ${simulated ? 'rgba(212,201,168,0.1)' : 'rgba(212,201,168,0.25)'}`,
             borderRadius: 'var(--radius)',
-            cursor: 'pointer',
+            cursor: simulated ? 'not-allowed' : 'pointer',
             display: 'inline-flex',
             alignItems: 'center',
             gap: '0.4rem',
@@ -107,16 +111,19 @@ export function Report({ report }: ReportProps) {
             outline: 'none',
           }}
           onMouseEnter={(e) => {
+            if (simulated) return
             const el = e.currentTarget
             el.style.color = 'var(--color-ink)'
             el.style.borderColor = 'var(--color-accent)'
           }}
           onMouseLeave={(e) => {
+            if (simulated) return
             const el = e.currentTarget
             el.style.color = 'var(--color-muted)'
             el.style.borderColor = 'rgba(212,201,168,0.25)'
           }}
           onFocus={(e) => {
+            if (simulated) return
             e.currentTarget.style.outlineOffset = '2px'
             e.currentTarget.style.outline = '2px solid var(--color-accent)'
           }}
@@ -137,6 +144,14 @@ export function Report({ report }: ReportProps) {
 
       {/* Counts — three-column figure row ───────────────────────────────── */}
       <CountPanel report={report} />
+
+      {/* Publish gate ────────────────────────────────────────────────────── */}
+      <PublishGatePanel
+        realReport={realReport}
+        simulated={simulated}
+        onSimulate={() => setSimulated(true)}
+        onRestore={() => setSimulated(false)}
+      />
 
       {/* Field mappings ──────────────────────────────────────────────────── */}
       {report.fieldMappings.length > 0 && <FieldMappingTable report={report} />}
@@ -453,6 +468,131 @@ function SynthesisedFields({ report }: ReportProps) {
           </li>
         ))}
       </ul>
+    </section>
+  )
+}
+
+interface PublishGatePanelProps {
+  realReport: ResurrectionReport
+  simulated: boolean
+  onSimulate(): void
+  onRestore(): void
+}
+
+function PublishGatePanel({ realReport, simulated, onSimulate, onRestore }: PublishGatePanelProps) {
+  const simulatedReport = simulateLossyImport(realReport)
+  const delta = simulatedReport.rowsIn - (simulatedReport.rowsOut + simulatedReport.rejected.length)
+
+  return (
+    <section
+      aria-labelledby="publish-gate-heading"
+      style={{
+        marginBottom: 'var(--density)',
+        padding: 'var(--density)',
+        background: 'var(--color-surface)',
+        border: `1px solid ${simulated ? 'var(--color-danger)' : 'rgba(212,201,168,0.18)'}`,
+        borderRadius: 'var(--radius)',
+        transition: 'border-color var(--motion-duration, 150ms) ease',
+      }}
+    >
+      <h2
+        id="publish-gate-heading"
+        style={{
+          fontFamily: 'var(--font-display)',
+          fontSize: '1rem',
+          color: 'var(--color-bone)',
+          margin: '0 0 0.75rem',
+        }}
+      >
+        Publish gate
+      </h2>
+
+      {simulated ? (
+        <div>
+          <p
+            style={{
+              fontFamily: 'var(--font-mono)',
+              fontSize: '0.8125rem',
+              color: 'var(--color-danger)',
+              margin: '0 0 0.75rem',
+            }}
+          >
+            rowsOut reduced by {delta} — publish would throw{' '}
+            <strong>InconsistentReportError</strong> and refuse the dataset.
+          </p>
+          <button
+            type="button"
+            onClick={onRestore}
+            aria-label="Restore verified report"
+            style={{
+              fontFamily: 'var(--font-mono)',
+              fontSize: '0.8125rem',
+              padding: '0.35rem 0.75rem',
+              background: 'transparent',
+              color: 'var(--color-accent)',
+              border: '1px solid var(--color-accent)',
+              borderRadius: 'var(--radius)',
+              cursor: 'pointer',
+              outline: 'none',
+            }}
+            onFocus={(e) => {
+              e.currentTarget.style.outlineOffset = '2px'
+              e.currentTarget.style.outline = '2px solid var(--color-accent)'
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.outline = 'none'
+            }}
+          >
+            Restore verified report
+          </button>
+        </div>
+      ) : (
+        <div>
+          <p
+            style={{
+              fontFamily: 'var(--font-mono)',
+              fontSize: '0.8125rem',
+              color: 'var(--color-muted)',
+              margin: '0 0 0.75rem',
+            }}
+          >
+            Simulate what happens when an adapter silently drops a row.
+          </p>
+          <button
+            type="button"
+            onClick={onSimulate}
+            aria-label="Simulate a lossy adapter"
+            style={{
+              fontFamily: 'var(--font-mono)',
+              fontSize: '0.8125rem',
+              padding: '0.35rem 0.75rem',
+              background: 'var(--color-surface)',
+              color: 'var(--color-muted)',
+              border: '1px solid rgba(212,201,168,0.25)',
+              borderRadius: 'var(--radius)',
+              cursor: 'pointer',
+              outline: 'none',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = 'var(--color-ink)'
+              e.currentTarget.style.borderColor = 'var(--color-danger)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = 'var(--color-muted)'
+              e.currentTarget.style.borderColor = 'rgba(212,201,168,0.25)'
+            }}
+            onFocus={(e) => {
+              e.currentTarget.style.outlineOffset = '2px'
+              e.currentTarget.style.outline = '2px solid var(--color-accent)'
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.outline = 'none'
+            }}
+          >
+            Simulate a lossy adapter
+          </button>
+        </div>
+      )}
     </section>
   )
 }
