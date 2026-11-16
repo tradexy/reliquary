@@ -82,6 +82,46 @@ npm run dev:parts     # Parts Ledger
 npm test              # includes property-based adapter tests
 ```
 
+## How Kiro was used
+
+Built spec-first with **Kiro CLI 3.3.0**. Order of work mattered more than the tool:
+steering → requirements → design → tasks → implementation, one scoped run per task
+group.
+
+**Steering** (`.kiro/steering/`) — `product.md` fixed the single non-negotiable
+("lossless, or it tells you exactly what it lost") before any requirement existed.
+`tech.md` set the dependency rules and forbade apps from forking kit components.
+`security.md` was added after a threat-model pass and lists eight rules that a
+script now enforces.
+
+**Specs** (`.kiro/specs/reliquary-kit/`) — eight EARS requirements, then design,
+then tasks. Every task went to Kiro as its own headless run
+(`kiro-cli chat --no-interactive`), with a commit between runs.
+
+**Hooks** (`.kiro/hooks/`) — three gates, no prompts involved:
+
+| Hook | Trigger | Action |
+| --- | --- | --- |
+| `verify-on-stop` | Agent Stop | typecheck + security scan + 219 tests; exit 1 makes Kiro keep working |
+| `contract-on-adapter-edit` | File Save on an adapter | re-run the suite |
+| `security-on-write` | Post Tool Use on writes | static scan for `eval`, HTML sinks, storage, credentials |
+
+**What Kiro got right, unassisted:** it designed the pipeline module split
+(`pipeline` / `report` / `publish`) better than the spec asked, chose a
+non-throwing `ValidationResult` for callers and a throwing assertion at the
+boundary, and diagnosed its own bug — `configureGlobalConfig` does not exist in
+fast-check 3.x — by running the suite rather than reading its code.
+
+**What it got wrong, and who caught it:** `tsc` caught a `maxSize`/`maxLength`
+confusion that left tests green while types were wrong. Screenshots caught three
+layout failures the suite was indifferent to: bare-ID result rows, a bin picker that
+looked filled but was empty, and full-bleed text at 8px from the edge. The honest
+division of labour was: Kiro implements and self-corrects at runtime; a human runs
+the static checks and looks at the page.
+
+**What we did not use:** Kiro Crew and MCP are not part of this build. We would
+rather say so than pad the write-up.
+
 ## Licence
 
 MIT — see [LICENSE](./LICENSE).
