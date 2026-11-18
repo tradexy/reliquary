@@ -4,7 +4,9 @@ Ordered so every task ends runnable and verifiable. One Kiro run per task group.
 
 - [ ] 1. Core scaffold
   - [ ] 1.1 `packages/core` with `src/{crypto,chain,capture,evidence,ui}`
-  - [ ] 1.2 Rename workspaces; keep the existing build/test/hook plumbing working
+  - [ ] 1.2 Add it as a third workspace alongside the existing packages; keep
+        `npm run verify` and the hooks green. The old apps are retired in Task 14,
+        not here, so the repo stays releasable at every commit.
   - [ ] 1.3 `FORMAT_VERSION = 'anchora/1'` and a format-version test
   - **Done when:** `npm run verify` still passes on the new workspace layout.
 
