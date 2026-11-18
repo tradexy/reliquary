@@ -1,3 +1,3 @@
-// Capture sub-package — catalogue, writers, coverage (Task 9).
-// Stub: exports will be populated in later task groups.
-export {};
+// Capture sub-package — catalogue, writers, coverage (Tasks 4, 9).
+export type { FailMode, CatalogueEntry } from './catalogue.js';
+export { CATALOGUE, CATALOGUE_MAP, requireCatalogueEntry } from './catalogue.js';

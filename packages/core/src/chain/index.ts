@@ -1,3 +1,28 @@
-// Chain sub-package — append, verify, findings (Task 4–5).
-// Stub: exports will be populated in later task groups.
-export {};
+// Chain sub-package — append, verify, findings, types (Tasks 4–5).
+export type {
+  AuditEvent,
+  AppendDraft,
+  Seal,
+  Anchor,
+  Finding,
+  FindingCode,
+  FindingSeverity,
+  VerificationResult,
+} from './types.js';
+export { createLog, GENESIS_PREV_HASH } from './append.js';
+export type { Log, LogOptions } from './append.js';
+export { verifyChain } from './verify.js';
+export type { VerifyBundle } from './verify.js';
+export {
+  makeFinding,
+  makeHashMismatch,
+  makeLinkBroken,
+  makeSeqGap,
+  makeSealInvalid,
+  makeAnchorMismatch,
+  makeAnchorMissing,
+  makeLawfulChange,
+  makeVersionUnsupported,
+  sortFindings,
+  firstDivergenceSeq,
+} from './findings.js';
