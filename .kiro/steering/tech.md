@@ -2,49 +2,52 @@
 inclusion: always
 ---
 
-# Tech steering — Reliquary
+# Tech steering — Anchora
 
 ## Stack
 
-- **TypeScript** everywhere, `strict: true`. No `any` in exported signatures.
-- **React + Vite** for both apps. Client-side only; no server required to demo.
-- **npm workspaces** monorepo: `packages/reliquary` (the kit), `apps/*`.
-- **Vitest** for unit and property-based tests.
-- **fast-check** for property-based testing.
-- **Tailwind CSS** with a hand-authored design token layer. No component library.
-- Data is bundled as static JSON at build time, produced by the import pipeline.
+- **TypeScript**, `strict: true`, no `any` in exported signatures.
+- **npm workspaces**: `packages/core` (evidence core), `apps/seal`, `apps/witness`.
+- **React + Vite** for both apps, client-side only, no server at runtime.
+- **Vitest + fast-check** for unit and property-based tests.
+- **@noble/ed25519** for signatures — small, audited, no native build, works offline.
+- **WebCrypto SHA-256** for hashing, with a pure-JS fallback for Node and CI.
+- **Tailwind-free**: hand-authored design tokens, inline styles through CSS custom
+  properties, as in the previous build.
 
 ## Rules
 
-1. `packages/reliquary` must not import from `apps/*`. Ever.
-2. Apps extend the kit in exactly three ways: the adapter contract, a theme object,
-   and additional screens composed from kit primitives. Forking or copying a kit
-   component is not allowed — if an app needs different behaviour from a kit
-   component, fix the kit so both apps benefit.
-3. All data access goes through the `Repository` interface. Components never read
-   JSON directly.
-4. No `localStorage` for anything a judge would need to see. State is in the URL
-   where it matters (search query, selected record).
-5. Build output must work from a static host. No server-side rendering.
+1. `packages/core` must not import from `apps/*`.
+2. Apps extend the core only through: the event catalogue, a theme object, and
+   additional screens composed from core components.
+3. **All cryptographic code lives in `packages/core/src/crypto`.** No hashing or
+   signing anywhere else. No hand-rolled curve arithmetic.
+4. **Deterministic by default.** No `Date.now()` or `Math.random()` inside the core;
+   time and entropy are injected. Tests must be reproducible from a seed.
+5. **Canonical serialisation is a single function.** Any change to it invalidates
+   every hash ever produced, so it has its own test suite and a version tag.
+6. The verifier must never trust its input: every field is parsed defensively and
+   every count is recomputed.
+7. Anything simulated (key custody, object lock) is marked in the UI with a
+   `simulated` badge and documented in `docs/limits.md`.
 
 ## Property-based testing
 
-The adapter contract is the place PBT earns its keep. At minimum:
+The invariants worth generating over:
 
-- `scan()` yields exactly `count()` items.
-- Every yielded record survives `normalise()` with its source identifier intact.
-- No two records share an identifier after normalisation.
-- The report's `in` count equals `out` count plus rejected count.
-
-These are invariants, not examples. If a change makes one of them unprovable in a
-single sentence, the change is too clever.
+- Appending any event preserves the chain: `hash(n)` depends on `hash(n-1)`.
+- Editing any single field of any event makes verification fail at that index.
+- Deleting any event creates a sequence gap or a broken link, never silence.
+- Reordering two events is detected.
+- A lawful change (erasure/retention/strip) verifies as lawful, not as tampering.
+- Seals verify only with the matching public key; a wrong key fails every seal.
 
 ## Commands
 
 ```bash
-npm test           # all tests
-npm run test:pbt   # property-based suite, more runs
-npm run dev:cards  # Card Catalogue
-npm run dev:parts  # Parts Ledger
-npm run build      # builds both apps
+npm run verify        # typecheck + security scan + tests
+npm run test:pbt      # property-based suite at 1,000 runs
+npm run dev:seal
+npm run dev:witness
+npm run verify:bundle -- ./exports/demo.bundle.json   # offline verifier CLI
 ```
