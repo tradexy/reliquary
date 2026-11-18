@@ -16,7 +16,7 @@
     "security:check": "node scripts/security-check.mjs",
     "verify": "npm run typecheck && npm run security:check && npx vitest run",
     "build": "npm run build -w apps/card-catalogue && npm run build -w apps/parts-ledger",
-    "typecheck": "tsc -p packages/reliquary && tsc -p apps/card-catalogue && tsc -p apps/parts-ledger"
+    "typecheck": "tsc -p packages/reliquary && tsc -p apps/card-catalogue && tsc -p apps/parts-ledger && tsc -p packages/core"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.4.6",
