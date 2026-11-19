@@ -13,5 +13,9 @@ export default defineConfig({
     // PBT_RUNS env var controls property-based test run count (default 100).
     // Set to 1000 via `npm run test:pbt`.
     setupFiles: ['./vitest.setup.ts'],
+    // The Seal app renders a 500-row chain and verifies it on mount; slower CI
+    // runners need more than the 5s default.
+    testTimeout: 20_000,
+    hookTimeout: 20_000,
   },
 })
