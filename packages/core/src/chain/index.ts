@@ -26,3 +26,5 @@ export {
   sortFindings,
   firstDivergenceSeq,
 } from './findings.js';
+export { createSeal, createSeals, verifySeal, sealPayload } from './seal.js';
+export { createAnchor, anchorDigestOf } from './anchor.js';

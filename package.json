@@ -2,7 +2,7 @@
   "name": "reliquary",
   "private": true,
   "version": "0.1.0",
-  "description": "A skeleton kit for resurrecting dead software — and proving nothing was lost.",
+  "description": "A skeleton kit for resurrecting dead software \u2014 and proving nothing was lost.",
   "license": "MIT",
   "workspaces": [
     "packages/*",
@@ -16,12 +16,15 @@
     "security:check": "node scripts/security-check.mjs",
     "verify": "npm run typecheck && npm run security:check && npx vitest run",
     "build": "npm run build -w apps/card-catalogue && npm run build -w apps/parts-ledger",
-    "typecheck": "tsc -p packages/reliquary && tsc -p apps/card-catalogue && tsc -p apps/parts-ledger && tsc -p packages/core"
+    "typecheck": "tsc -p packages/reliquary && tsc -p apps/card-catalogue && tsc -p apps/parts-ledger && tsc -p packages/core",
+    "verify:bundle": "vite-node tools/verify/index.ts --",
+    "generate:stream": "vite-node scripts/generate-stream.ts"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.4.6",
     "@testing-library/react": "^16.0.0",
     "@testing-library/user-event": "^14.5.2",
+    "@types/node": "^26.6.6",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "fast-check": "^3.19.0",
