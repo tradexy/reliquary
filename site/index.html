@@ -3,21 +3,17 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Reliquary — two apps, one skeleton</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:wght@400;700&display=swap"
-      rel="stylesheet"
-    />
+    <title>Anchora — every action recorded, every record provably unchanged</title>
     <style>
       :root {
         color-scheme: dark;
-        --bg: #0d1a12;
-        --surface: #152118;
-        --ink: #e8dfc8;
-        --muted: #8a9e8d;
-        --bone: #d4c9a8;
+        --bg: #0f1419;
+        --surface: #161d24;
+        --ink: #e6e9ef;
+        --muted: #8b97a6;
+        --bone: #cfd6df;
+        --slate: #6f8fb3;
+        --ledger: #7aa87a;
       }
       * { box-sizing: border-box; }
       body {
@@ -25,130 +21,91 @@
         min-height: 100vh;
         background: var(--bg);
         color: var(--ink);
-        font-family: 'EB Garamond', Georgia, serif;
+        font-family: ui-serif, Georgia, 'Times New Roman', serif;
         background-image: repeating-linear-gradient(
-          0deg,
-          transparent,
-          transparent 3px,
-          rgba(212, 201, 168, 0.012) 3px,
-          rgba(212, 201, 168, 0.012) 4px
+          0deg, transparent, transparent 3px,
+          rgba(207, 214, 223, 0.012) 3px, rgba(207, 214, 223, 0.012) 4px
         );
       }
-      .wrap {
-        max-width: 1120px;
-        margin: 0 auto;
-        padding: 4rem 2rem 5rem;
-      }
+      .wrap { max-width: 1080px; margin: 0 auto; padding: 4.5rem 2rem 5rem; }
       .eyebrow {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 0.7rem;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase;
         color: var(--muted);
       }
       h1 {
-        font-family: 'Playfair Display', Georgia, serif;
-        font-weight: 400;
-        font-size: clamp(2.4rem, 5vw, 3.4rem);
-        margin: 0.6rem 0 0.75rem;
+        font-family: ui-serif, Georgia, serif;
+        font-weight: 400; font-size: clamp(2.6rem, 5vw, 3.6rem);
+        margin: 0.5rem 0 0.9rem; letter-spacing: -0.01em;
       }
-      .lede {
-        font-size: 1.15rem;
-        line-height: 1.55;
-        max-width: 62ch;
-        color: var(--ink);
-        margin: 0 0 0.5rem;
-      }
+      .lede { font-size: 1.2rem; line-height: 1.55; max-width: 60ch; margin: 0 0 0.75rem; }
       .note {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 0.78rem;
-        color: var(--muted);
-        line-height: 1.7;
-        max-width: 70ch;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 0.78rem; line-height: 1.8; color: var(--muted); max-width: 72ch;
       }
-      .cards {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
-        gap: 1.25rem;
-        margin: 3rem 0 0;
-      }
+      .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(21rem, 1fr)); gap: 1.25rem; margin: 3rem 0 0; }
       a.card {
-        display: block;
-        border: 1px solid rgba(212, 201, 168, 0.25);
-        padding: 1.5rem 1.5rem 1.75rem;
-        text-decoration: none;
-        color: var(--ink);
-        background: var(--surface);
+        display: block; text-decoration: none; color: var(--ink);
+        border: 1px solid rgba(207, 214, 223, 0.22);
+        background: var(--surface); padding: 1.6rem 1.6rem 1.8rem;
         transition: border-color 160ms ease, transform 160ms ease;
       }
-      a.card:hover,
-      a.card:focus-visible {
-        border-color: var(--bone);
-        transform: translateY(-2px);
-        outline: none;
-      }
-      a.card.rust { background: #241c16; border-color: rgba(200, 186, 168, 0.22); }
-      a.card.rust:hover, a.card.rust:focus-visible { border-color: #c8baa8; }
-      .card h2 {
-        font-family: 'Playfair Display', Georgia, serif;
-        font-weight: 400;
-        font-size: 1.6rem;
-        margin: 0 0 0.35rem;
-      }
+      a.card:hover, a.card:focus-visible { border-color: var(--bone); transform: translateY(-2px); outline: none; }
+      a.card.witness { border-color: rgba(122, 168, 122, 0.28); }
+      a.card.witness:hover, a.card.witness:focus-visible { border-color: var(--ledger); }
+      .card h2 { font-weight: 400; font-size: 1.65rem; margin: 0.15rem 0 0.4rem; }
       .card p { margin: 0 0 1rem; line-height: 1.5; }
-      .card .meta {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 0.72rem;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        color: var(--muted);
+      .meta {
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 0.7rem; letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted);
       }
-      .repo {
-        margin-top: 3rem;
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 0.78rem;
+      .foot {
+        margin-top: 3.5rem; padding-top: 1.25rem;
+        border-top: 1px solid rgba(207, 214, 223, 0.15);
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 0.75rem; color: var(--muted); display: flex; flex-wrap: wrap; gap: 1rem; justify-content: space-between;
       }
-      .repo a { color: #7eb87e; }
+      .foot a { color: var(--slate); }
     </style>
   </head>
   <body>
     <main class="wrap">
-      <p class="eyebrow">Kiroween 2026 · Skeleton Crew</p>
-      <h1>Reliquary</h1>
+      <p class="eyebrow">Kiroween 2026 · Frankenstein</p>
+      <h1>Anchora</h1>
       <p class="lede">
-        A skeleton kit for resurrecting dead software — and proving nothing was lost.
-        Two applications, one contract, one reconciliation report.
+        Every action is recorded, and every record is provably unchanged.
       </p>
       <p class="note">
-        Both apps are built from the same package. Each imports exactly one adapter that maps a
-        legacy export onto the kit's contract, then supplies its own theme and screens.
+        Two pillars of one audit trail. Integrity proves nobody edited the record;
+        capture proves nothing was left out. Both run offline, on seeded evidence a
+        judge can re-verify with one command.
       </p>
 
       <div class="cards">
-        <a class="card" href="./cards/">
-          <p class="meta">Search-first · 2,000 cards</p>
-          <h2>Card Catalogue</h2>
+        <a class="card" href="./seal/">
+          <p class="meta">Integrity · 500 events · 9 seals · 4 anchors</p>
+          <h2>Seal</h2>
           <p>
-            A volunteer archive's 1994 dBase export, resurrected for public search. Every field
-            carries its provenance.
+            A hash-chained, signed, anchored audit trail — and the tool that breaks it
+            on camera to show you exactly which record moved.
           </p>
-          <p class="meta">Open the catalogue →</p>
+          <p class="meta">Inspect the chain →</p>
         </a>
-        <a class="card rust" href="./parts/">
-          <p class="meta">Task-first · 1,200 ledger lines</p>
-          <h2>Parts Ledger</h2>
+        <a class="card witness" href="./witness/">
+          <p class="meta">Capture · 14 auditable actions · 0 gaps</p>
+          <h2>Witness</h2>
           <p>
-            A scrapyard ledger inherited in an acquisition. Walk the bins, count what is there,
-            and reconcile it against the paper.
+            What happens when the audit store fails: widening actions stop, tightening
+            actions queue, and every compliance claim points at records.
           </p>
-          <p class="meta">Begin a stocktake →</p>
+          <p class="meta">Run the outage drill →</p>
         </a>
       </div>
 
-      <p class="repo">
-        Source: <a href="https://github.com/tradexy/reliquary">github.com/tradexy/reliquary</a>
-        &nbsp;·&nbsp; MIT
-      </p>
+      <div class="foot">
+        <span>Key fingerprint 7f2d0c75f3608e2d2f9743ca688960c5 · MIT</span>
+        <span><a href="https://github.com/tradexy/reliquary">github.com/tradexy/reliquary</a></span>
+      </div>
     </main>
   </body>
 </html>

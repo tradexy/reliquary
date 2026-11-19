@@ -14,9 +14,9 @@
  *   4. No existing event is ever mutated; every event in the store is frozen.
  */
 
-import { canonical } from '../crypto/canonical.js';
 import { sha256Hex } from '../crypto/hash.js';
 import { requireCatalogueEntry } from '../capture/catalogue.js';
+import { eventPreimage } from './preimage.js';
 import type { AuditEvent, AppendDraft } from './types.js';
 
 // ---------------------------------------------------------------------------
@@ -67,21 +67,8 @@ function rejectComputedFields(draft: AppendDraft): void {
 // ---------------------------------------------------------------------------
 
 async function computeEventHash(event: Omit<AuditEvent, 'hash'>): Promise<string> {
-  // Per design.md: hash = sha256(canonical({...event, hash: undefined}))
-  // canonical() rejects undefined values, so we build a plain object without
-  // the hash key rather than setting it to undefined.
-  const preimage: Record<string, unknown> = {
-    seq: event.seq,
-    at: event.at,
-    actor: event.actor,
-    action: event.action,
-    subject: event.subject,
-    outcome: event.outcome,
-    lawful: event.lawful,
-    detail: event.detail,
-    prevHash: event.prevHash,
-  };
-  return sha256Hex(canonical(preimage));
+  // Per design.md: hash = sha256(canonical(event without hash)).
+  return sha256Hex(eventPreimage(event));
 }
 
 // ---------------------------------------------------------------------------

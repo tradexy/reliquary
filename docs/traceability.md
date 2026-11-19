@@ -1,34 +1,41 @@
 # Requirements traceability
 
-Every requirement in `.kiro/specs/reliquary-kit/requirements.md`, mapped to the
+Every requirement in `.kiro/specs/anchora-evidence/requirements.md`, mapped to the
 tests that would fail if it stopped being true.
 
-| Req | Statement (short) | Tests | Status |
+| Req | Statement | Tests | Status |
 | --- | --- | --- | --- |
-| 1 | Adapter contract stays minimal | `packages/reliquary/src/contract/validate.test.ts` (13) | Covered |
-| 2 | Every row accounted for | `packages/reliquary/src/import/pipeline.test.ts` (21), `pipeline.pbt.test.ts` (11) | Covered |
-| 3 | Field mapping is visible | `pipeline.test.ts` — mapping dedup, unmapped, synthesised | Covered |
-| 4 | Losslessness is a tested invariant | `pipeline.pbt.test.ts` — 4 properties | Covered |
-| 5 | One shell, three screens | `packages/reliquary/src/ui/ui.test.tsx` (37) | Covered |
-| 6 | Two apps prove versatility | `apps/card-catalogue/src/source/cardSource.test.ts`, `apps/parts-ledger/src/source/ledgerSource.test.ts` | Covered |
-| 7 | Runs without ceremony | `npm run verify`, CI workflow on every push | Covered by CI |
-| 8 | Accessibility baseline | Partial: aria roles and keyboard paths in `ui.test.tsx`; contrast and reduced-motion are manual | **Partial** |
+| 1 | One chain format for every evidence type | `chain/append.test.ts`, `capture/catalogue.test.ts` | Covered |
+| 2 | The hash covers everything that matters | `crypto/canonical.test.ts`, `crypto/hash.test.ts` | Covered |
+| 3 | Edit, delete, insert and reorder are detectable | `chain/verify.test.ts` (truth table + PBT), `chain/bundle.test.ts` | Covered |
+| 4 | Appends are one ordered operation | `chain/append.test.ts` (concurrent appends, frozen events) | Covered |
+| 5 | Signed chain heads, key outside the data | `chain/seal.test.ts`, `chain/bundle.test.ts` | Covered |
+| 6 | Anchors in create-only storage | `chain/anchor.test.ts` (`wx` refusal, original bytes intact) | Covered |
+| 7 | Verification is a runnable artefact | `tools/verify/verify.test.ts` (clean pass, doctored fail, fingerprint) | Covered |
+| 8 | Scheduled verification and alerting | Covered in part: verification state and control states exist; there is no scheduler or pager | **Partial** |
+| 9 | Lawful change classified, not concealed | `chain/verify.test.ts`, `chain/bundle.test.ts` (144, 288, 401) | Covered |
+| 10 | Capture is fail-closed where it must be | `capture/writers.test.ts`, `apps/witness` drill tests | Covered |
+| 11 | Coverage visible and enforced | `capture/catalogue.test.ts` (guard test), Witness coverage matrix | Covered |
+| 12 | Evidence traces to records | `evidence/evidence.test.ts`, Witness export-then-verify test | Covered |
+| 13 | Two apps, one core | `apps/seal/App.test.tsx`, `apps/witness` tests; no duplicated crypto | Covered |
+| 14 | Honest claims | `docs/limits.md`, `simulated` badges, security scan for banned words | Covered |
+| 15 | Runs sealed | System fonts, no network calls, CSP `connect-src 'none'` | Covered |
 
 ## Honest gaps
 
-- **Req 8 is not fully automated.** We test roles, labels and the presence of the
-  reduced-motion hook, but contrast has not been measured with a tool. Claiming
-  full WCAG 2.2 AA compliance would be false.
-- **Req 7 is verified by the pipeline, not by a test file.** The deploy workflow
-  runs `npm ci`, the suite and both builds on a clean Ubuntu runner, which is a
-  stronger check than a local one.
-- **Security properties are tracked in `docs/threat-model.md`**, not here, because
-  they are not in the original requirements document. That spec was written before
-  the security pass and should probably gain a requirement 9.
+- **Requirement 8 is partial.** The control states and the tamper-evident alert state
+  exist; the scheduled job and the pager do not. Said plainly here rather than implied
+  by a green tick.
+- **Requirement 14's word check is manual.** The security scanner blocks `eval`,
+  HTML sinks, storage and credentials, but not the words "tamper-proof"; review does
+  that.
+- **Requirement 15 is verified by inspection** of the built HTML (no font hosts, CSP
+  present), not by an automated test.
 
-## How to re-run the evidence
+## Re-running the evidence
 
 ```bash
-npm run verify        # typecheck + static security scan + 201 tests
-npm run test:pbt      # property-based suite at 1,000 runs
+npm run verify                                   # typecheck + security scan + 176 tests
+npm run test:pbt                                 # property-based suite at 1,000 runs
+npm run verify:bundle -- packages/core/data/bundle.json
 ```

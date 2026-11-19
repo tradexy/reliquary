@@ -28,3 +28,4 @@ export {
 } from './findings.js';
 export { createSeal, createSeals, verifySeal, sealPayload } from './seal.js';
 export { createAnchor, anchorDigestOf } from './anchor.js';
+export { eventPreimage } from './preimage.js';

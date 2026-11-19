@@ -32,18 +32,20 @@ jobs:
 
       - name: Build both apps
         run: |
-          npm run build -w apps/card-catalogue
-          npm run build -w apps/parts-ledger
+          npm run build -w apps/seal
+          npm run build -w apps/witness
+
+      - name: Verify the demo bundle offline
+        run: npm run verify:bundle -- packages/core/data/bundle.json
 
       - name: Assemble site
         run: |
-          mkdir -p _site/cards _site/parts
-          cp -R apps/card-catalogue/dist/. _site/cards/
-          cp -R apps/parts-ledger/dist/. _site/parts/
+          mkdir -p _site/seal _site/witness
+          cp -R apps/seal/dist/. _site/seal/
+          cp -R apps/witness/dist/. _site/witness/
           cp site/index.html _site/index.html
-          # SPA-ish fallback for direct links to a route
-          cp _site/cards/index.html _site/cards/404.html
-          cp _site/parts/index.html _site/parts/404.html
+          cp _site/seal/index.html _site/seal/404.html
+          cp _site/witness/index.html _site/witness/404.html
 
       - uses: actions/configure-pages@v5
 

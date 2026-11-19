@@ -2,23 +2,23 @@
   "name": "reliquary",
   "private": true,
   "version": "0.1.0",
-  "description": "A skeleton kit for resurrecting dead software \u2014 and proving nothing was lost.",
+  "description": "Anchora \u2014 an evidence core for audit trails in sealed environments.",
   "license": "MIT",
   "workspaces": [
     "packages/*",
     "apps/*"
   ],
   "scripts": {
-    "dev:cards": "npm run dev -w apps/card-catalogue",
-    "dev:parts": "npm run dev -w apps/parts-ledger",
+    "dev:seal": "npm run dev -w apps/seal",
+    "dev:witness": "npm run dev -w apps/witness",
     "test": "vitest run",
     "test:pbt": "PBT_RUNS=1000 vitest run",
     "security:check": "node scripts/security-check.mjs",
     "verify": "npm run typecheck && npm run security:check && npx vitest run",
-    "build": "npm run build -w apps/card-catalogue && npm run build -w apps/parts-ledger",
-    "typecheck": "tsc -p packages/reliquary && tsc -p apps/card-catalogue && tsc -p apps/parts-ledger && tsc -p packages/core",
     "verify:bundle": "vite-node tools/verify/index.ts --",
-    "generate:stream": "vite-node scripts/generate-stream.ts"
+    "generate:stream": "vite-node scripts/generate-stream.ts",
+    "typecheck": "tsc -p packages/core && tsc -p apps/seal && tsc -p apps/witness && tsc -p tools",
+    "build": "npm run build -w apps/seal && npm run build -w apps/witness"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.4.6",

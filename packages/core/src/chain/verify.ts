@@ -34,6 +34,7 @@ import {
   firstDivergenceSeq,
 } from './findings.js';
 import { GENESIS_PREV_HASH } from './append.js';
+import { eventPreimage } from './preimage.js';
 import type { Finding } from './types.js';
 
 // ---------------------------------------------------------------------------
@@ -52,18 +53,7 @@ export interface VerifyBundle {
 // ---------------------------------------------------------------------------
 
 async function recomputeHash(event: AuditEvent): Promise<string> {
-  const preimage: Record<string, unknown> = {
-    seq: event.seq,
-    at: event.at,
-    actor: event.actor,
-    action: event.action,
-    subject: event.subject,
-    outcome: event.outcome,
-    lawful: event.lawful,
-    detail: event.detail,
-    prevHash: event.prevHash,
-  };
-  return sha256Hex(canonical(preimage));
+  return sha256Hex(eventPreimage(event));
 }
 
 // ---------------------------------------------------------------------------
