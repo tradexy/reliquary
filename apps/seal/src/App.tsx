@@ -29,15 +29,18 @@ import {
   matchesText,
   rowState,
 } from './model.js'
-import type { Evidence } from './model.js'
-
-const ORIGINAL_EVIDENCE: Evidence = ORIGINAL
+import type { DemoBundle, Evidence } from './model.js'
 
 function short(hash: string, n: number): string {
   return `${hash.slice(0, n)}…`
 }
 
-export function App() {
+export interface AppProps {
+  /** Evidence to show. Defaults to the committed demo bundle. */
+  bundle?: DemoBundle
+}
+
+export function App({ bundle = ORIGINAL }: AppProps = {}) {
   // `tampered` is an in-memory copy; null means "showing the original bundle".
   const [tampered, setTampered] = useState<Evidence | null>(null)
   const [selected, setSelected] = useState<number | null>(null)
@@ -46,7 +49,7 @@ export function App() {
   const [result, setResult] = useState<VerificationResult | null>(null)
   const [running, setRunning] = useState(false)
 
-  const evidence = tampered ?? ORIGINAL_EVIDENCE
+  const evidence = tampered ?? bundle
   const runId = useRef(0)
 
   const run = useCallback(async (target: Evidence) => {
@@ -54,32 +57,32 @@ export function App() {
     setRunning(true)
     const r = await verifyChain(
       {
-        formatVersion: ORIGINAL.formatVersion,
+        formatVersion: bundle.formatVersion,
         events: target.events,
         seals: target.seals,
         anchors: target.anchors,
       },
-      ORIGINAL.publicKeyPem,
-      ORIGINAL.keyFingerprint,
+      bundle.publicKeyPem,
+      bundle.keyFingerprint,
     )
     // A newer run supersedes this one.
     if (id === runId.current) {
       setResult(r)
       setRunning(false)
     }
-  }, [])
+  }, [bundle])
 
   // Initial verification on load so the demo starts with every control `ok`.
   useEffect(() => {
-    void run(ORIGINAL_EVIDENCE)
-  }, [run])
+    void run(bundle)
+  }, [run, bundle])
 
   const apply = useCallback(
     (next: Evidence | null) => {
       setTampered(next)
-      void run(next ?? ORIGINAL_EVIDENCE)
+      void run(next ?? bundle)
     },
-    [run],
+    [run, bundle],
   )
 
   const errors = useMemo(() => errorSeqs(result?.findings ?? []), [result])
@@ -116,7 +119,7 @@ export function App() {
       subtitle="Proves nothing changed. Every record is hash-chained, signed and anchored, and you can recompute it."
       nav={<span aria-current="page">Chain</span>}
       footer={{
-        keyFingerprint: ORIGINAL.keyFingerprint,
+        keyFingerprint: bundle.keyFingerprint,
         events: evidence.events.length,
         rejections: refused,
       }}
