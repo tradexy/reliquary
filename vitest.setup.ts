@@ -43,3 +43,9 @@ if (!globalThis.crypto?.subtle) {
     writable: true,
   })
 }
+
+// The Seal app verifies 500 events on mount before rendering PASS. On a cold CI
+// runner that exceeds Testing Library's 1s default for findBy*/waitFor.
+import { configure } from '@testing-library/react'
+
+configure({ asyncUtilTimeout: 10_000 })
