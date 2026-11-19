@@ -30,3 +30,16 @@ configureGlobal({
   // same seed logged in the output.
   seed: 42,
 })
+
+// jsdom does not expose WebCrypto's subtle API, and Node 20's global crypto may
+// be partial. The core hashes and signs with crypto.subtle, so tests need a real
+// implementation regardless of environment.
+import { webcrypto } from 'node:crypto'
+
+if (!globalThis.crypto?.subtle) {
+  Object.defineProperty(globalThis, 'crypto', {
+    value: webcrypto,
+    configurable: true,
+    writable: true,
+  })
+}
