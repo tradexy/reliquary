@@ -78,6 +78,8 @@ body { margin: 0; background: var(--color-bg); color: var(--color-ink);
 .ax-intro-lede { font-size: 18px; margin: 0 0 20px; }
 .ax-intro h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-muted); margin: 24px 0 8px; }
 .ax-intro p { margin: 0 0 12px; }
+.ax-intro-story-label { font-size: 12px; letter-spacing: 0.08em; color: var(--color-accent); margin: 24px 0 4px !important; }
+.ax-intro .ax-intro-story-title { font-family: var(--font-display); font-weight: 400; font-size: 22px; text-transform: none; letter-spacing: 0; color: var(--color-ink); margin: 0 0 12px; }
 .ax-intro-steps { margin: 0; padding-left: 22px; display: grid; gap: 8px; }
 .ax-intro-figure { margin: 24px 0 0; padding: 16px; background: var(--color-surface); border: 1px solid var(--color-muted); border-radius: var(--radius); }
 .ax-intro-cta { font-size: 15px; padding: 8px 18px; margin-top: 12px; }

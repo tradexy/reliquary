@@ -6,6 +6,7 @@ import {
   Badge,
   ControlPanel,
   FindingList,
+  Intro,
   Table,
   TBody,
   Td,
@@ -97,5 +98,33 @@ describe('components', () => {
     expect(screen.getByRole('contentinfo')).toHaveTextContent('abc')
     expect(screen.getByRole('contentinfo')).toHaveTextContent('5')
     expect(screen.getByRole('main')).toHaveTextContent('body')
+  })
+})
+
+describe('Intro story', () => {
+  const base = {
+    title: 'T',
+    lede: 'L',
+    steps: ['one', 'two', 'three'],
+    example: 'E',
+    illustration: <span>fig</span>,
+    ctaLabel: 'Go',
+    onCta: () => {},
+  }
+
+  it('renders the story above the steps when supplied', () => {
+    render(<Intro {...base} story={{ title: 'A tale', paragraphs: ['First.', 'Second.'] }} />)
+    expect(screen.getByText('THE STORY')).toBeTruthy()
+    expect(screen.getByRole('heading', { name: 'A tale' })).toBeTruthy()
+    expect(screen.getByText('Second.')).toBeTruthy()
+    const story = screen.getByRole('region', { name: 'A tale' })
+    const how = screen.getByRole('region', { name: 'How it works' })
+    expect(story.compareDocumentPosition(how) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
+
+  it('renders no story section when not supplied', () => {
+    render(<Intro {...base} />)
+    expect(screen.queryByText('THE STORY')).toBeNull()
+    expect(screen.getByRole('region', { name: 'How it works' })).toBeTruthy()
   })
 })

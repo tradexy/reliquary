@@ -44,6 +44,7 @@ jobs:
           cp -R apps/seal/dist/. _site/seal/
           cp -R apps/witness/dist/. _site/witness/
           cp site/index.html _site/index.html
+          cp site/favicon.svg _site/favicon.svg
           cp _site/seal/index.html _site/seal/404.html
           cp _site/witness/index.html _site/witness/404.html
 

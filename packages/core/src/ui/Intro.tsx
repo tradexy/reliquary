@@ -1,8 +1,15 @@
 import type { ReactNode } from 'react';
 
+export interface IntroStory {
+  title: string;
+  paragraphs: string[];
+}
+
 export interface IntroProps {
   title: string;
   lede: string;
+  /** Optional concrete opening story, rendered between the lede and the steps. */
+  story?: IntroStory;
   /** Exactly the steps of the "how it works" list, in order. */
   steps: readonly string[];
   exampleTitle?: string;
@@ -14,11 +21,20 @@ export interface IntroProps {
 }
 
 /** "Start here" page: plain-English explainer shared by both apps. */
-export function Intro({ title, lede, steps, exampleTitle = 'A worked example', example, illustration, ctaLabel, onCta }: IntroProps) {
+export function Intro({ title, lede, story, steps, exampleTitle = 'A worked example', example, illustration, ctaLabel, onCta }: IntroProps) {
   return (
     <article className="ax-intro" aria-labelledby="ax-intro-title">
       <h2 id="ax-intro-title" className="ax-intro-title">{title}</h2>
       <p className="ax-intro-lede">{lede}</p>
+      {story ? (
+        <section className="ax-intro-story" aria-labelledby="ax-intro-story-title">
+          <p className="ax-intro-story-label ax-mono" aria-hidden="true">THE STORY</p>
+          <h3 id="ax-intro-story-title" className="ax-intro-story-title">{story.title}</h3>
+          {story.paragraphs.map((p) => (
+            <p key={p}>{p}</p>
+          ))}
+        </section>
+      ) : null}
       <section aria-labelledby="ax-intro-how">
         <h3 id="ax-intro-how">How it works</h3>
         <ol className="ax-intro-steps">

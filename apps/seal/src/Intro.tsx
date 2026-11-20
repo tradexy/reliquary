@@ -6,8 +6,17 @@ const STEPS = [
   'Every so often the end of the chain is signed (a seal), and a copy (an anchor) is put somewhere that cannot be overwritten.',
 ]
 
+const STORY = {
+  title: 'A bank, a changed row, and one command',
+  paragraphs: [
+    'Northgate Bank runs AI agents over commercial loan files. On 3 November an engineer with database access opened the audit table and changed one row. An agent run that had approved a two-million-pound facility now read as declined. Nothing in the application looked wrong; the table simply said something different.',
+    "The next morning the auditor did not open a dashboard. She ran one command against the export. It printed four words: divergence at 217. The engineer could have recomputed every hash in the table afterwards. It would not have helped, because a signed copy of the end of the chain had already been written to storage the bank's own administrators cannot delete.",
+    'Total time to find it: under a second. Total trust required in the bank: none.',
+  ],
+}
+
 const EXAMPLE =
-  'On 1 November at 09:00, someone with database access changes the subject of entry 217. Nothing looks wrong in the table. Seal recomputes the fingerprint, sees it no longer matches, and reports the first broken entry: 217. Recomputing every later fingerprint does not help, because the signed copy of the chain end was already written.'
+  'Entry 217 was edited. Seal recomputes its fingerprint, sees the mismatch, and reports 217 as the first broken entry.'
 
 function Illustration() {
   return (
@@ -44,6 +53,7 @@ export function SealIntro({ onOpen }: { onOpen: () => void }) {
     <Intro
       title="What Seal does"
       lede="An audit log is the list of everything that happened in a system. Seal makes it so that if anyone changes that list afterwards, you can tell."
+      story={STORY}
       steps={STEPS}
       example={EXAMPLE}
       illustration={<Illustration />}
