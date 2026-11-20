@@ -20,10 +20,12 @@ import {
   witnessTheme,
 } from '@anchora/core/ui'
 import { ORIGINAL, loadCoverage, lawfulRows } from './model.js'
+import { WitnessIntro } from './Intro.js'
 
-type Screen = 'coverage' | 'drill' | 'lawful' | 'evidence'
+type Screen = 'start' | 'coverage' | 'drill' | 'lawful' | 'evidence'
 
 const SCREENS: readonly { id: Screen; label: string }[] = [
+  { id: 'start', label: 'Start here' },
   { id: 'coverage', label: 'Coverage' },
   { id: 'drill', label: 'Drill' },
   { id: 'lawful', label: 'Lawful changes' },
@@ -34,7 +36,7 @@ const ACTOR = { id: 'ravi.menon', role: 'security-lead' }
 
 function screenFromHash(): Screen {
   const id = window.location.hash.replace(/^#/, '')
-  return SCREENS.find((s) => s.id === id)?.id ?? 'coverage'
+  return SCREENS.find((s) => s.id === id)?.id ?? 'start'
 }
 
 // -- Coverage ----------------------------------------------------------------
@@ -435,6 +437,7 @@ export function App() {
         rejections: counts.refused,
       }}
     >
+      {screen === 'start' ? <WitnessIntro onOpen={() => go('coverage')} /> : null}
       {screen === 'coverage' ? <CoverageScreen /> : null}
       {screen === 'drill' ? (
         <DrillScreen

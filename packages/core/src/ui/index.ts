@@ -28,3 +28,5 @@ export type {
 } from './components.js';
 export { AppShell } from './AppShell.js';
 export type { AppShellProps, AppShellFooter } from './AppShell.js';
+export { Intro } from './Intro.js';
+export type { IntroProps } from './Intro.js';

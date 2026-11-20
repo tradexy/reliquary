@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { beforeEach, describe, it, expect } from 'vitest'
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { App } from './App.js'
@@ -25,10 +25,28 @@ const row = (container: HTMLElement, seq: number) =>
 
 async function renderVerified() {
   const utils = render(<App bundle={fixture} />)
+  await userEvent.click(screen.getByRole('tab', { name: 'Chain' }))
   // The initial verification seeds every control as ok.
   await screen.findByText('PASS', undefined, { timeout: 5000 })
   return utils
 }
+
+beforeEach(() => {
+  window.location.hash = ''
+})
+
+describe('Seal start page', () => {
+  it('is the default screen, listed first, and leads to the chain', async () => {
+    render(<App bundle={fixture} />)
+    expect(screen.getAllByRole('tab')[0]).toHaveTextContent('Start here')
+    expect(screen.getByRole('tab', { name: 'Start here' })).toHaveAttribute('aria-selected', 'true')
+    expect(screen.getByRole('heading', { name: 'What Seal does' })).toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: 'Open the chain' }))
+    expect(screen.getByRole('tab', { name: 'Chain' })).toHaveAttribute('aria-selected', 'true')
+    expect(screen.getByRole('heading', { name: 'Chain' })).toBeInTheDocument()
+    await screen.findByText('PASS', undefined, { timeout: 5000 })
+  })
+})
 
 describe('Seal app', () => {
   it('renders the chain and starts with every control ok', async () => {

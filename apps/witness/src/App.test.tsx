@@ -11,9 +11,23 @@ beforeEach(() => {
   window.location.hash = ''
 })
 
+describe('Witness start page', () => {
+  it('is the default screen, listed first, and leads to the coverage matrix', async () => {
+    render(<App />)
+    expect(screen.getAllByRole('tab')[0]).toHaveTextContent('Start here')
+    expect(tab('Start here')).toHaveAttribute('aria-selected', 'true')
+    expect(screen.getByRole('heading', { name: 'What Witness does' })).toBeInTheDocument()
+    expect(screen.getAllByRole('listitem').length).toBeGreaterThanOrEqual(3)
+    await userEvent.click(screen.getByRole('button', { name: 'See the coverage matrix' }))
+    expect(tab('Coverage')).toHaveAttribute('aria-selected', 'true')
+    expect(screen.getByTestId('total-actions')).toBeInTheDocument()
+  })
+})
+
 describe('Witness app', () => {
-  it('renders every catalogued action and reports zero gaps', () => {
+  it('renders every catalogued action and reports zero gaps', async () => {
     const { container } = render(<App />)
+    await userEvent.click(tab('Coverage'))
     for (const entry of CATALOGUE) {
       expect(container.querySelector(`tr[data-action="${entry.id}"]`)).not.toBeNull()
     }

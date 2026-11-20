@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <title>Witness</title>
+  <rect x="2" y="2" width="28" height="28" fill="none" stroke="#7aa87a" stroke-width="2"/>
+  <rect x="7" y="8" width="18" height="4" fill="#7aa87a"/>
+  <rect x="7" y="14" width="13" height="4" fill="#7aa87a"/>
+  <rect x="7" y="20" width="8" height="4" fill="#7aa87a"/>
+</svg>

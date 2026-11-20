@@ -30,6 +30,19 @@ import {
   rowState,
 } from './model.js'
 import type { DemoBundle, Evidence } from './model.js'
+import { SealIntro } from './Intro.js'
+
+type Screen = 'start' | 'chain'
+
+const SCREENS: readonly { id: Screen; label: string }[] = [
+  { id: 'start', label: 'Start here' },
+  { id: 'chain', label: 'Chain' },
+]
+
+function screenFromHash(): Screen {
+  const id = window.location.hash.replace(/^#/, '')
+  return SCREENS.find((s) => s.id === id)?.id ?? 'start'
+}
 
 function short(hash: string, n: number): string {
   return `${hash.slice(0, n)}…`
@@ -48,6 +61,11 @@ export function App({ bundle = ORIGINAL }: AppProps = {}) {
   const [text, setText] = useState('')
   const [result, setResult] = useState<VerificationResult | null>(null)
   const [running, setRunning] = useState(false)
+  const [screen, setScreen] = useState<Screen>(screenFromHash)
+  const go = (s: Screen) => {
+    window.location.hash = s
+    setScreen(s)
+  }
 
   const evidence = tampered ?? bundle
   const runId = useRef(0)
@@ -117,13 +135,31 @@ export function App({ bundle = ORIGINAL }: AppProps = {}) {
       theme={sealTheme}
       title="Seal"
       subtitle="Proves nothing changed. Every record is hash-chained, signed and anchored, and you can recompute it."
-      nav={<span aria-current="page">Chain</span>}
+      nav={
+        <div role="tablist" aria-label="Screens" className="ax-row">
+          {SCREENS.map((s) => (
+            <button
+              key={s.id}
+              type="button"
+              role="tab"
+              aria-selected={screen === s.id}
+              className={`ax-btn${screen === s.id ? ' ax-btn--primary' : ''}`}
+              onClick={() => go(s.id)}
+            >
+              {s.label}
+            </button>
+          ))}
+        </div>
+      }
       footer={{
         keyFingerprint: bundle.keyFingerprint,
         events: evidence.events.length,
         rejections: refused,
       }}
     >
+      {screen === 'start' ? <SealIntro onOpen={() => go('chain')} /> : null}
+      {screen === 'chain' ? (
+      <>
       <Panel title="Controls">
         <ControlPanel controls={controls} />
       </Panel>
@@ -283,6 +319,8 @@ export function App({ bundle = ORIGINAL }: AppProps = {}) {
           />
         </div>
       </div>
+      </>
+      ) : null}
     </AppShell>
   )
 }

@@ -73,6 +73,26 @@ body { margin: 0; background: var(--color-bg); color: var(--color-ink);
 .ax-skip { position: absolute; left: -9999px; }
 .ax-skip:focus { left: 8px; top: 8px; background: var(--color-surface); padding: 6px 10px; z-index: 10; }
 :focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+.ax-intro { max-width: 720px; }
+.ax-intro-title { font-family: var(--font-display); font-weight: 400; font-size: 30px; margin: 0 0 8px; }
+.ax-intro-lede { font-size: 18px; margin: 0 0 20px; }
+.ax-intro h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-muted); margin: 24px 0 8px; }
+.ax-intro p { margin: 0 0 12px; }
+.ax-intro-steps { margin: 0; padding-left: 22px; display: grid; gap: 8px; }
+.ax-intro-figure { margin: 24px 0 0; padding: 16px; background: var(--color-surface); border: 1px solid var(--color-muted); border-radius: var(--radius); }
+.ax-intro-cta { font-size: 15px; padding: 8px 18px; margin-top: 12px; }
+.ax-fig-row { display: flex; align-items: stretch; gap: 8px; flex-wrap: wrap; }
+.ax-fig-block { flex: 1 1 120px; min-width: 0; border: 1px solid var(--color-muted); border-radius: var(--radius); padding: 8px 10px; background: var(--color-bg); }
+.ax-fig-block[data-bad="true"] { border-color: var(--color-danger); }
+.ax-fig-block strong { display: block; font-size: 13px; }
+.ax-fig-block span { font-family: var(--font-mono); font-size: 12px; color: var(--color-muted); }
+.ax-fig-arrow { align-self: center; font-family: var(--font-mono); color: var(--color-accent); white-space: nowrap; }
+.ax-fig-arrow[data-bad="true"] { color: var(--color-danger); }
+.ax-fig-caption { margin: 10px 0 0 !important; font-size: 13px; color: var(--color-muted); }
+.ax-fig-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.ax-fig-col { border: 1px solid var(--color-muted); border-radius: var(--radius); padding: 10px 12px; background: var(--color-bg); }
+.ax-fig-col h4 { margin: 0 0 6px; font-size: 15px; }
+.ax-fig-col ul { margin: 0; padding-left: 18px; font-size: 14px; }
 @media (max-width: 860px) { .ax-grid { grid-template-columns: minmax(0, 1fr); }
   .ax-controls { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (prefers-reduced-motion: no-preference) {
