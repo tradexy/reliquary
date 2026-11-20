@@ -3,8 +3,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <meta name="description" content="Anchora — every action recorded, every record provably unchanged. Two apps, one audit trail you can verify offline." />
     <title>Anchora — every action recorded, every record provably unchanged</title>
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <style>
       :root {
         color-scheme: dark;
@@ -15,93 +16,192 @@
         --bone: #cfd6df;
         --slate: #6f8fb3;
         --ledger: #7aa87a;
+        --danger: #b4634a;
       }
       * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
       body {
         margin: 0;
         min-height: 100vh;
         background: var(--bg);
         color: var(--ink);
         font-family: ui-serif, Georgia, 'Times New Roman', serif;
+        font-size: 17px;
+        line-height: 1.6;
         background-image: repeating-linear-gradient(
           0deg, transparent, transparent 3px,
           rgba(207, 214, 223, 0.012) 3px, rgba(207, 214, 223, 0.012) 4px
         );
       }
-      .wrap { max-width: 1080px; margin: 0 auto; padding: 4.5rem 2rem 5rem; }
+      .wrap { max-width: 1000px; margin: 0 auto; padding: 4rem 1.5rem 5rem; }
       .eyebrow {
         font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-        font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase;
-        color: var(--muted);
+        font-size: 0.68rem; letter-spacing: 0.16em; text-transform: uppercase;
+        color: var(--muted); margin: 0 0 0.75rem;
       }
       h1 {
-        font-family: ui-serif, Georgia, serif;
-        font-weight: 400; font-size: clamp(2.6rem, 5vw, 3.6rem);
-        margin: 0.5rem 0 0.9rem; letter-spacing: -0.01em;
+        font-weight: 400; font-size: clamp(2.6rem, 6vw, 4rem);
+        margin: 0 0 1rem; letter-spacing: -0.015em; line-height: 1.05;
       }
-      .lede { font-size: 1.2rem; line-height: 1.55; max-width: 60ch; margin: 0 0 0.75rem; }
-      .note {
+      .claim { font-size: 1.35rem; line-height: 1.5; max-width: 40ch; margin: 0 0 0.75rem; }
+      .sub { color: var(--muted); max-width: 62ch; margin: 0 0 3rem; }
+      h2 {
+        font-weight: 400; font-size: 1.6rem; margin: 3.5rem 0 1rem;
+        padding-top: 1.5rem; border-top: 1px solid rgba(207, 214, 223, 0.15);
+      }
+      h3 { font-weight: 400; font-size: 1.1rem; margin: 2rem 0 0.4rem; }
+      p { max-width: 66ch; margin: 0 0 1rem; }
+      .story p { font-size: 1.05rem; }
+      .beat {
+        display: grid; grid-template-columns: 3.5rem 1fr; gap: 0.5rem;
+        margin: 0 0 1.4rem; align-items: start;
+      }
+      .beat .when {
         font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-        font-size: 0.78rem; line-height: 1.8; color: var(--muted); max-width: 72ch;
+        font-size: 0.72rem; color: var(--muted); padding-top: 0.42rem;
+        letter-spacing: 0.04em;
       }
-      .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(21rem, 1fr)); gap: 1.25rem; margin: 3rem 0 0; }
+      .beat p { margin: 0; }
+      .pull {
+        border-left: 2px solid var(--slate);
+        padding: 0.35rem 0 0.35rem 1.1rem;
+        margin: 2rem 0;
+        font-size: 1.2rem;
+        max-width: 52ch;
+      }
+      .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr)); gap: 1.25rem; margin: 1.5rem 0 0; }
       a.card {
         display: block; text-decoration: none; color: var(--ink);
         border: 1px solid rgba(207, 214, 223, 0.22);
-        background: var(--surface); padding: 1.6rem 1.6rem 1.8rem;
+        background: var(--surface); padding: 1.5rem 1.5rem 1.7rem;
         transition: border-color 160ms ease, transform 160ms ease;
       }
       a.card:hover, a.card:focus-visible { border-color: var(--bone); transform: translateY(-2px); outline: none; }
       a.card.witness { border-color: rgba(122, 168, 122, 0.28); }
       a.card.witness:hover, a.card.witness:focus-visible { border-color: var(--ledger); }
-      .card h2 { font-weight: 400; font-size: 1.65rem; margin: 0.15rem 0 0.4rem; }
-      .card p { margin: 0 0 1rem; line-height: 1.5; }
+      .card h3 { margin: 0.15rem 0 0.45rem; font-size: 1.5rem; }
+      .card p { margin: 0 0 1rem; font-size: 0.98rem; }
       .meta {
         font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-        font-size: 0.7rem; letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted);
+        font-size: 0.68rem; letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted);
       }
+      pre {
+        background: var(--surface); border: 1px solid rgba(207, 214, 223, 0.15);
+        padding: 1rem 1.1rem; overflow-x: auto; font-size: 0.8rem; line-height: 1.7;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--bone);
+        max-width: 72ch;
+      }
+      code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
       .foot {
         margin-top: 3.5rem; padding-top: 1.25rem;
         border-top: 1px solid rgba(207, 214, 223, 0.15);
         font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-        font-size: 0.75rem; color: var(--muted); display: flex; flex-wrap: wrap; gap: 1rem; justify-content: space-between;
+        font-size: 0.72rem; color: var(--muted);
+        display: flex; flex-wrap: wrap; gap: 1rem; justify-content: space-between;
       }
       .foot a { color: var(--slate); }
+      .small { font-size: 0.92rem; color: var(--muted); }
     </style>
   </head>
   <body>
     <main class="wrap">
       <p class="eyebrow">Kiroween 2026 · Frankenstein</p>
       <h1>Anchora</h1>
-      <p class="lede">
-        Every action is recorded, and every record is provably unchanged.
+      <p class="claim">Every action is recorded, and every record is provably unchanged.</p>
+      <p class="sub">
+        An audit trail for systems that run AI agents over other people's money, patients
+        and secrets. Two apps, one file an outsider can check without trusting you.
       </p>
-      <p class="note">
-        Two pillars of one audit trail. Integrity proves nobody edited the record;
-        capture proves nothing was left out. Both run offline, on seeded evidence a
-        judge can re-verify with one command.
+
+      <h2>The story</h2>
+      <div class="story">
+        <div class="beat">
+          <span class="when">09:14</span>
+          <p>
+            Northgate Bank runs AI agents over commercial loan files. An engineer with
+            database access opens the audit table and changes one row. An agent run that
+            had approved a two-million-pound facility now reads as declined.
+          </p>
+        </div>
+        <div class="beat">
+          <span class="when">09:16</span>
+          <p>
+            Nothing looks wrong. No alert fires. The dashboard is green, because the
+            dashboard is reading the same table that was just edited.
+          </p>
+        </div>
+        <div class="beat">
+          <span class="when">09:31</span>
+          <p>
+            The audit store goes down for forty minutes. A contractor asks for
+            administrator rights. The platform refuses: no record, no grant. A departing
+            employee's access is revoked in the same window — that completes, and its
+            record waits in a queue, because blocking a removal during an outage would be
+            worse than the outage.
+          </p>
+        </div>
+        <div class="beat">
+          <span class="when">Next day</span>
+          <p>
+            The auditor runs one command. It prints <strong>divergence at 217</strong>.
+            She does not ask the bank for anything, and she does not need their
+            cooperation to check the rest.
+          </p>
+        </div>
+      </div>
+
+      <p class="pull">
+        The engineer could recompute every hash in the table afterwards. It would not
+        help: a signed copy of the end of the chain was already written somewhere the
+        bank's own administrators cannot delete.
+      </p>
+
+      <h2>Two questions, two apps</h2>
+      <p>
+        Neither question is enough on its own. A record that is provably unchanged is
+        still useless if the action never reached it; a complete record is worthless if
+        anyone with a database login can rewrite it.
       </p>
 
       <div class="cards">
         <a class="card" href="./seal/">
           <p class="meta">Integrity · 500 events · 9 seals · 4 anchors</p>
-          <h2>Seal</h2>
+          <h3>Seal</h3>
           <p>
-            A hash-chained, signed, anchored audit trail — and the tool that breaks it
-            on camera to show you exactly which record moved.
+            <strong>Did anything change?</strong> Edit a row on camera and see the exact
+            entry come back broken — with the first-divergence index, not a green tick.
           </p>
           <p class="meta">Inspect the chain →</p>
         </a>
         <a class="card witness" href="./witness/">
           <p class="meta">Capture · 14 auditable actions · 0 gaps</p>
-          <h2>Witness</h2>
+          <h3>Witness</h3>
           <p>
-            What happens when the audit store fails: widening actions stop, tightening
-            actions queue, and every compliance claim points at records.
+            <strong>Did the action leave a record?</strong> Run the outage drill: a grant
+            is refused, a revoke queues, and every compliance claim points at the events
+            that prove it.
           </p>
           <p class="meta">Run the outage drill →</p>
         </a>
       </div>
+
+      <h2>Check it yourself</h2>
+      <p>
+        The whole claim is one command against one file. Nothing is fetched, no account
+        is needed, and it exits non-zero if a single byte has moved.
+      </p>
+      <pre><code>npm run verify:bundle -- packages/core/data/bundle.json
+
+  events      500
+  seals       9
+  anchors     4
+  key         7f2d0c75f3608e2d2f9743ca688960c5
+  result      PASS
+  divergence  none</code></pre>
+      <p class="small">
+        Change one field in that file and the same command exits 1 with
+        <code>divergence 217</code>.
+      </p>
 
       <div class="foot">
         <span>Key fingerprint 7f2d0c75f3608e2d2f9743ca688960c5 · MIT</span>
