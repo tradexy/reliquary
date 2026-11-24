@@ -1,8 +1,7 @@
 # Kiro journal
 
-A running, dated record of what Kiro actually did on this project. This is the raw
-material for the "how Kiro was used" write-up and the video's final section, so it
-is written as it happens, not reconstructed afterwards.
+A dated record of what Kiro actually did on Anchora, and what broke. This is raw
+material for the "how Kiro was used" write-up and the video's final section.
 
 Rule: if it isn't in here, it doesn't go in the submission.
 
@@ -10,211 +9,109 @@ Rule: if it isn't in here, it doesn't go in the submission.
 
 ## 2026-11-13 — Setup
 
-- Registered for Kiroween 2026 (Skeleton Crew).
-- Kiro CLI 3.3.0 installed; signed in as Builder ID.
-- Credits requested (4,000, review ~48h). Building on the free tier until they land.
-- Wrote steering docs by hand: `product.md`, `tech.md`, `conventions.md`.
-- Wrote `requirements.md` (8 requirements, EARS style) before any code existed.
-- Wrote `design.md` and `tasks.md`.
+- Registered for Kiroween 2026; Kiro CLI 3.3.0 installed; signed in.
+- Credits requested (4,000; review ~48h).
+- Wrote steering before requirements. Writing `product.md` first changed what the
+  requirements said: "the verifier is the product" and "never overstate" only became
+  concrete promises after that file existed.
 
-**Observation to write up later:** writing the steering docs first changed what the
-requirements said. The "lossless or it tells you what it lost" promise only became a
-requirement after `product.md` forced a single non-negotiable. That ordering —
-steering, then requirements, then design — is the thing worth explaining to judges.
-
-**Parked:** anything requiring compute (install, tests, builds).
+**Observation for the write-up:** steering → requirements → design → tasks is the order
+that produced a testable design. Reversing it would have produced features, not claims.
 
 ---
 
-## 2026-11-14 — Task 1, workspace scaffold (Kiro CLI)
+## 2026-11-19 — Core, in five scoped runs
 
-One headless Kiro run, scoped to Task 1 only:
+Kiro CLI, one headless run per task group, with a commit between runs.
 
-```
-kiro-cli chat --no-interactive --trust-all-tools "Read .kiro/steering/*.md, design.md
-and tasks.md. Implement Task 1 only: items 1.1 to 1.4. ... Do NOT run npm install."
-```
+**Tasks 1–3 (crypto).** Kiro built `canonical()`, sha256 over WebCrypto, Ed25519 keys and
+sign/verify. It chose to keep PEM headers honest ("ED25519 PRIVATE KEY", raw bytes rather
+than pretending to be X.509). 44 tests.
 
-Kiro produced 18 files: root tsconfigs, vitest config with the `PBT_RUNS` knob
-wired into `configureGlobalConfig`, three workspace `package.json` files, Vite
-configs aliasing `@reliquary/kit/*` straight to source, and app entry points.
+**Tasks 4–5 (chain).** `createLog().append()` computes seq, prevHash and hash together
+and freezes the result; `verifyChain` implements the truth table for edit, delete, insert
+and reorder. Kiro's own test suite found a semantic hole I had to fix: a lawful erasure
+that re-hashes in place leaves a matching hash, so the mismatch loop never saw it. The
+verifier now reports declared lawful changes independently of the mismatch loop — which
+is also what an auditor would want.
 
-What I had to correct by hand afterwards:
+**Tasks 6–8 (data and verifier).** Generated the 500-event fixture from a committed seed
+(9 seals, 4 anchors, three lawful changes at 144/288/401, refusals at 212–213, a queued
+revoke at 214). Built the offline CLI: PASS on the bundle, `divergence 217` on a doctored
+copy, exit 1.
 
-- The generated base tsconfig set `noEmit` alongside `composite` + `declaration`,
-  which cannot build. Simplified to `noEmit` only and dropped project references.
-- Root `typecheck` used `tsc -b`, which requires composite. Now runs `tsc -p` per
-  workspace.
-- Missing test-environment dependencies (jsdom, testing-library) were absent from
-  the root, so the configured `jsdom` environment would have failed on first run.
+**Tasks 9–10 (capture and evidence).** `createCapture().perform()` with fail-closed and
+queue paths, a durable in-memory outbox, and a coverage guard that fails when a catalogued
+action has no test. Three standards mapped to predicate-based controls so every claim
+resolves to event seqs.
 
-**Observation to write up later:** the useful part of spec-driven development here
-was that the spec constrained *scope*, not that it produced perfect code. Kiro
-implemented exactly Task 1 and stopped — and the mistakes it made were all in the
-build configuration, the one area the spec did not specify. That's a clean example
-of specs covering behaviour well and infrastructure poorly, which is worth saying
-plainly in the submission rather than pretending the first pass was flawless.
-
----
-
-## 2026-11-14 — Tasks 2 and 3, contract and pipeline (Kiro CLI)
-
-One headless run, scoped to Tasks 2 and 3 only. Kiro designed the module split
-itself: `pipeline.ts` (drain and separate), `report.ts` (compute status),
-`publish.ts` (refuse to publish an inconsistent report). It chose a Result-shaped
-`ValidationResult` that never throws, plus a separate throwing `assertValidSource`
-at the pipeline entry — a better split than the spec asked for, and it explained
-why.
-
-It also caught a real bug in its own Task 1 output: `vitest.setup.ts` called
-`configureGlobalConfig`, which does not exist in fast-check 3.x. It found this by
-running the suite, not by reading its own code. 45 tests, 11 of them property-based.
-
-What I corrected afterwards: the PBT file used `{ maxSize: n }` for array
-constraints. That is the string constraint name; fast-check arrays take
-`maxLength`. Tests passed at runtime because the extra key was ignored, and only
-`tsc` caught it. Worth noting: **the tests were green while the types were wrong.**
-
-**Observation to write up later:** the division of labour that worked was — Kiro
-implements and self-corrects at runtime, the human runs the static checks. Neither
-side caught everything alone. That is a more honest account of agentic development
-than "the agent wrote it and it just worked", and judges are explicitly asked
-whether there was a *strategy* to the AI development.
+**Observation:** the useful part of spec-driven work was scope, not perfection. Each run
+stopped where the task list stopped, which kept commits reviewable.
 
 ---
 
-## 2026-11-14 — Tasks 4 and 5, repository and UI shell (Kiro CLI)
+## 2026-11-19 — UI and apps (tasks 11–13)
 
-One run, Tasks 4 and 5. Output: `createRepository` with pre-lowercased haystacks
-built once at construction, multi-word AND search, frozen results; then the full
-shell — `Search`, `Record`, `Report`, `App` — with URL-driven routing (`?q=`, `?id=`,
-`/report`), CSS custom-property theming from a single token object, `role="status"`
-vs `role="alert"` for the reconciliation badge, and the provenance disclosure kept
-in the DOM rather than conditionally mounted.
+Two runs: shared shell plus Seal, then Witness.
 
-Kiro hit a type error on its own `T extends object` constraint and fixed it by
-loosening to `object` and dropping a now-redundant `@ts-expect-error`. Two things
-were left behind that I removed: four `index.js` files emitted into `src/` by a
-`tsc` run without `noEmit`, and one of them sat next to its `.ts` twin, which is
-exactly the kind of thing that resolves differently in Vite and Vitest.
+**Seal.** Chain table with per-row state, record detail showing the exact canonical
+preimage, seals and anchors with signature status, a tamper simulator that edits a frozen
+copy and reports the first divergence, and a five-control strip.
 
-Verified independently: 97 tests, 0 type errors, both apps build.
+**Witness.** Coverage matrix, outage drill (grant refused, revoke queued, flush), lawful
+change ledger, evidence export with in-memory verification.
 
-**Observation to write up later:** the constraint change is the interesting bit.
-The agent removed a `@ts-expect-error` because the compiler stopped complaining —
-not because the test changed. That is a small, real example of a type system and a
-test suite disagreeing about what "correct" means, and of the agent trusting the
-compiler over its own earlier reasoning.
-
-### Status checkpoint
-
-Kit is complete: contract, pipeline, report, publish guard, repository, UI shell.
-97 tests green, typecheck clean, both placeholders build. Still to do: the two app
-adapters and datasets (Tasks 6–7), then evidence and submission (Task 8).
+**Observation:** Kiro added an `eventPreimage()` helper and made `append` and the verifier
+share it, so the bytes shown in the UI are provably the bytes that were hashed. That was
+better than the spec asked for.
 
 ---
 
-## 2026-11-16 — Task 6, Card Catalogue (Kiro CLI)
+## 2026-11-19/20 — CI, three real failures
 
-One run, items 6.1–6.6. The interesting decision was how to represent the legacy
-source: Kiro kept the fixed-width trailing spaces in the JSON rather than
-pre-trimming it, so the adapter has to do the trimming the way a real dBase export
-forces you to. That is the difference between a demo and a plausible artefact.
+Locally green, red on GitHub Actions, three different reasons:
 
-Rejection rules are narrow and defensible: missing shelfmark, blank title, and a
-purely numeric date that isn't four digits. Documentary forms — `c.1893`,
-`1893-1901`, `1893?` — are parsed, not rejected. A stricter adapter would have
-thrown away real records, which is precisely the failure mode the report exists to
-catch.
+1. **jsdom has no `crypto.subtle`** — every hashing and signing test failed on Node 20.
+   Fixed by installing Node's WebCrypto in `vitest.setup.ts` and pinning CI to Node 22.
+2. **The Seal tests rendered 500 table rows in jsdom** and timed out on a slower runner.
+   Verification itself is 31 ms; the cost was the DOM. Gave `App` an optional `bundle`
+   prop and the tests a 40-event fixture. Suite: 11.7 s → 1.5 s.
+3. **Async assertions had a 1 s window** — raised to 10 s.
 
-137 tests, typecheck clean, both apps build. Dataset is 2,000 records, 727 KB,
-deterministic from seed `0xc0ffee42`, with the three broken rows always last.
-
-**Observation to write up later:** the seed is committed and the generator is
-committed, which means a judge can regenerate the dataset and get byte-identical
-data. For a project whose entire claim is "you can verify this", reproducible input
-data is not a nicety.
+**Observation for the write-up:** the agent wrote code that passed its own tests and still
+shipped a layout that only a screenshot caught (bare-ID rows, a bin picker that looked
+filled but was empty, full-bleed text). Tests and eyes find different defects.
 
 ---
 
-## 2026-11-16 — Task 7, Parts Ledger (Kiro CLI)
+## 2026-11-20 — Plain-English intros
 
-The category requires "two distinct applications", so this one had to differ by
-task, not palette. It lands on a bin-range picker, not a search box: choose the row
-you are walking, then step through 228 entries in A1–A9 counting each. Discrepancies
-need a note and initials before they commit. The Report component is reused inline,
-unforked.
+Feedback: the apps were legible to engineers and opaque to everyone else. Kiro added a
+shared `Intro` component and a "Start here" screen per app, first in the tab list.
 
-Three broken rows: `QTY = 'n/a'`, a blank `BIN`, `STATUS = 'Z'`. 1,200 entries,
-seed `0xdeadbe42`, generator committed.
+Then a second pass: the copy explained mechanics before it gave anyone a reason to care.
+Rewritten to open with a story — a bank, a changed row, one command — then three steps,
+one illustration, one worked example, one button. No jargon survives without a clause of
+definition.
 
-Then I opened both apps in a browser and took screenshots. That found three things
-194 green tests and a clean typecheck did not:
-
-1. **The Search list showed only the record id.** Rows read `MAP/0001` with no
-   title, author or year. Fixed in the kit by adding `renderSummary(record)` to
-   `AppConfig`, so every app must say how a record presents in a list.
-2. **The bin picker looked filled in but was empty.** `A1` and `A9` were
-   placeholders, so the default state failed validation on first click.
-3. **Title casing mangled names** — "ERNEST Of Wood Lane". Added a small-words list.
-
-**Observation to write up later:** every one of those was visible in one screenshot
-and invisible to the test suite. If there is a single honest lesson from this build,
-it is that agent-written code passes its own tests and still ships an unusable
-screen.
+**Observation:** the best line in the whole build came out of that rewrite — "the
+dashboard is green, because the dashboard reads the same table that was just edited."
 
 ---
 
-## 2026-11-16 — Design pass
+## What Kiro got right unassisted
 
-Two Kiro runs: kit shell + Card Catalogue, then Parts Ledger. The brief was very
-specific — container widths, type sizes, border opacities, leader dots, stamp
-treatment — because "make it look better" produces exactly the generic result you
-were trying to avoid.
+- The pipeline module split: `pipeline` / `report` / `publish` in the earlier concept, and
+  `chain` / `capture` / `evidence` here.
+- Predicate-based evidence controls, so each claim resolves to events rather than to a
+  paragraph.
+- Sharing `eventPreimage()` between append and verify.
+- Finding its own fast-check API error by running the suite instead of reading code.
 
-What changed: centred 1120px container with 72ch reading measure, header and footer
-with counts, index-card record view with dotted leaders and a rotated rubber-stamp
-provenance block, pill reconciliation badge with 2.4rem tabular figures, zebra
-mapping table. Parts Ledger became a two-column landing with a context panel and
-live stats, then a 46rem centred walk card with stepper buttons, a visible progress
-rail, and an inline discrepancy form with danger border.
+## What the human caught
 
-Then I fixed, by hand, what the screenshots exposed:
-
-- The grain gradient was a visible CRT stripe at 3% opacity. Dropped to 1.2%.
-- The record card sat left-aligned in a 1120px container and truncated the title.
-  Centred it and allowed values to wrap.
-- The ledger landing reported "Rejected 0" and "Bins 4" because it derived stats
-  from readable rows only. It now takes the report and shows 1200 / 1197 / 3 / 48.
-- Custom screens bypassed the shell, so nothing was constrained: full-bleed text at
-  8px from the edge. Wrapped main and header in the container.
-
-**Observation to write up later:** every one of these was a *layout* bug that the
-type system and 194 tests were indifferent to. The design brief improved the look;
-looking at the rendered page found the errors. Those are different activities, and
-only one of them can be delegated to a prompt.
-
----
-
-## 2026-11-16 — The publish gate, made demonstrable
-
-Feedback that mattered: the apps read as "plain CRUD" and the one novel idea — a
-migration that refuses to publish unless it can prove losslessness — was hidden
-behind a nav link.
-
-So: `simulateLossyImport(report)` drops one row and recomputes status from the same
-equation as the real pipeline. The Report screen gains a **Publish gate** panel: one
-button breaks the data on camera, the badge flips to `INCONSISTENT` (role=alert), the
-delta appears, the export disables, and the panel names `InconsistentReportError` and
-what it would refuse. A second button restores the verified report.
-
-The Search screen gained a status strip — rows in, rows out, rejected, pill, link —
-so the claim is visible before you click anything.
-
-219 tests, security scan clean, typecheck clean, build clean.
-
-**Observation for the write-up:** none of this added capability. It added
-*legibility*. The guard, the equation and the error class already existed and were
-already tested; the only change was letting a judge see the refusal in four seconds
-instead of reading the pipeline source. That is the difference between a correct
-project and a winning entry, and it cost an afternoon.
+- A `maxSize`/`maxLength` mix-up that left tests green while types were wrong.
+- The lawful-change classification hole.
+- Layout failures invisible to tests: bare-ID rows, a picker that looked filled but was
+  empty, full-bleed text at 8 px from the edge.
+- The Builder ID / Google identity split that made the CLI refuse every request.

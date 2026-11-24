@@ -31,8 +31,7 @@ Neither claim is sufficient alone, which is the Frankenstein argument: integrity
 without capture proves an incomplete record is unchanged.
 
 **Category rationale:** Frankenstein = "stitch together seemingly incompatible
-elements". Cryptography + compliance evidence + air-gapped operation is that stitch.
-Skeleton Crew would have required a template + two apps framing we no longer satisfy.
+elements". Cryptography, compliance evidence and air-gapped operation is that stitch.
 
 ## 2. Scope of this submission
 
