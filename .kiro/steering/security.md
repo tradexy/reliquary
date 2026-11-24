@@ -20,9 +20,10 @@ and every dependency as a liability.
    description. Prefer the standard library and what is already installed.
 5. **No `localStorage` or `sessionStorage` for records, reports or anything a judge
    needs to see.** State lives in memory or in the URL.
-6. **Untrusted keys never reach an object spread or `Object.assign`.** The import
-   pipeline rejects rows carrying `__proto__`, `constructor` or `prototype`
-   (`packages/reliquary/src/import/guard.ts`). Do not weaken that guard.
+6. **Untrusted input never reaches a spread or `Object.assign`.** Event payloads are
+   parsed defensively, and `detail` holds primitives only. The capture path
+   (`packages/core/src/capture/writers.ts`) is the single write entry point; do not add a
+   second one.
 7. **Text from data is never interpreted as markup or as a URL scheme.** No
    `href={record.field}` without an allowlist of schemes.
 8. **Errors shown to users must not leak stack traces or file paths.** The report
