@@ -62,23 +62,23 @@ Bundle key fingerprint: `7f2d0c75f3608e2d2f9743ca688960c5`
 `scripts/generate-stream.ts` and is *not* committed. Only the public key ships. That
 is deliberate (see `docs/limits.md`).
 
-## 4. Competition compliance checklist
+## 4. Competition compliance
 
-From the Official Rules — verify before submitting:
+**All rules, eligibility, prizes and mechanics live in [`RULES.md`](RULES.md).** Do not
+restate them here; update that file instead.
 
-- [x] Built during the Submission Period (started 13 Nov 2026)
-- [x] Uses Kiro (CLI 3.4.0, supported by steering, specs, hooks, journal)
-- [x] Public GitHub repo, MIT licence visible in About
-- [x] `/.kiro` at repo root, **not** gitignored
-- [x] Working URL, no login required, free for judges until 29 Jan 2027
-- [ ] Demo video, under 3 minutes, public on YouTube — **outstanding**
-- [ ] Devpost submission form, category Frankenstein — **outstanding**
-- [ ] Blog post (bonus, 100 winners) — **outstanding**
-- [ ] Social post with `#KiroweenHackathon26` (bonus) — **outstanding**
-- [ ] Freeze `main` after submission (no pushes — judges test the live URL)
+Outstanding items only:
 
-Credits: 4,000 Kiroween credits granted; Pro upgraded (free first month) — **cancel by
-27 Nov** to avoid a charge on 1 Dec.
+- [ ] Demo video, under 3 minutes, public on YouTube
+- [ ] Devpost submission form, category **Frankenstein**
+- [ ] Blog post (bonus)
+- [ ] Social post starting with `#KiroweenHackathon26` (bonus)
+- [ ] Freeze `main` after submission (judges test the live URL until 29 Jan 2027)
+- [ ] Cancel Kiro Pro by 27 Nov to avoid a charge on 1 Dec
+
+Verified as already compliant: built in period, Kiro usage, public repo, MIT licence in
+About, `/.kiro` at root and not gitignored, live URL with no login. Full checklist:
+`RULES.md` §11.
 
 ## 5. Judging rubric → evidence
 
@@ -131,6 +131,7 @@ Key files:
 | `docs/traceability.md` | requirements → tests, with gaps stated |
 | `docs/demo-plan.md` | data composition and the demo beat sheet |
 | `docs/kiro-journal.md` | dated record of what Kiro did and what broke |
+| `RULES.md` | competition rules, prizes, and operational lessons |
 | `packages/core/data/bundle.json` | the 500-event fixture (regenerate with `npm run generate:stream`) |
 
 ## 8. Environment gotchas
