@@ -81,9 +81,8 @@ requested credits under Skeleton Crew; see §10 for why that does not matter.)
   other pre-existing code** that is incorporated.
 - Multiple submissions are allowed but each must be unique and substantially different.
 
-**Our position:** started 13 Nov 2026. Everything in the repo was written for this
-entry. The earlier Reliquary concept (catalogue/ledger) was our own work in the same
-period and was deleted, not adapted.
+**Our position:** started 13 Nov 2026. Everything in the repository was written for
+this entry.
 
 ## 6. Judging
 

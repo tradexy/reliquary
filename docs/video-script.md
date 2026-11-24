@@ -1,100 +1,105 @@
 # Demo video — script and shot list
 
-Target: **2:50**, hard limit 3:00. Judges are not required to watch past 3:00, so
-the last 10 seconds are a buffer, not content.
+Target **2:50**, hard limit 3:00. Judges are not required to watch past 3:00.
 
-Record at 1440×900, browser at 100%, no bookmarks bar. One take, cuts only — no
-transitions, no music. Captions burned in, since many judges watch muted.
+Record 1440×900, browser at 100%, no bookmarks bar, no notifications. One take, cuts
+only, no music. Burn in captions; many watch muted.
 
 ---
 
-## 0:00 – 0:15 — The problem, stated as a fact
+## 0:00–0:20 — The lie
 
-**Screen:** the Card Catalogue, report screen, already loaded. Close on the counts.
+**Screen:** landing page, the story timeline.
 
-**Voice:** "Two thousand records from a 1994 dBase export. Three of them are broken.
-A normal migration would swallow those three and nobody would ever know."
+**Voice:** "On 3 November, an engineer at a bank changed one row in the audit log. An
+agent run that had approved a two-million-pound loan now read as declined. The dashboard
+stayed green — because the dashboard reads the same table he just edited."
 
-## 0:15 – 0:40 — Who this is for
+## 0:20–0:35 — The claim
 
-**Screen:** search `WOOD`, scroll the results, open one record.
+**Screen:** scroll to "Two questions, two apps".
 
-**Voice:** "This is Ashworth Local History Society — a volunteer archive with a card
-index and no budget for a collections system. They can't put this online, because
-nobody can prove a rebuild didn't quietly drop a row."
+**Voice:** "A record you can rewrite proves nothing. Anchora makes two claims, and
+neither app can make them alone: every action is recorded, and every record is provably
+unchanged."
 
-## 0:40 – 1:05 — What the kit does
+## 0:35–1:05 — Seal, and the record itself
 
-**Screen:** the record view. Open the provenance disclosure.
+**Screen:** Seal → Chain. Open seq 217. Show the canonical preimage.
 
-**Voice:** "Reliquary wraps a dead source in a modern interface and makes one promise:
-lossless, or it tells you exactly what it lost. Every field carries its provenance —
-this title came from that column, in that export."
+**Voice:** "Five hundred events, each carrying the hash of the one before it. This is
+entry 217, and this is the exact byte sequence that produced its hash. Anyone can
+recompute it."
 
-## 1:05 – 1:35 — The report
+## 1:05–1:35 — Break it on camera
 
-**Screen:** `View report`. Slow pan across counts, mapping table, rejected rows.
+**Screen:** press **Edit this record** → verify.
 
-**Voice:** "Every import produces a report. Rows in, rows out, every rejected row and
-why. Two thousand in, one thousand nine hundred and ninety-seven out, three
-rejected — and it adds up. If it didn't add up, the build would refuse to publish."
+**Voice:** "So let's do what he did. One field changes. Verification does not say
+'failed' — it says divergence at 217. Recomputing every later hash would not help: the
+signed head of this chain was already written to storage nobody here can overwrite."
 
-## 1:35 – 2:00 — Break it on camera
+Show the anchors panel: 4 anchors, stored, untouched.
 
-**Screen:** click **Simulate a lossy adapter**.
+## 1:35–1:50 — The assessor's tool
 
-Badge flips to INCONSISTENT, danger colour, delta shown.
+**Screen:** terminal.
 
-**Voice:** "So let's break it. One row disappears. The status flips, the delta appears,
-and the publish guard refuses the dataset. The failure is louder than the success —
-which is the point."
+```
+npm run verify:bundle -- bundle.json
+→ FAIL, divergence 217, exit 1
+```
 
-Click **Restore verified report**.
+**Voice:** "And the auditor's tool, offline, with no access to the bank, says the same
+thing and exits non-zero."
 
-## 2:00 – 2:30 — The second app, different job
+Then restore, verify, PASS.
 
-**Screen:** Parts Ledger landing → Start walk → count 14 against ledger 16 → note and
-initials → confirm.
+## 1:50–2:20 — Witness, and the other question
 
-**Voice:** "Same kit, opposite question. A scrapyard ledger inherited in an
-acquisition. Not 'where is it' but 'is the paper true?' Pick a bin range, walk two
-hundred and twenty-eight entries, and every disagreement is signed for."
+**Screen:** Witness → Drill. Switch the store off. Grant a role → refused. Revoke a role
+→ queued. Restore, flush.
 
-## 2:30 – 2:50 — Kiro
+**Voice:** "Capture asks what Seal cannot. The audit store goes down. A grant is refused
+— no record, no grant. A revoke completes and queues its record, because blocking a
+removal would be worse than the outage. When the store returns, the queued row lands."
 
-**Screen:** editor, `.kiro/specs/reliquary-kit/requirements.md`; then
-`.kiro/hooks/verify-on-stop.json`; then a green test run.
+## 2:20–2:35 — Evidence
 
-**Voice:** "Built with Kiro, spec first. Requirements, then design, then tasks —
-then one scoped run per task. Three hooks gate the work: tests on adapter edits, a
-security scan on every write, and a verification gate that won't let a turn finish
-green until typecheck, the scan and two hundred and one tests pass."
+**Screen:** Evidence tab → a SOC 2 control → event list → Export → verify in place.
 
-**Screen:** the failing-then-passing commit, if time allows.
+**Voice:** "Every compliance claim points at the events that prove it. Export, and the
+same verifier reads the file."
 
-**Voice:** "It caught its own mistakes. That's the part worth trusting."
+## 2:35–2:50 — Kiro, and close
 
-## 2:50 – 2:58 — Close
+**Screen:** `.kiro/specs/anchora-evidence/requirements.md`, then
+`.kiro/hooks/verify-on-stop.json`, then a green test run.
 
-**Screen:** landing page, both cards.
+**Voice:** "Built with Kiro, spec first. Fifteen requirements, a design, then one scoped
+run per task. Three hooks gate the work — tests, a security scan, and a verification gate
+that will not let a turn finish until typecheck, the scan and a hundred and eighty tests
+pass. It caught its own mistakes, which is the part worth trusting."
 
-**Voice:** "Reliquary. Two apps, one skeleton, and a report that proves it."
+**Screen:** landing page.
+
+**Voice:** "Anchora. Two apps, one audit trail, and a file you can check yourself."
 
 ---
 
 ## Production checklist
 
-- [ ] Kill notifications, hide the menu bar, close other tabs
-- [ ] Seed the search box empty so the first frame is the report, not a keyboard
-- [ ] Rehearse the break-it click — it must land within one second of the line
-- [ ] Record system audio only, then replace with narration
-- [ ] Burn captions; check they don't cover the counts
-- [ ] Upload unlisted, watch it back on a phone, then make public
-- [ ] Title: "Reliquary — Kiroween 2026" ; description includes the repo URL
+- [ ] Close other tabs; hide the menu bar; mute notifications
+- [ ] Start Seal on the Chain tab with verification already PASS
+- [ ] Rehearse the tamper click — it must land within a second of the line
+- [ ] Record narration separately, then align
+- [ ] Captions must not cover counts or the divergence line
+- [ ] Upload unlisted, watch on a phone, then make public
+- [ ] Title: "Anchora — Kiroween 2026"; description includes the repo URL
 
-## What not to do
+## Do not
 
-- No logo intro. The first frame must be the product.
+- No logo intro. First frame is the story.
 - No talking head.
-- Don't explain the stack. Nobody scores TypeScript.
-- Don't say "secure". Say what was tested.
+- Don't explain the stack.
+- Don't say "secure" or "tamper-proof". Say what was tested.

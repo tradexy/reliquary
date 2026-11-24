@@ -34,17 +34,11 @@ without capture proves an incomplete record is unchanged.
 elements". Cryptography + compliance evidence + air-gapped operation is that stitch.
 Skeleton Crew would have required a template + two apps framing we no longer satisfy.
 
-## 2. Where we came from (do not rebuild this)
+## 2. Scope of this submission
 
-The first submission was **Reliquary** (Skeleton Crew): a kit for resurrecting dead
-data sources, with a Card Catalogue and a Parts Ledger. It worked — 219 tests, two
-apps, deployed — but it was **boring**: a card index and a stocktake. Feedback from
-the user was blunt and correct, so the concept was replaced on 19 Nov. The old
-`apps/card-catalogue`, `apps/parts-ledger` and `packages/reliquary` are deleted and
-their tests gone; do not look for them in git history expecting them back.
-
-What survived from that phase: the method (steering → spec → design → tasks → scoped
-implementation runs), the hooks, the security scan, and the journal.
+Anchora is a single, self-contained entry: the evidence core, the two apps, the CLI and
+the 500-event fixture were all written for this competition. There is no third-party
+code beyond the dependencies in `package-lock.json`.
 
 ## 3. Test and verification state
 
