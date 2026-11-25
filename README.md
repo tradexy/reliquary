@@ -52,6 +52,10 @@ rewrite. Both are needed for the claim above, and neither app can make it alone.
 
 ## Verify it yourself (zero network, offline CLI)
 
+Two signed bundles ship in the repository: `packages/core/data/bundle.json` is the
+500-event Northgate Bank demo stream, and `packages/core/data/kiro-audit.bundle.json` is
+Anchora's own 24-event Kiro build audit trail.
+
 ```bash
 npm ci
 npm run verify:bundle -- packages/core/data/bundle.json

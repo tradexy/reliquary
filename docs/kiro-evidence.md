@@ -70,3 +70,53 @@ Anchora bundle verification
 ```
 
 You can inspect this Kiro build trail interactively in **Seal** by clicking the **Kiro Build Trail (24)** pill at the top of the Chain view, or inspect individual build events via the Anchora MCP server (`inspect_seq`).
+
+---
+
+## 4. Live Kiro Agent + MCP + Power Invocation Evidence
+
+Captured directly from `kiro-cli` 3.5.0 inside this repository:
+
+### Agent discovery & validation
+```text
+$ kiro-cli agent list
+Workspace: ~/Documents/competitions/261204-kiroween-hack/.kiro/agents
+  evidence-builder    Workspace     Spec-driven builder for Anchora ...
+  security-auditor    Workspace     Read-only auditor for Anchora ...
+
+$ kiro-cli agent validate --path .kiro/agents/security-auditor.json
+$ kiro-cli agent validate --path .kiro/agents/evidence-builder.json
+# both exit 0
+```
+
+### Live `@security-auditor` run invoking Anchora MCP tools
+```text
+$ kiro-cli chat --agent security-auditor --no-interactive --trust-workspace \
+  --trust-tools=@anchora/verify_bundle,@anchora/check_coverage,fs_read \
+  --require-mcp-startup \
+  "Call @anchora/verify_bundle on packages/core/data/bundle.json and packages/core/data/kiro-audit.bundle.json, plus @anchora/check_coverage."
+
+[tool] Running: @anchora/verify_bundle
+[tool] Running: @anchora/verify_bundle
+[tool] Running: @anchora/check_coverage
+[tool] status: Completed (x3)
+
+packages/core/data/bundle.json
+- Result: PASS, format anchora/1, first divergence none.
+- Counts: 500 events, 9 seals, 4 anchors.
+- Key fingerprint: 7f2d0c75f3608e2d2f9743ca688960c5.
+- Lawful seqs: 144 (erasure, dpo@northgate.example), 288 (retention, retention-scheduler), 401 (payload-stripped, jose.singh).
+
+packages/core/data/kiro-audit.bundle.json
+- Result: PASS, format anchora/1, first divergence none.
+- Counts: 24 events, 4 seals, 2 anchors.
+- Key fingerprint: cc43bb0e7789b34a62f28015b79e9972.
+- Lawful seq: 19, payload-stripped, authorised by tradexy.
+
+Coverage (check_coverage)
+- gapCount is 0 and gaps is empty.
+- 15 catalogued actions, all tested (9 fail-closed, 6 queue).
+```
+
+*(Because `--trust-tools` scoped permissions strictly to the Anchora MCP verification tools and `fs_read`, `security-auditor`'s attempted shell grep was cleanly denied by Kiro CLI — and the agent honestly refused to claim overclaim-check completion without running it.)*
+

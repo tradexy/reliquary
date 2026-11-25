@@ -2,7 +2,13 @@
 
 Anchora is structured as a **Skeleton Crew** foundation: one reusable evidence core (`packages/core`) powering two distinct applications (`apps/seal` and `apps/witness`), an offline verifier CLI (`tools/verify`), and an offline Kiro MCP server (`tools/mcp`).
 
-This guide shows how to add a **third** domain application (for example, a clinical-trial dispenser or treasury-transfer console) on top of `@anchora/core` in four steps without touching any cryptography.
+This guide shows how to add a **third** domain application (for example, a clinical-trial dispenser or treasury-transfer console) on top of `@anchora/core` without touching any cryptography.
+
+## Quickstart: build your own evidence app in 3 steps
+
+1. **Declare actions (`packages/core/src/capture/catalogue.ts` + `catalogue.test.ts`):** add your domain action ID (`fail-closed` for widening, `queue` for tightening) and its matching test classification so the build guard enforces coverage.
+2. **Map controls (`packages/core/src/evidence/standards.ts`):** add plain-data predicates `{ standard, control, statement, query }` resolving directly to event `seq`s.
+3. **Mount a themed app (`apps/<your-app>/src/App.tsx`):** pass a custom `Theme` + `AppShell`, `Panel`, `Table`, and `Badge` from `@anchora/core/ui` and call `createLog`, `createCapture`, and `verifyChain` from `@anchora/core`.
 
 ---
 
