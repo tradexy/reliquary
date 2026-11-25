@@ -206,6 +206,30 @@ export function App({ bundle = ORIGINAL }: AppProps = {}) {
     setSelected(parsed.bundle.events.length > 0 ? 0 : null)
   }
 
+  const downloadBundle = () => {
+    const payload = {
+      formatVersion: activeBundle.formatVersion,
+      generatedAt: activeBundle.generatedAt || new Date().toISOString(),
+      publicKeyPem: activeBundle.publicKeyPem,
+      keyFingerprint: activeBundle.keyFingerprint,
+      events: evidence.events,
+      seals: evidence.seals,
+      anchors: evidence.anchors,
+    }
+    const stem =
+      sourceKind === 'custom' && uploadedBundle !== null
+        ? uploadedBundle.name.replace(/\.json$/i, '')
+        : `anchora-${sourceKind}`
+    const filename = `${stem}${tampered !== null ? '-tampered' : ''}.bundle.json`
+    const blob = new Blob([`${JSON.stringify(payload, null, 2)}\n`], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = filename
+    link.click()
+    URL.revokeObjectURL(url)
+  }
+
   const errors = useMemo(() => errorSeqs(result?.findings ?? []), [result])
   const areas = useMemo(
     () => [...new Set(evidence.events.map((e) => areaOf(e.action)))].sort(),
@@ -333,6 +357,7 @@ export function App({ bundle = ORIGINAL }: AppProps = {}) {
                 className="ax-visually-hidden"
                 onChange={(e) => {
                   const file = e.target.files?.[0]
+                  e.currentTarget.value = ''
                   if (file) void loadFile(file)
                 }}
               />
@@ -343,7 +368,17 @@ export function App({ bundle = ORIGINAL }: AppProps = {}) {
               >
                 Drop or open bundle .json
               </button>
+              <button type="button" className="ax-btn" onClick={downloadBundle}>
+                Download .json
+              </button>
             </div>
+            <p style={{ flexBasis: '100%', margin: 0, fontSize: 12, color: 'var(--color-muted)' }}>
+              Optional: verify any <span className="ax-mono">anchora/1</span> file exported from{' '}
+              <a href="../witness/#evidence" style={{ color: 'var(--color-accent)' }}>
+                Witness → Evidence
+              </a>
+              , or download the active copy to edit and drop back in.
+            </p>
           </div>
           {uploadError !== null ? (
             <p role="alert" style={{ color: 'var(--color-danger)', margin: '0 0 12px', fontSize: 13 }}>

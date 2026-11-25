@@ -1,4 +1,4 @@
-import { beforeEach, describe, it, expect } from 'vitest'
+import { beforeEach, describe, it, expect, vi } from 'vitest'
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { App } from './App.js'
@@ -149,5 +149,25 @@ describe('Seal app', () => {
     render(<App bundle={fixture} />)
     await screen.findByText('PASS', undefined, { timeout: 5000 })
     expect(screen.getByTestId('preimage').textContent).toContain('"seq":17')
+  })
+
+  it('downloads the active bundle JSON and links to Witness Evidence', async () => {
+    const create = vi.fn(() => 'blob:seal-test')
+    const revoke = vi.fn()
+    Object.assign(URL, { createObjectURL: create, revokeObjectURL: revoke })
+    vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {})
+
+    try {
+      await renderVerified()
+      const witnessLink = screen.getByRole('link', { name: 'Witness → Evidence' })
+      expect(witnessLink).toHaveAttribute('href', '../witness/#evidence')
+
+      await userEvent.click(screen.getByRole('button', { name: 'Download .json' }))
+      expect(create).toHaveBeenCalledTimes(1)
+      expect(revoke).toHaveBeenCalledTimes(1)
+      expect(revoke).toHaveBeenCalledWith('blob:seal-test')
+    } finally {
+      vi.restoreAllMocks()
+    }
   })
 })
