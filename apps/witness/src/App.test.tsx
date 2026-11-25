@@ -82,7 +82,7 @@ describe('Witness app', () => {
     const expected: [number, string, string][] = [
       [144, 'erasure', 'dpo@northgate.example'],
       [288, 'retention', 'policy:retention-90d'],
-      [401, 'payload-stripped', 'ravi.menon'],
+      [401, 'payload-stripped', 'jose.singh'],
     ]
     expect(container.querySelectorAll('tr[data-seq]')).toHaveLength(3)
     for (const [seq, kind, authority] of expected) {

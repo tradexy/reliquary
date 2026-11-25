@@ -44,9 +44,9 @@ function pem(label: string, bytes: Uint8Array): string {
 }
 
 const ACTORS = [
-  { id: 'dana.okafor', role: 'owner', weight: 3 },
-  { id: 'ravi.menon', role: 'security-lead', weight: 3 },
-  { id: 'alina.petrova', role: 'auditor', weight: 1 },
+  { id: 'danna.kafor', role: 'owner', weight: 3 },
+  { id: 'jose.singh', role: 'security-lead', weight: 3 },
+  { id: 'lina.palmer', role: 'auditor', weight: 1 },
   { id: 'system', role: 'scheduler', weight: 2 },
 ]
 
@@ -145,31 +145,31 @@ async function main() {
     }
     if (seq === 401) {
       draft.lawful = 'payload-stripped'
-      draft.actor = { id: 'ravi.menon', role: 'security-lead' }
+      draft.actor = { id: 'jose.singh', role: 'security-lead' }
       draft.action = 'governance.policy.update'
-      draft.detail = { authority: 'ravi.menon', reason: 'regulatory-redaction', fields: 'attachment' }
+      draft.detail = { authority: 'jose.singh', reason: 'regulatory-redaction', fields: 'attachment' }
     }
     if (seq === 300) {
-      draft.actor = { id: 'ravi.menon', role: 'security-lead' }
+      draft.actor = { id: 'jose.singh', role: 'security-lead' }
       draft.action = 'governance.policy.update'
       draft.detail = { change: 'signing-key-rotation', from: 'key-2026-03', to: 'key-2026-11' }
     }
     if (seq === 212) {
-      draft.actor = { id: 'dana.okafor', role: 'owner' }
+      draft.actor = { id: 'danna.kafor', role: 'owner' }
       draft.action = 'roles.grant'
       draft.subject = 'contractor.07@northgate.example'
       draft.outcome = 'refused'
       draft.detail = { reason: 'audit-unavailable', attempted: 'roles.grant', requestedRole: 'admin' }
     }
     if (seq === 213) {
-      draft.actor = { id: 'dana.okafor', role: 'owner' }
+      draft.actor = { id: 'danna.kafor', role: 'owner' }
       draft.action = 'agents.guardrail.ceiling.raise'
       draft.subject = 'commercial-loan-agent'
       draft.outcome = 'refused'
       draft.detail = { reason: 'audit-unavailable', attempted: 'agents.guardrail.ceiling.raise' }
     }
     if (seq === 214) {
-      draft.actor = { id: 'ravi.menon', role: 'security-lead' }
+      draft.actor = { id: 'jose.singh', role: 'security-lead' }
       draft.action = 'roles.revoke'
       draft.subject = 'ex-analyst.09@northgate.example'
       draft.outcome = 'queued'

@@ -11,9 +11,9 @@ the same numbers and a judge can regenerate it.
 
 | Actor | Role | Why they exist |
 | --- | --- | --- |
-| `dana.okafor` | owner | Widening actions: invites, role grants, connector changes |
-| `ravi.menon` | security lead | Settings, routing, key rotation |
-| `alina.petrova` | auditor | Read-only access events; the person whose checks we are modelling |
+| `danna.kafor` | owner | Widening actions: invites, role grants, connector changes |
+| `jose.singh` | security lead | Settings, routing, key rotation |
+| `lina.palmer` | auditor | Read-only access events; the person whose checks we are modelling |
 | `system` | scheduler | Seals, anchor writes, nightly verification runs |
 
 **Areas:** identity (sign-in, MFA, invite), roles (grant, revoke), agents (run,

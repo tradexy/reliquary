@@ -10,7 +10,7 @@ const AT = '2026-11-01T09:00:00.000Z'
 function draft(overrides: Partial<AppendDraft> = {}): AppendDraft {
   return {
     at: AT,
-    actor: { id: 'dana.okafor', role: 'owner' },
+    actor: { id: 'danna.kafor', role: 'owner' },
     action: 'identity.user.invite',
     subject: 'new-analyst@example.com',
     outcome: 'committed',

@@ -19,7 +19,6 @@ export function ChainVisualizer({
   const events = evidence.events
   if (events.length === 0) return null
 
-  // Focus around the first divergence if tampered, otherwise around selected row.
   const focusSeq =
     result && result.firstDivergence !== null
       ? result.firstDivergence
@@ -59,15 +58,15 @@ export function ChainVisualizer({
   return (
     <div className="ax-vis" data-testid="chain-visualizer">
       <svg
-        viewBox="0 0 760 106"
+        viewBox="0 0 860 110"
         width="100%"
-        height="106"
+        height="110"
         role="img"
         aria-label="Cryptographic chain visualizer showing event links and external seal anchor"
-        style={{ display: 'block', minWidth: 580 }}
+        style={{ display: 'block', minWidth: 640 }}
       >
         {windowEvents.map((ev, idx) => {
-          const x = 8 + idx * 184
+          const x = 8 + idx * 210
           const isBad = chainErrors.has(ev.seq)
           const isLawful = ev.lawful !== 'none' && !isBad
           const isSelected = selected !== null && events[selected]?.seq === ev.seq
@@ -100,8 +99,8 @@ export function ChainVisualizer({
                 <rect
                   x={x}
                   y={10}
-                  width={150}
-                  height={82}
+                  width={180}
+                  height={86}
                   rx={4}
                   fill="var(--color-surface)"
                   stroke={stroke}
@@ -115,17 +114,17 @@ export function ChainVisualizer({
                   fontWeight={700}
                   fontFamily="var(--font-mono)"
                 >
-                  seq {ev.seq} {isLawful ? '· lawful' : ''}
+                  seq {ev.seq}{isLawful ? ' · lawful' : ''}
                 </text>
-                <text x={x + 12} y={49} fill="var(--color-muted)" fontSize={10.5} fontFamily="var(--font-body)">
-                  {ev.action.length > 21 ? `${ev.action.slice(0, 20)}…` : ev.action}
+                <text x={x + 12} y={50} fill="var(--color-muted)" fontSize={10.5} fontFamily="var(--font-body)">
+                  {ev.action.length > 26 ? `${ev.action.slice(0, 25)}…` : ev.action}
                 </text>
-                <text x={x + 12} y={67} fill="var(--color-bone)" fontSize={10.5} fontFamily="var(--font-mono)">
+                <text x={x + 12} y={68} fill="var(--color-bone)" fontSize={10.5} fontFamily="var(--font-mono)">
                   prev {ev.prevHash.slice(0, 8)}…
                 </text>
                 <text
                   x={x + 12}
-                  y={82}
+                  y={84}
                   fill={isBad ? 'var(--color-danger)' : 'var(--color-accent)'}
                   fontSize={10.5}
                   fontFamily="var(--font-mono)"
@@ -136,17 +135,17 @@ export function ChainVisualizer({
               {idx < windowEvents.length - 1 ? (
                 <g>
                   <line
-                    x1={x + 150}
-                    y1={51}
-                    x2={x + 184}
-                    y2={51}
+                    x1={x + 180}
+                    y1={53}
+                    x2={x + 210}
+                    y2={53}
                     stroke={linkBroken ? 'var(--color-danger)' : 'var(--color-accent)'}
                     strokeWidth={2}
                     strokeDasharray={linkBroken ? '4 3' : undefined}
                   />
                   <text
-                    x={x + 167}
-                    y={44}
+                    x={x + 195}
+                    y={45}
                     textAnchor="middle"
                     fontSize={12}
                     fontWeight={700}
@@ -161,19 +160,18 @@ export function ChainVisualizer({
           )
         })}
 
-        {/* Connector from chain window to Seal & Anchor vault */}
         <line
-          x1={530}
-          y1={51}
-          x2={578}
-          y2={51}
+          x1={608}
+          y1={53}
+          x2={646}
+          y2={53}
           stroke={anyCheckpointFailed ? 'var(--color-danger)' : 'var(--color-accent)'}
           strokeWidth={2}
           strokeDasharray={anyCheckpointFailed ? '4 3' : undefined}
         />
         <text
-          x={554}
-          y={44}
+          x={627}
+          y={45}
           textAnchor="middle"
           fontSize={12}
           fontWeight={700}
@@ -184,10 +182,10 @@ export function ChainVisualizer({
         </text>
 
         <rect
-          x={578}
+          x={646}
           y={10}
-          width={174}
-          height={82}
+          width={206}
+          height={86}
           rx={4}
           fill="var(--color-surface)"
           stroke={anyCheckpointFailed ? 'var(--color-danger)' : 'var(--color-accent)'}
@@ -195,7 +193,7 @@ export function ChainVisualizer({
           strokeDasharray={anyCheckpointFailed ? undefined : '4 2'}
         />
         <text
-          x={590}
+          x={658}
           y={30}
           fill={anyCheckpointFailed ? 'var(--color-danger)' : 'var(--color-accent)'}
           fontSize={11.5}
@@ -204,15 +202,15 @@ export function ChainVisualizer({
         >
           {anyCheckpointFailed ? 'ANCHOR BROKEN' : 'SEAL + ANCHOR'}
         </text>
-        <text x={590} y={49} fill="var(--color-ink)" fontSize={11} fontFamily="var(--font-mono)">
+        <text x={658} y={50} fill="var(--color-ink)" fontSize={11} fontFamily="var(--font-mono)">
           {nextCheckpoint ? `checkpoint seq ${nextCheckpoint.seq}` : 'no seal in slice'}
         </text>
-        <text x={590} y={67} fill="var(--color-muted)" fontSize={10.5} fontFamily="var(--font-body)">
+        <text x={658} y={68} fill="var(--color-muted)" fontSize={10.5} fontFamily="var(--font-body)">
           {checkpointFailed || anyCheckpointFailed
-            ? 'Recomputed chain ≠ external seal'
+            ? 'Chain rewrite ≠ external seal'
             : 'Ed25519 + create-only WORM'}
         </text>
-        <text x={590} y={82} fill="var(--color-muted)" fontSize={10} fontFamily="var(--font-mono)">
+        <text x={658} y={84} fill="var(--color-muted)" fontSize={10} fontFamily="var(--font-mono)">
           {evidence.seals.length} seals · {evidence.anchors.length} anchors
         </text>
       </svg>

@@ -4,7 +4,7 @@ import { FORMAT_VERSION } from '../format.js'
 import { CATALOGUE } from './catalogue.js'
 import { createCapture } from './writers.js'
 
-const actor = { id: 'ravi.menon', role: 'security-lead' }
+const actor = { id: 'jose.singh', role: 'security-lead' }
 const now = (): string => '2026-11-01T09:00:00.000Z'
 
 function setup(initiallyBroken = false) {

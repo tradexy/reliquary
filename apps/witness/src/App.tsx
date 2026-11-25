@@ -32,7 +32,7 @@ const SCREENS: readonly { id: Screen; label: string }[] = [
   { id: 'evidence', label: 'Evidence' },
 ]
 
-const ACTOR = { id: 'ravi.menon', role: 'security-lead' }
+const ACTOR = { id: 'jose.singh', role: 'security-lead' }
 
 function screenFromHash(): Screen {
   const id = window.location.hash.replace(/^#/, '').split('?')[0] ?? ''
@@ -41,9 +41,14 @@ function screenFromHash(): Screen {
 
 // -- Coverage ----------------------------------------------------------------
 
-function CoverageScreen() {
+function CoverageScreen({
+  simulateGap,
+  setSimulateGap,
+}: {
+  simulateGap: boolean
+  setSimulateGap: (v: boolean) => void
+}) {
   const baseRows = useMemo(() => loadCoverage(), [])
-  const [simulateGap, setSimulateGap] = useState(false)
 
   const rows: CoverageRow[] = useMemo(() => {
     if (!simulateGap) return baseRows
@@ -55,7 +60,7 @@ function CoverageScreen() {
         failMode: 'fail-closed',
         testRef: 'capture/catalogue.test.ts#roles.escalate',
         tested: false,
-        gap: '"capture/catalogue.test.ts" has no entry for capture/catalogue.test.ts#roles.escalate',
+        gap: 'missing test ref in capture/catalogue.test.ts',
       },
     ]
   }, [baseRows, simulateGap])
@@ -69,7 +74,7 @@ function CoverageScreen() {
       <Panel
         title="Coverage matrix"
         actions={
-          <button type="button" className="ax-btn" onClick={() => setSimulateGap((v) => !v)}>
+          <button type="button" className="ax-btn" onClick={() => setSimulateGap(!simulateGap)}>
             {simulateGap ? 'Clear simulated gap' : 'Simulate untested action'}
           </button>
         }
@@ -100,31 +105,33 @@ function CoverageScreen() {
         </div>
       ) : null}
       <Panel title="Catalogue">
-        <Table caption="Auditable actions" hideCaption>
-          <THead>
-            <Th>Action</Th>
-            <Th>Area</Th>
-            <Th>Fail mode</Th>
-            <Th>Description</Th>
-            <Th>Tested</Th>
-          </THead>
-          <TBody>
-            {rows.map((r) => {
-              const entry = CATALOGUE.find((c) => c.id === r.id)
-              return (
-                <Tr key={r.id} data={{ 'data-action': r.id }}>
-                  <Td mono><span className="ax-nowrap">{r.id}</span></Td>
-                  <Td>{r.area}</Td>
-                  <Td><span className="ax-nowrap">{r.failMode === 'fail-closed' ? 'stops' : 'queues'}</span></Td>
-                  <Td>{entry?.description ?? 'Simulated unverified route (missing testRef)'}</Td>
-                  <Td>
-                    {r.tested ? <Badge variant="ok">tested</Badge> : <Badge variant="fail">untested</Badge>}
-                  </Td>
-                </Tr>
-              )
-            })}
-          </TBody>
-        </Table>
+        <div className="ax-tall-table">
+          <Table caption="Auditable actions" hideCaption>
+            <THead>
+              <Th>Action</Th>
+              <Th>Area</Th>
+              <Th>Fail mode</Th>
+              <Th>Description</Th>
+              <Th>Tested</Th>
+            </THead>
+            <TBody>
+              {rows.map((r) => {
+                const entry = CATALOGUE.find((c) => c.id === r.id)
+                return (
+                  <Tr key={r.id} data={{ 'data-action': r.id }}>
+                    <Td mono><span className="ax-nowrap">{r.id}</span></Td>
+                    <Td>{r.area}</Td>
+                    <Td><span className="ax-nowrap">{r.failMode === 'fail-closed' ? 'stops' : 'queues'}</span></Td>
+                    <Td>{entry?.description ?? 'Simulated unverified route (missing testRef)'}</Td>
+                    <Td>
+                      {r.tested ? <Badge variant="ok">tested</Badge> : <Badge variant="fail">untested</Badge>}
+                    </Td>
+                  </Tr>
+                )
+              })}
+            </TBody>
+          </Table>
+        </div>
       </Panel>
     </>
   )
@@ -325,6 +332,7 @@ function EvidenceScreen({ controls, bundle }: EvidenceProps) {
   })
   const [showAllSeqs, setShowAllSeqs] = useState(false)
   const [exported, setExported] = useState<EvidenceBundle | null>(null)
+  const [wasDownloaded, setWasDownloaded] = useState(false)
   const [result, setResult] = useState<VerificationResult | null>(null)
   const [verifying, setVerifying] = useState(false)
   const standards = useMemo(() => [...new Set(controls.map((c) => c.standard))], [controls])
@@ -334,6 +342,7 @@ function EvidenceScreen({ controls, bundle }: EvidenceProps) {
   const exportBundle = () => {
     const b = bundle()
     setExported(b)
+    setWasDownloaded(true)
     setResult(null)
     const blob = new Blob([JSON.stringify(b, null, 2)], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
@@ -346,7 +355,10 @@ function EvidenceScreen({ controls, bundle }: EvidenceProps) {
 
   const verifyExport = async () => {
     const b = exported ?? bundle()
-    if (exported === null) setExported(b)
+    if (exported === null) {
+      setExported(b)
+      setWasDownloaded(false)
+    }
     setVerifying(true)
     // Round-trip through JSON so the check sees what a file reader would see.
     const parsed = JSON.parse(JSON.stringify(b)) as EvidenceBundle
@@ -379,9 +391,12 @@ function EvidenceScreen({ controls, bundle }: EvidenceProps) {
                       setSelected(key(c))
                       setShowAllSeqs(false)
                     }}
-                    style={{ width: '100%', textAlign: 'left' }}
+                    style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
                   >
-                    {c.control}
+                    <span>{c.control}</span>
+                    <span className="ax-mono" style={{ fontSize: 11.5, color: 'var(--color-muted)' }}>
+                      {c.eventSeqs.length}
+                    </span>
                   </button>
                 </li>
               ))}
@@ -434,12 +449,13 @@ function EvidenceScreen({ controls, bundle }: EvidenceProps) {
             </button>
           </div>
           <p className="ax-empty" style={{ marginBottom: 8 }}>
-            Verify offline with <span className="ax-mono">npm run verify:bundle</span>, or drop the downloaded{' '}
-            <span className="ax-mono">.json</span> into Seal.
+            Download the JSON bundle to verify offline in Seal or via the CLI.
           </p>
           {exported !== null ? (
             <p className="ax-empty" style={{ marginBottom: 8 }}>
-              Exported {summary(exported).events} events with {exported.controls.length} controls.
+              {wasDownloaded
+                ? `Exported ${summary(exported).events} events with ${exported.controls.length} controls.`
+                : `Verified in-memory bundle (${summary(exported).events} events, ${exported.controls.length} controls).`}
             </p>
           ) : null}
           {result !== null && exported !== null ? (
@@ -473,6 +489,7 @@ export function App() {
   const [flushNote, setFlushNote] = useState<string | null>(null)
   const [lastSeq, setLastSeq] = useState<number | null>(null)
   const [feed, setFeed] = useState<DrillFeedItem[]>([])
+  const [simulateGap, setSimulateGap] = useState(false)
   const [version, setVersion] = useState(0)
 
   // One log and one capture for the life of the page, seeded with the bundle.
@@ -528,6 +545,7 @@ export function App() {
     const r = await capture.current.flush()
     const note = `Flushed ${r.flushed} queued event${r.flushed === 1 ? '' : 's'}; ${r.remaining} remaining.`
     setFlushNote(note)
+    setOutcome('Outbox flushed to the audit chain.')
     const head = log.current.head()
     if (r.flushed > 0 && head !== null && log.current.events().length > before) setLastSeq(head.seq)
     const id = ++feedSeqRef.current
@@ -560,6 +578,8 @@ export function App() {
 
   const headerStatus = !available ? (
     <Badge variant="fail">outage active · {counts.outbox} queued</Badge>
+  ) : simulateGap ? (
+    <Badge variant="fail">{CATALOGUE.length + 1} actions · 1 gap</Badge>
   ) : (
     <Badge variant="ok">{CATALOGUE.length} actions · 0 gaps</Badge>
   )
@@ -594,7 +614,9 @@ export function App() {
       }}
     >
       {screen === 'start' ? <WitnessIntro onOpen={() => go('coverage')} /> : null}
-      {screen === 'coverage' ? <CoverageScreen /> : null}
+      {screen === 'coverage' ? (
+        <CoverageScreen simulateGap={simulateGap} setSimulateGap={setSimulateGap} />
+      ) : null}
       {screen === 'drill' ? (
         <DrillScreen
           perform={perform}

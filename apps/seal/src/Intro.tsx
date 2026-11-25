@@ -10,7 +10,7 @@ const STORY = {
   title: 'A bank, a changed row, and one command',
   paragraphs: [
     'Northgate Bank runs AI agents over commercial loan files. On 3 November an engineer with database access opened the audit table and changed one row. An agent run that had approved a two-million-pound facility now read as declined. Nothing in the application looked wrong; the table simply said something different.',
-    "The next morning the auditor did not open a dashboard. She ran one command against the export. It printed four words: divergence at 217. The engineer could have recomputed every hash in the table afterwards. It would not have helped, because a signed copy of the end of the chain had already been written to storage the bank's own administrators cannot delete.",
+    "The next morning the auditor did not open a dashboard. She ran one command against the export. It printed three words: divergence at 217. The engineer could have recomputed every hash in the table afterwards. It would not have helped, because a signed copy of the end of the chain had already been written to storage the bank's own administrators cannot delete.",
     'Total time to find it: under a second. Total trust required in the bank: none.',
   ],
 }

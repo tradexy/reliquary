@@ -68,7 +68,7 @@ Anchora bundle verification
 
   INFO  seq  144  LAWFUL_CHANGE      seq 144: lawful erasure authorised by dpo@northgate.example
   INFO  seq  288  LAWFUL_CHANGE      seq 288: lawful retention authorised by retention-scheduler
-  INFO  seq  401  LAWFUL_CHANGE      seq 401: lawful payload-stripped authorised by ravi.menon
+  INFO  seq  401  LAWFUL_CHANGE      seq 401: lawful payload-stripped authorised by jose.singh
 
   result      PASS
   divergence  none

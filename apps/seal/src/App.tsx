@@ -64,8 +64,8 @@ function short(hash: string, n: number): string {
 }
 
 function compactTime(iso: string): string {
-  // 2026-11-03T09:14:00.000Z -> 11-03 09:14:00
-  if (iso.length >= 19) return `${iso.slice(5, 10)} ${iso.slice(11, 19)}`
+  // 2026-11-03T09:14:00.000Z -> 11-03 09:14
+  if (iso.length >= 16) return `${iso.slice(5, 10)} ${iso.slice(11, 16)}`
   return iso
 }
 
@@ -104,6 +104,7 @@ export function App({ bundle = ORIGINAL }: AppProps = {}) {
   const [running, setRunning] = useState(false)
   const [screen, setScreen] = useState<Screen>(initialRoute.screen)
   const fileInputRef = useRef<HTMLInputElement | null>(null)
+  const tableWrapRef = useRef<HTMLDivElement | null>(null)
 
   const go = (s: Screen) => {
     window.location.hash = s
@@ -149,6 +150,15 @@ export function App({ bundle = ORIGINAL }: AppProps = {}) {
     }
   }, [screen, selected, sourceKind, activeBundle])
 
+  // Auto-scroll the selected row into view inside the Chain table container.
+  useEffect(() => {
+    if (screen !== 'chain' || selected === null) return
+    const rowEl = tableWrapRef.current?.querySelector<HTMLElement>('tr[aria-current="true"]')
+    if (rowEl && typeof rowEl.scrollIntoView === 'function') {
+      rowEl.scrollIntoView({ block: 'nearest' })
+    }
+  }, [screen, selected, sourceKind])
+
   const apply = useCallback(
     (next: Evidence | null, isRewrite = false) => {
       setTampered(next)
@@ -165,6 +175,7 @@ export function App({ bundle = ORIGINAL }: AppProps = {}) {
     setRewritten(false)
     setArea('all')
     setText('')
+    window.location.hash = 'chain'
     setSelected(kind === 'northgate' && bundle.events.length >= 217 ? 216 : 0)
   }
 
@@ -236,7 +247,7 @@ export function App({ bundle = ORIGINAL }: AppProps = {}) {
     ) : result.ok ? (
       <Badge variant="ok">PASS · {result.counts.events} events</Badge>
     ) : (
-      <Badge variant="fail">FAIL · div {result.firstDivergence ?? '?'}</Badge>
+      <Badge variant="fail">FAIL · divergence {result.firstDivergence ?? '?'}</Badge>
     )
 
   return (
@@ -397,6 +408,7 @@ export function App({ bundle = ORIGINAL }: AppProps = {}) {
                     Filter{' '}
                     <input
                       className="ax-input"
+                      style={{ minWidth: 215 }}
                       type="search"
                       value={text}
                       placeholder="seq, action, actor, subject"
@@ -407,62 +419,60 @@ export function App({ bundle = ORIGINAL }: AppProps = {}) {
                     {visible.length} of {evidence.events.length} records
                   </span>
                 </div>
-                <Table caption="Audit events" hideCaption>
-                  <THead>
-                    <Th>Seq</Th>
-                    <Th>Time</Th>
-                    <Th>Action</Th>
-                    <Th>Actor</Th>
-                    <Th>Subject</Th>
-                    <Th>Outcome</Th>
-                    <Th>Hash</Th>
-                    <Th>State</Th>
-                  </THead>
-                  <TBody>
-                    {visible.map(({ ev, index }) => {
-                      const state = rowState(ev, errors)
-                      return (
-                        <Tr
-                          key={`${index}-${ev.seq}`}
-                          data={{ 'data-seq': String(ev.seq), 'data-state': state }}
-                          selected={index === selected}
-                          onSelect={() => setSelected(index)}
-                        >
-                          <Td mono>
-                            <span className="ax-nowrap">{ev.seq}</span>
-                          </Td>
-                          <Td mono>
-                            <span className="ax-nowrap" title={ev.at}>
-                              {compactTime(ev.at)}
-                            </span>
-                          </Td>
-                          <Td>
-                            <span className="ax-nowrap">{ev.action}</span>
-                          </Td>
-                          <Td>
-                            <span className="ax-nowrap">{ev.actor.id}</span>
-                          </Td>
-                          <Td>
-                            <div className="ax-truncate" title={ev.subject}>
-                              {ev.subject}
-                            </div>
-                          </Td>
-                          <Td>
-                            <span className="ax-nowrap">{ev.outcome}</span>
-                          </Td>
-                          <Td mono>
-                            <span className="ax-nowrap">{ev.hash.slice(0, 8)}</span>
-                          </Td>
-                          <Td>
-                            <Badge variant={state === 'ok' ? 'ok' : state === 'lawful' ? 'warn' : 'fail'}>
-                              {state}
-                            </Badge>
-                          </Td>
-                        </Tr>
-                      )
-                    })}
-                  </TBody>
-                </Table>
+                <div ref={tableWrapRef}>
+                  <Table caption="Audit events" hideCaption>
+                    <THead>
+                      <Th>Seq</Th>
+                      <Th>Time</Th>
+                      <Th>Action</Th>
+                      <Th>Actor</Th>
+                      <Th>Subject</Th>
+                      <Th>Hash</Th>
+                      <Th>State</Th>
+                    </THead>
+                    <TBody>
+                      {visible.map(({ ev, index }) => {
+                        const state = rowState(ev, errors)
+                        return (
+                          <Tr
+                            key={`${index}-${ev.seq}`}
+                            data={{ 'data-seq': String(ev.seq), 'data-state': state }}
+                            selected={index === selected}
+                            onSelect={() => setSelected(index)}
+                          >
+                            <Td mono>
+                              <span className="ax-nowrap">{ev.seq}</span>
+                            </Td>
+                            <Td mono>
+                              <span className="ax-nowrap" title={ev.at}>
+                                {compactTime(ev.at)}
+                              </span>
+                            </Td>
+                            <Td>
+                              <span className="ax-nowrap">{ev.action}</span>
+                            </Td>
+                            <Td>
+                              <span className="ax-nowrap">{ev.actor.id}</span>
+                            </Td>
+                            <Td>
+                              <div className="ax-truncate" title={ev.subject}>
+                                {ev.subject}
+                              </div>
+                            </Td>
+                            <Td mono>
+                              <span className="ax-nowrap">{ev.hash.slice(0, 8)}</span>
+                            </Td>
+                            <Td>
+                              <Badge variant={state === 'ok' ? 'ok' : state === 'lawful' ? 'warn' : 'fail'}>
+                                {state}
+                              </Badge>
+                            </Td>
+                          </Tr>
+                        )
+                      })}
+                    </TBody>
+                  </Table>
+                </div>
                 {visible.length === 0 ? <p className="ax-empty" style={{ marginTop: 10 }}>No records match these filters.</p> : null}
               </Panel>
 

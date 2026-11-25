@@ -95,9 +95,9 @@ export async function verifyChain(
     bySeq.set(ev.seq, ev);
   }
 
-  // Set of seq values whose hash does not match, keyed before lawful
-  // classification so we can decide the code in step 7.
-  const hashMismatchSeqs = new Set<number>();
+  // Map of seq → recomputed hash for events whose hash does not match, keyed
+  // before lawful classification so we can decide the code in step 7.
+  const hashMismatchSeqs = new Map<number, string>();
   // Set of seq values with broken prevHash links.
   const linkBrokenSeqs = new Set<number>();
 
@@ -127,7 +127,7 @@ export async function verifyChain(
     // Step 2: recompute hash
     const recomputed = await recomputeHash(ev);
     if (ev.hash !== recomputed) {
-      hashMismatchSeqs.add(ev.seq);
+      hashMismatchSeqs.set(ev.seq, recomputed);
     }
 
     // The prevHash for the next iteration is always the stored hash of this
@@ -150,7 +150,7 @@ export async function verifyChain(
 
   const lawfulReported = new Set<number>();
 
-  for (const seq of hashMismatchSeqs) {
+  for (const [seq, recomputed] of hashMismatchSeqs) {
     const marker = lawfulMarkers.get(seq);
     if (marker !== undefined) {
       findings.push(makeLawfulChange(seq, marker.kind, marker.authority));
@@ -158,7 +158,7 @@ export async function verifyChain(
     } else {
       const ev = bySeq.get(seq);
       const stored = ev?.hash ?? '?';
-      findings.push(makeHashMismatch(seq, stored, '(recomputed)'));
+      findings.push(makeHashMismatch(seq, stored, recomputed));
     }
   }
 

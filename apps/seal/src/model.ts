@@ -56,11 +56,13 @@ export function cloneEvidence(source: Evidence): Evidence {
 }
 
 function mutateEventInPlace(ev: AuditEvent): void {
-  if (ev.detail && ev.detail['decision'] === 'approved') {
+  if (ev.detail && (ev.detail['decision'] === 'approved' || ev.detail['decision'] === 'declined')) {
     ev.detail = { ...ev.detail, decision: 'declined' }
     return
   }
-  ev.subject = `${ev.subject} (edited)`
+  if (!ev.subject.endsWith(' (edited)')) {
+    ev.subject = `${ev.subject} (edited)`
+  }
 }
 
 // -- Tamper operations (always on a copy) ------------------------------------
@@ -353,7 +355,7 @@ export function deriveControls(result: VerificationResult | null, running: boole
       id: 'retention',
       label: 'Retention',
       state: 'ok',
-      detail: `${lawful} lawful changes recorded and classified.`,
+      detail: `${lawful} lawful ${lawful === 1 ? 'change' : 'changes'} recorded and classified.`,
     },
   ]
 }
