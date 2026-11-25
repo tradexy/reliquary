@@ -22,10 +22,13 @@ same database an administrator can edit. A record you can rewrite proves nothing
 
 ## What it does
 
-One reusable cryptographic evidence skeleton (`@anchora/core`) powering two distinct
-applications, an offline verifier CLI, and an offline Kiro MCP server:
+One reusable cryptographic evidence skeleton (`packages/core/` → `@anchora/core`) powering
+two distinct applications in separate folders (`apps/seal/` and `apps/witness/`), an
+offline verifier CLI (`tools/verify/`), and an offline Kiro MCP server (`tools/mcp/`).
+Everything runs **completely offline** with zero runtime network calls (`connect-src 'none'`
+CSP, system fonts only, no login or external APIs):
 
-**Seal** (*Integrity Vault*) proves nothing changed. Five hundred events are
+**Seal** (`apps/seal/`, *Integrity Vault*) proves nothing changed. Five hundred events are
 hash-chained, sealed with Ed25519, and anchored into create-only storage. Edit `seq 217`
 (the £2,000,000 commercial loan approval) and the live SVG chain visualizer fractures at
 `HASH_MISMATCH` with a first-divergence index of `217`. Click **Rewrite chain from here**
@@ -35,7 +38,7 @@ create-only anchor (`SEAL_INVALID`, `ANCHOR_MISSING`). You can also drop any exp
 `.json` bundle into Seal to verify it offline in the browser, or switch to Anchora's own
 **Kiro Build Trail** bundle.
 
-**Witness** (*Capture Registry*) proves nothing was missed. Fifteen auditable actions are
+**Witness** (`apps/witness/`, *Capture Registry*) proves nothing was missed. Fifteen auditable actions are
 classified `fail-closed` or `queue`. Flip the simulated audit store offline: widening
 actions (`roles.grant`, `agents.guardrail.ceiling.raise`) refuse with
 `audit-unavailable`, while tightening actions (`roles.revoke`, `agents.disable`) complete

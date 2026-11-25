@@ -418,6 +418,9 @@ export function App({ bundle = ORIGINAL }: AppProps = {}) {
                   <span className="ax-mono" role="status" style={{ fontSize: 12, color: 'var(--color-muted)' }}>
                     {visible.length} of {evidence.events.length} records
                   </span>
+                  <span className="ax-mono ax-scroll-hint" aria-hidden="true">
+                    · scroll →
+                  </span>
                 </div>
                 <div ref={tableWrapRef}>
                   <Table caption="Audit events" hideCaption>

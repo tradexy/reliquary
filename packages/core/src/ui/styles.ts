@@ -148,6 +148,12 @@ input[type="checkbox"] { accent-color: var(--color-accent); }
 .ax-fig-col { border: 1px solid rgba(155,167,180,0.26); border-radius: var(--radius); padding: 10px 12px; background: var(--color-bg); }
 .ax-fig-col h4 { margin: 0 0 6px; font-size: 15px; }
 .ax-fig-col ul { margin: 0; padding-left: 18px; font-size: 14px; }
+.ax-scroll-hint { display: none; font-size: 11.5px; color: var(--color-muted); }
+@media (max-width: 1200px) { .ax-scroll-hint { display: inline; } }
+@media (max-width: 1100px) {
+  .ax-panel > header { flex-direction: column; align-items: flex-start; }
+  .ax-alert-banner { flex-direction: column; align-items: flex-start; }
+}
 @media (max-width: 960px) { .ax-grid { grid-template-columns: minmax(0, 1fr); }
   .ax-controls { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 640px) { .ax-container { padding: 0 14px; }
