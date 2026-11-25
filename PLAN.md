@@ -5,7 +5,7 @@ resume cold. Numbers here are measured, not remembered.
 
 - **Competition:** Kiroween 2026 (Devpost, sponsored by AWS/Kiro)
 - **Entry:** Anchora — category **Skeleton Crew**
-- **Deadline:** **Fri 4 Dec 2026, 14:00 PT = 22:00 London.** Submit Thu 3 Dec.
+- **Deadline:** **Fri 4 Dec 2026, 14:00 PT = 22:00 London.** Freeze `main` **Thu 3 Dec 18:00 London**.
 - **Prize target:** 1st Overall ($30,000) / Best Skeleton Crew ($5,000) / Best Demo ($1,000) + Bonus stack
 - **Live:** https://tradexy.github.io/reliquary/ (`/seal/`, `/witness/`)
 - **Repo:** https://github.com/tradexy/reliquary (public, MIT)
@@ -35,21 +35,22 @@ plus `tools/verify`, `tools/mcp`, and `.kiro/powers/anchora`.
 
 ## 2. Scope of this submission
 
-Anchora is a single, self-contained entry: the evidence core, the two apps, the CLI and
-the 500-event fixture were all written for this competition. There is no third-party
-code beyond the dependencies in `package-lock.json`.
+Anchora is a single, self-contained entry: the evidence core, the two apps, the CLI, the
+offline MCP server, and both deterministic fixtures (`bundle.json`, `kiro-audit.bundle.json`)
+were written for this competition. There is no third-party code beyond the dependencies in
+`package-lock.json`.
 
 ## 3. Test and verification state
 
 | Check | Result |
 | --- | --- |
-| `npm run verify` | **198 tests** across 17 files, typecheck clean, security scan clean (64 files) |
+| `npm run verify` | **198 tests** across 17 files, typecheck clean (4 projects), security scan clean (64 files) |
 | `npm run test:pbt` | **198 tests** at 1,000 PBT runs clean |
 | `npm run build` | both apps build (Vite, CSP injected) |
-| `npm run verify:bundle -- packages/core/data/bundle.json` | PASS, 500 events / 9 seals / 4 anchors, 3 lawful changes |
-| `npm run verify:bundle -- packages/core/data/kiro-audit.bundle.json` | PASS, 24 events / 4 seals / 2 anchors, 1 lawful change |
-| `kiro-cli agent validate` | both `.kiro/agents/*.json` valid (exit 0) |
-| CI | GitHub Actions: `npm run verify` → CLI verification (both bundles) → build → deploy Pages |
+| `npm run verify:bundle -- packages/core/data/bundle.json` | PASS, 500 events / 9 seals / 4 anchors, 3 lawful changes (`144`, `288`, `401`) |
+| `npm run verify:bundle -- packages/core/data/kiro-audit.bundle.json` | PASS, 24 events / 4 seals / 2 anchors, 1 lawful change (`19`) |
+| `kiro-cli agent validate` + live `@security-auditor` MCP run | both agents valid (exit 0); live MCP verified both bundles + 0 coverage gaps |
+| CI | GitHub Actions: `npm run verify` → build → CLI verification (both bundles) → deploy Pages |
 
 Bundle key fingerprint: `7f2d0c75f3608e2d2f9743ca688960c5`
 
@@ -64,12 +65,12 @@ restate them here; update that file instead.
 
 Outstanding items only:
 
-- [ ] Demo video, under 3 minutes, public on YouTube
+- [ ] Demo video, under 3 minutes, public on YouTube (1920×1080, captions, no music)
 - [ ] Devpost submission form, category **Skeleton Crew**
-- [ ] Blog post (bonus)
+- [ ] Blog post (bonus, mentions Kiroween 2026)
 - [ ] Social post starting with `#KiroweenHackathon26` (bonus)
-- [ ] Freeze `main` after submission (judges test the live URL until 29 Jan 2027)
-- [ ] Cancel Kiro Pro by 27 Nov to avoid a charge on 1 Dec
+- [ ] Freeze `main` **Thu 3 Dec 18:00 London** (judges test the live URL until 29 Jan 2027)
+- [ ] Cancel Kiro Pro by **27 Nov** to avoid a charge on 1 Dec (CLI/MCP evidence already captured)
 
 Verified as already compliant: built in period, Kiro usage, public repo, MIT licence in
 About, `/.kiro` at root and not gitignored, live URL with no login. Full checklist:
@@ -79,26 +80,27 @@ About, `/.kiro` at root and not gitignored, live URL with no login. Full checkli
 
 | Criterion (20% each) | Our evidence |
 | --- | --- |
-| Potential Impact | Banks/defence/pharma; the auditor who must not trust the operator. Concrete Northgate story on the landing page. |
-| Technological Implementation | Spec-first Kiro use: 15 EARS requirements, design, hooks as gates, 180 tests, PBT, offline CLI. Journal records what Kiro got right and wrong. |
-| Design | Two coherent themes, plain-English "Start here" page per app, no stock imagery, accessible tables. |
-| Innovation | Two-pillar thesis, lawful-change classification, first-divergence index, honest `simulated` labelling. |
-| Presentation | Landing story timeline; video script in `docs/video-script.md` (needs rewrite for Anchora). |
+| Potential Impact | Banks/defence/pharma; the auditor who must not trust the operator. Concrete Northgate story on the landing page + browser dropzone + offline CLI. |
+| Technological Implementation | Full Kiro stack: 4 steering docs, 15 EARS requirements, 3 hooks, 2 validated custom agents, offline MCP server (`tools/mcp/`), Kiro Power, 198 tests, PBT, self-audited `kiro-audit.bundle.json` + live `@security-auditor` MCP run in `docs/kiro-evidence.md`. |
+| Design | Two coherent themes, centered plain-English "Start here" pages, SVG chain-fracture & architecture diagrams, accessible tables. |
+| Innovation | Two-pillar thesis, full-chain rewrite caught by external anchor, lawful-change classification, first-divergence index, honest `simulated` labelling. |
+| Presentation | Chronological landing story timeline; 2:45 1080p video script in `docs/video-script.md` and `docs/kiro-evidence.md`. |
 
 ## 6. Remaining work
 
 | # | Task | Date | Notes |
 | --- | --- | --- | --- |
-| 1 | Record video (<3 min), upload public | 27–28 Nov | 1920×1080, captions, no music, script in `docs/video-script.md` |
-| 2 | Cancel Kiro Pro (after any final CLI sessions) | 27 Nov | Avoids 1 Dec charge |
-| 3 | Blog post (Kiro + build) | 29 Nov | Must mention Kiroween 2026 |
-| 4 | Social post `#KiroweenHackathon26` | 29 Nov | Must start with the hashtag |
-| 5 | Devpost form, category **Skeleton Crew** | 3 Dec | Draft early from `docs/submission.md`; leave credentials blank |
-| 6 | Final compliance pass + freeze `main` | 3 Dec | Check licence, `.kiro`, URLs, video visibility |
+| 1 | Red-team live URLs (`1024/1280/1440`) + review bonus drafts | 25–26 Nov | DO1 review pass |
+| 2 | Cancel Kiro Pro | by 27 Nov | Avoids 1 Dec charge |
+| 3 | Record video (<3 min), upload public | 27–28 Nov | 1920×1080, captions, no music, script in `docs/video-script.md` |
+| 4 | Publish Blog post (Kiro + build) | 29 Nov | Must mention Kiroween 2026 |
+| 5 | Publish Social post `#KiroweenHackathon26` | 29 Nov | Must start with the hashtag |
+| 6 | Devpost form, category **Skeleton Crew** | 3 Dec | Draft early from `docs/submission.md`; leave credentials blank |
+| 7 | Final compliance pass + freeze `main` | 3 Dec 18:00 | Check licence, `.kiro`, URLs, video visibility |
 
 Cut order if time slips: EU AI Act evidence mapping → anchors side panel → insert and
-delete tamper modes (keep edit) → Witness evidence tab polish. Never cut the CLI, the
-divergence index, or the outage drill.
+delete tamper modes (keep edit & rewrite) → Witness evidence tab polish. Never cut the CLI,
+the divergence index, or the outage drill.
 
 ## 7. How to resume cold
 
@@ -109,6 +111,7 @@ npm run verify
 npm run dev:seal       # :5180
 npm run dev:witness    # :5181
 npm run verify:bundle -- packages/core/data/bundle.json
+npm run verify:bundle -- packages/core/data/kiro-audit.bundle.json
 ```
 
 Key files:
@@ -119,13 +122,19 @@ Key files:
 | `.kiro/specs/anchora-evidence/requirements.md` | 15 requirements (EARS) |
 | `.kiro/specs/anchora-evidence/design.md` | chain, canonical form, seals, anchors, verifier |
 | `.kiro/steering/*.md` | product, tech, security, conventions |
+| `.kiro/agents/*.json` | validated custom agents (`security-auditor`, `evidence-builder`) |
+| `.kiro/settings/mcp.json` | offline Anchora MCP server registration |
+| `.kiro/powers/anchora/POWER.md` | installable Skeleton Crew Kiro Power |
+| `docs/kiro-evidence.md` | judge-scannable summary of all Kiro primitives & live MCP output |
+| `docs/skeleton-guide.md` | 3-step quickstart to extend `@anchora/core` into a 3rd domain app |
 | `docs/limits.md` | what is simulated — read before writing any claim |
-| `docs/threat-model.md` | 8 threats, controls and residual risk |
+| `docs/threat-model.md` | 13 threats, controls and residual risk |
 | `docs/traceability.md` | requirements → tests, with gaps stated |
 | `docs/demo-plan.md` | data composition and the demo beat sheet |
 | `docs/kiro-journal.md` | dated record of what Kiro did and what broke |
 | `RULES.md` | competition rules, prizes, and operational lessons |
 | `packages/core/data/bundle.json` | the 500-event fixture (regenerate with `npm run generate:stream`) |
+| `packages/core/data/kiro-audit.bundle.json` | the 24-event Kiro self-audit trail (`npm run generate:kiro-audit`) |
 
 ## 8. Environment gotchas
 
@@ -143,19 +152,6 @@ Key files:
 ## 9. Machine storage plan
 
 Current disk: **~38 GB free** of 228 GB. `~/Documents/competitions` is **22 GB**.
-
-Largest offenders (measured 21 Nov):
-
-| Path | Size | Recommendation |
-| --- | --- | --- |
-| `263011-pump-or-dump-solana/data` | 10 GB | Archive to external drive or Drive, keep a `data/README` with the source URL |
-| `261130-predicting-soil-grain-size-images/data` + `reports` | 2.7 GB | Archive; keep `submissions/` |
-| `261202-gemma4-dev-agent/demo` | 2.0 GB | Regenerable; delete after that competition closes |
-| `270113-name-that-llm/kaggle` | 1.3 GB | Kaggle-hosted; safe to download on demand |
-| `261201-vr-calibration-aura/data` | 1.2 GB | Keep until that competition closes, then archive |
-| `~/Library/Caches` | 5.6 GB | Safe to clear selectively |
-| `~/.npm` | 1.0 GB | `npm cache clean --force` after the build is done |
-| `~/Downloads` | 0.9 GB | Review and clear |
 
 **This project:** 123 MB total, of which 116 MB is `node_modules`. After submission:
 
@@ -176,9 +172,9 @@ project; it would add risk for no benefit.
 
 | Risk | Mitigation |
 | --- | --- |
-| Judges read "audit app" as dull | Landing page story, tamper-on-camera, outage drill; video leads with the story |
+| Judges read "audit app" as dull | Landing page story, tamper-on-camera, full-chain rewrite proof, outage drill; video leads with the story |
 | Overclaiming security | `docs/limits.md`; `simulated` badges; rubric wording says tamper-*evident* |
-| Video left to the last day | Script by 22 Nov, recorded 27–28 Nov |
-| Kiro CLI blocked again | Identity must be Google; if it fails, IDE/Web still work and local build continues |
-| Accidental push after submission | Freeze `main` on 3 Dec; work on a branch after that |
-| Losing context | This file. Keep it updated when state changes. |
+| Video left to the last day | Script ready in `docs/video-script.md`; record 27–28 Nov |
+| Kiro CLI blocked again | Live `@security-auditor` + MCP evidence already captured before 27 Nov cancel |
+| Accidental push after submission | Freeze `main` on **Thu 3 Dec 18:00 London**; work on a branch after that |
+| Losing context | `PLAN.md` + `PLAN_GEM_261124.md` + `COORDINATION.md`. |

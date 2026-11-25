@@ -49,7 +49,7 @@ No extensions. Late submissions are not accepted.
 | Skeleton Crew | A skeleton template plus **two distinct applications** built from it |
 | Costume Contest | Any app, judged on a haunting, polished UI |
 
-**Our position: Skeleton Crew.** One reusable `@anchora/core` evidence skeleton powering two distinct applications (`apps/seal` and `apps/witness` in separate folders), an offline verifier CLI, and an offline Kiro MCP server. (We originally registered and requested credits under Skeleton Crew, briefly explored Frankenstein, and locked in Skeleton Crew for submission; see §10 for why changing before submission is explicitly allowed.)
+**Our position: Skeleton Crew.** One reusable `@anchora/core` evidence skeleton powering two distinct applications (`apps/seal` and `apps/witness` in separate folders), an offline verifier CLI, and an offline Kiro MCP server.
 
 ## 4. What must be submitted
 
