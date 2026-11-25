@@ -29,7 +29,7 @@ Record **1920×1080 (16:9, 60fps)**, browser zoom **115%** (or `node GA2_demo_pl
 **Screen:** Scroll to the top bundle bar while the chain is still broken:
 1. Click **Download .json** (`anchora-northgate-tampered.bundle.json`, `1:03`).
 2. Click **Restore** so Seal returns to green **PASS · 500 events** (`1:09`).
-3. Drop / upload that downloaded `.json` back into **Drop or open bundle .json** (`1:14`) → immediate **`FAIL · divergence 217`** (`SEAL_INVALID` / `ANCHOR_MISSING`).
+3. Drop / upload that downloaded `.json` back into **Drop or open bundle .json** (`1:14`) → immediate **`FAIL · divergence 240`** (`SEAL_INVALID` / `ANCHOR_MISSING`).
 
 **Voice:** "Better yet, proof shouldn't depend on our demo buttons. We download that tampered working copy as JSON, restore Seal to green PASS, and drop the file we just saved straight back in. Offline WebCrypto verifies the file from scratch and immediately flags `FAIL`."
 
