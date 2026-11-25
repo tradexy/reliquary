@@ -108,4 +108,46 @@ describe('Seal app', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Insert a record' }))
     await within(await screen.findByRole('list', { name: 'Verification findings' }, { timeout: 5000 })).findByText('LINK_BROKEN')
   })
+
+  it('catches a full-chain rewrite via external seals and anchors', async () => {
+    const sealedFixture: DemoBundle = {
+      ...ORIGINAL,
+      events: ORIGINAL.events.slice(0, 60),
+      seals: ORIGINAL.seals.filter((s) => s.seq <= 60),
+      anchors: ORIGINAL.anchors.filter((a) => a.seq <= 60),
+    }
+    const { container } = render(<App bundle={sealedFixture} />)
+    await userEvent.click(screen.getByRole('tab', { name: 'Chain' }))
+    await screen.findByText('PASS', undefined, { timeout: 5000 })
+    await userEvent.click(row(container, 17)!)
+    await userEvent.click(screen.getByRole('button', { name: 'Rewrite chain from here' }))
+
+    const findings = await screen.findByRole('list', { name: 'Verification findings' }, { timeout: 5000 })
+    await within(findings).findByText('SEAL_INVALID')
+    expect(screen.getByTestId('chain-visualizer')).toHaveTextContent('Rewrite attack caught')
+  })
+
+  it('switches to the Kiro build audit bundle and verifies uploaded JSON offline', async () => {
+    await renderVerified()
+    await userEvent.click(screen.getByRole('button', { name: /Kiro Build Trail/ }))
+    await screen.findByText('PASS', undefined, { timeout: 5000 })
+    expect(screen.getByText('24 of 24 records')).toBeInTheDocument()
+
+    const doctored = JSON.parse(JSON.stringify(ORIGINAL)) as DemoBundle
+    doctored.events[10] = { ...doctored.events[10]!, subject: 'tampered-upload' }
+    const file = new File([JSON.stringify(doctored)], 'doctored.json', { type: 'application/json' })
+    const input = screen.getByLabelText('Verify JSON bundle file')
+    await userEvent.upload(input, file)
+
+    const findings = await screen.findByRole('list', { name: 'Verification findings' }, { timeout: 5000 })
+    await within(findings).findByText('HASH_MISMATCH')
+    expect(findings.querySelector('[data-first="true"]')).toHaveTextContent('seq 11')
+  })
+
+  it('supports deep-linking directly to a seq via hash', async () => {
+    window.location.hash = '#chain?seq=17'
+    render(<App bundle={fixture} />)
+    await screen.findByText('PASS', undefined, { timeout: 5000 })
+    expect(screen.getByTestId('preimage').textContent).toContain('"seq":17')
+  })
 })

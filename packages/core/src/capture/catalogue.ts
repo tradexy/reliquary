@@ -104,6 +104,13 @@ export const CATALOGUE: readonly CatalogueEntry[] = [
     description: 'An agent guardrail ceiling is lowered (tightening).',
     testRef: 'capture/catalogue.test.ts#agents.guardrail.ceiling.lower',
   },
+  {
+    id: 'agents.decision.record',
+    area: 'agents',
+    failMode: 'fail-closed',
+    description: 'An AI agent records a regulated decision (widening: binds an institutional outcome).',
+    testRef: 'capture/catalogue.test.ts#agents.decision.record',
+  },
 
   // ── Routing ───────────────────────────────────────────────────────────────
   {

@@ -65,39 +65,46 @@ Ordered so every task ends runnable and verifiable. One Kiro run per task group.
   - [x] 10.3 Tests against seeded data: each control resolves to known events
   - **Done when:** every claim points at records.
 
-- [ ] 11. Shared shell and themes
-  - [ ] 11.1 Table, badge, finding list, control panel, theme tokens
-  - [ ] 11.2 Seal theme (slate/bone) and Witness theme (ink/ledger-green)
-  - [ ] 11.3 Accessibility: keyboard paths, roles, reduced motion
+- [x] 11. Shared shell and themes
+  - [x] 11.1 Table, badge, finding list, control panel, theme tokens
+  - [x] 11.2 Seal theme (slate/bone) and Witness theme (ink/ledger-green)
+  - [x] 11.3 Accessibility: keyboard paths, roles, reduced motion
   - **Done when:** both apps are assembled from the same components.
 
-- [ ] 12. Seal app
-  - [ ] 12.1 Chain table with state per row; record detail showing the hashed preimage
-  - [ ] 12.2 Seals and anchors column with signature status
-  - [ ] 12.3 Tamper simulator: edit or delete in memory, verify, show first divergence, restore
-  - [ ] 12.4 Controls strip: chain, signing, anchoring, verification, retention
+- [x] 12. Seal app
+  - [x] 12.1 Chain table with state per row; record detail showing the hashed preimage
+  - [x] 12.2 Seals and anchors column with signature status
+  - [x] 12.3 Tamper simulator: edit, delete, insert or full-chain rewrite in memory, verify, show first divergence, restore
+  - [x] 12.4 Controls strip: chain, signing, anchoring, verification, retention
   - **Done when:** a judge can break it and be told exactly where.
 
-- [ ] 13. Witness app
-  - [ ] 13.1 Coverage matrix with fail mode, test status, gap count
-  - [ ] 13.2 Outage drill: widening refused, tightening queued, counters visible
-  - [ ] 13.3 Lawful-change ledger with authority
-  - [ ] 13.4 Evidence view per standard, export, and "verify this file" result
+- [x] 13. Witness app
+  - [x] 13.1 Coverage matrix with fail mode, test status, gap count
+  - [x] 13.2 Outage drill: widening refused, tightening queued, counters visible
+  - [x] 13.3 Lawful-change ledger with authority
+  - [x] 13.4 Evidence view per standard, export, and "verify this file" result
   - **Done when:** a judge can see a refused action and a complete evidence pack.
 
-- [ ] 14. Retire the old apps
-  - [ ] 14.1 Remove `apps/card-catalogue`, `apps/parts-ledger`, `packages/reliquary`
-  - [ ] 14.2 Rewrite README, landing page and screenshots
-  - [ ] 14.3 Update `docs/submission.md`, `docs/limits.md`, traceability, threat model
-  - **Done when:** no catalogue or ledger reference survives anywhere.
+- [x] 14. Retire the old apps
+  - [x] 14.1 Remove legacy prototype folders (`apps/card-catalogue`, `apps/parts-ledger`, `packages/reliquary`)
+  - [x] 14.2 Rewrite README, landing page and screenshots
+  - [x] 14.3 Update `docs/submission.md`, `docs/limits.md`, traceability, threat model
+  - **Done when:** no legacy prototype reference survives in the active apps or steering docs.
 
-- [ ] 15. Evidence of process
-  - [ ] 15.1 Journal entries per task group
-  - [ ] 15.2 Hooks retargeted at the new workspace and proven to fire
-  - [ ] 15.3 Traceability matrix for requirements 1–15
+- [x] 15. Evidence of process
+  - [x] 15.1 Journal entries per task group
+  - [x] 15.2 Hooks retargeted at the new workspace and proven to fire
+  - [x] 15.3 Traceability matrix for requirements 1–15
   - **Done when:** a judge can trace every requirement to a test.
 
-- [ ] 16. Submission
-  - [ ] 16.1 Video per `docs/video-script.md` (rewritten for Anchora)
-  - [ ] 16.2 Blog post and social post
-  - [ ] 16.3 Devpost entry, category Frankenstein
+- [x] 16. Kiro Ecosystem, Skeleton Crew & Visual Polish
+  - [x] 16.1 Offline Anchora MCP server (`tools/mcp/`) + `.kiro/settings/mcp.json`
+  - [x] 16.2 Validated custom agents (`.kiro/agents/`) + Kiro Power (`.kiro/powers/anchora/`)
+  - [x] 16.3 Verifiable Kiro build audit trail (`packages/core/data/kiro-audit.bundle.json`)
+  - [x] 16.4 Story-aligned seq 217 fixture, SVG chain fracture visualizer, browser dropzone verifier, cross-app links
+  - **Done when:** all tests, MCP tools, custom agents, and builds verify clean offline.
+
+- [ ] 17. Submission
+  - [ ] 17.1 Video per `docs/video-script.md`
+  - [ ] 17.2 Blog post and social post
+  - [ ] 17.3 Devpost entry, category Skeleton Crew

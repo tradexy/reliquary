@@ -1,4 +1,4 @@
-// Global test setup for the Reliquary monorepo.
+// Global test setup for the Anchora monorepo.
 // fast-check is configured here so the PBT_RUNS env var is honoured
 // consistently across every suite — set seed and num runs once, not per file.
 import { configureGlobal } from 'fast-check'
@@ -8,19 +8,21 @@ import '@testing-library/jest-dom'
 
 // jsdom does not implement window.matchMedia. Stub it so components that read
 // prefers-reduced-motion work in tests without crashing.
-Object.defineProperty(window, 'matchMedia', {
-  writable: true,
-  value: (query: string) => ({
-    matches: false,
-    media: query,
-    onchange: null,
-    addListener: () => {},       // deprecated but some libs still call it
-    removeListener: () => {},    // deprecated but some libs still call it
-    addEventListener: () => {},
-    removeEventListener: () => {},
-    dispatchEvent: () => false,
-  }),
-})
+if (typeof window !== 'undefined') {
+  Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    value: (query: string) => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: () => {},       // deprecated but some libs still call it
+      removeListener: () => {},    // deprecated but some libs still call it
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      dispatchEvent: () => false,
+    }),
+  })
+}
 
 const runs = parseInt(process.env['PBT_RUNS'] ?? '100', 10)
 

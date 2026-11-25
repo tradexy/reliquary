@@ -193,7 +193,7 @@ no backend and no storage API.
 | Anchor store | Real S3 vs filesystem `wx` | Filesystem create-only | A real conditional write, no credentials, works offline |
 | Database | SQLite/D1 vs in-memory | In-memory with seeded bundle | A judge can run it with no setup; the guarantee demonstrated is the chain, not the DB |
 | Bundle format | JSON vs binary | JSON | The whole point is that someone else can read it |
-| Category | Skeleton Crew vs Frankenstein | **Frankenstein** | Two pillars stitched together is the category's own definition |
+| Category | Skeleton Crew vs Frankenstein | **Skeleton Crew** | Reusable `@anchora/core` skeleton powering two distinct applications (`apps/seal` and `apps/witness`), an offline CLI, and an MCP server |
 
 ## What this does not guarantee
 

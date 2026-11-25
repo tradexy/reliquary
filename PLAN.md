@@ -1,12 +1,12 @@
 # Plan / handoff — Anchora (Kiroween 2026)
 
-**Status as of Sat 21 Nov 2026.** Written so another agent, or me with no context, can
+**Status as of Wed 25 Nov 2026.** Written so another agent, or me with no context, can
 resume cold. Numbers here are measured, not remembered.
 
 - **Competition:** Kiroween 2026 (Devpost, sponsored by AWS/Kiro)
-- **Entry:** Anchora — category **Frankenstein**
+- **Entry:** Anchora — category **Skeleton Crew**
 - **Deadline:** **Fri 4 Dec 2026, 14:00 PT = 22:00 London.** Submit Thu 3 Dec.
-- **Prize target:** Best Frankenstein ($5,000), plus Overall and the bonus stack
+- **Prize target:** 1st Overall ($30,000) / Best Skeleton Crew ($5,000) / Best Demo ($1,000) + Bonus stack
 - **Live:** https://tradexy.github.io/reliquary/ (`/seal/`, `/witness/`)
 - **Repo:** https://github.com/tradexy/reliquary (public, MIT)
 - **Local:** `/Users/tradexy/Documents/competitions/261204-kiroween-hack`
@@ -21,17 +21,17 @@ Anchora is an **evidence core** for audit trails in sealed (air-gapped, regulate
 environments, with two apps on one core:
 
 - **Seal** — *did anything change?* 500 hash-chained events, Ed25519 seals, anchors in
-  create-only storage, a tamper simulator that reports `HASH_MISMATCH` at an exact seq
-  with a first-divergence index, and an offline verifier CLI.
-- **Witness** — *did the action leave a record?* 14 auditable actions classified
-  fail-closed vs queue, an outage drill (grant refused, revoke queued), lawful-change
-  accounting, and compliance evidence that traces to event seqs.
+  create-only storage, an SVG chain-fracture visualizer, a 4-mode tamper simulator
+  (including **Rewrite chain from here** caught by external seals & anchors), an offline
+  browser `.json` dropzone verifier, a Kiro Build Trail preset, and an offline verifier CLI.
+- **Witness** — *did the action leave a record?* 15 auditable actions classified
+  fail-closed vs queue, an interactive outage drill with live activity feed & outbox
+  (grant/guardrail raise refused; revoke/disable queued), simulated coverage-gap guard,
+  lawful-change accounting, and compliance evidence linking directly into Seal.
 
-Neither claim is sufficient alone, which is the Frankenstein argument: integrity
-without capture proves an incomplete record is unchanged.
-
-**Category rationale:** Frankenstein = "stitch together seemingly incompatible
-elements". Cryptography, compliance evidence and air-gapped operation is that stitch.
+**Category rationale:** Skeleton Crew = "a skeleton template plus **two distinct applications**
+built from it." `@anchora/core` is the shared skeleton powering `apps/seal` and `apps/witness`,
+plus `tools/verify`, `tools/mcp`, and `.kiro/powers/anchora`.
 
 ## 2. Scope of this submission
 
@@ -43,11 +43,13 @@ code beyond the dependencies in `package-lock.json`.
 
 | Check | Result |
 | --- | --- |
-| `npm run verify` | **180 tests**, typecheck clean, security scan clean |
-| `npm run build` | both apps build (Vite) |
+| `npm run verify` | **198 tests** across 17 files, typecheck clean, security scan clean (64 files) |
+| `npm run test:pbt` | **198 tests** at 1,000 PBT runs clean |
+| `npm run build` | both apps build (Vite, CSP injected) |
 | `npm run verify:bundle -- packages/core/data/bundle.json` | PASS, 500 events / 9 seals / 4 anchors, 3 lawful changes |
-| Doctored bundle | FAIL, `divergence 217` |
-| CI | GitHub Actions: tests → CLI verification → build → deploy Pages |
+| `npm run verify:bundle -- packages/core/data/kiro-audit.bundle.json` | PASS, 24 events / 4 seals / 2 anchors, 1 lawful change |
+| `kiro-cli agent validate` | both `.kiro/agents/*.json` valid (exit 0) |
+| CI | GitHub Actions: `npm run verify` → CLI verification (both bundles) → build → deploy Pages |
 
 Bundle key fingerprint: `7f2d0c75f3608e2d2f9743ca688960c5`
 
@@ -63,7 +65,7 @@ restate them here; update that file instead.
 Outstanding items only:
 
 - [ ] Demo video, under 3 minutes, public on YouTube
-- [ ] Devpost submission form, category **Frankenstein**
+- [ ] Devpost submission form, category **Skeleton Crew**
 - [ ] Blog post (bonus)
 - [ ] Social post starting with `#KiroweenHackathon26` (bonus)
 - [ ] Freeze `main` after submission (judges test the live URL until 29 Jan 2027)
@@ -87,14 +89,12 @@ About, `/.kiro` at root and not gitignored, live URL with no login. Full checkli
 
 | # | Task | Date | Notes |
 | --- | --- | --- | --- |
-| 1 | Rewrite `docs/video-script.md` for Anchora | 22 Nov | Beat sheet: story → Seal tamper → CLI → Witness drill → Kiro |
-| 2 | Design polish pass | 23–24 Nov | Seal time column wraps; Witness sparse; tighten both |
-| 3 | Record video (<3 min), upload public | 27–28 Nov | 1440×900, captions, no music |
-| 4 | Blog post (Kiro + build) | 29 Nov | Must mention Kiroween 2026 |
-| 5 | Social post `#KiroweenHackathon26` | 29 Nov | Must start with the hashtag |
-| 6 | Devpost form, category Frankenstein | 3 Dec | Draft early; leave credentials notes blank |
-| 7 | Final compliance pass + freeze `main` | 3 Dec | Check licence, `.kiro`, URLs, video visibility |
-| 8 | Cancel Kiro Pro | 27 Nov | Avoids 1 Dec charge |
+| 1 | Record video (<3 min), upload public | 27–28 Nov | 1920×1080, captions, no music, script in `docs/video-script.md` |
+| 2 | Cancel Kiro Pro (after any final CLI sessions) | 27 Nov | Avoids 1 Dec charge |
+| 3 | Blog post (Kiro + build) | 29 Nov | Must mention Kiroween 2026 |
+| 4 | Social post `#KiroweenHackathon26` | 29 Nov | Must start with the hashtag |
+| 5 | Devpost form, category **Skeleton Crew** | 3 Dec | Draft early from `docs/submission.md`; leave credentials blank |
+| 6 | Final compliance pass + freeze `main` | 3 Dec | Check licence, `.kiro`, URLs, video visibility |
 
 Cut order if time slips: EU AI Act evidence mapping → anchors side panel → insert and
 delete tamper modes (keep edit) → Witness evidence tab polish. Never cut the CLI, the

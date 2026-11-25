@@ -49,9 +49,7 @@ No extensions. Late submissions are not accepted.
 | Skeleton Crew | A skeleton template plus **two distinct applications** built from it |
 | Costume Contest | Any app, judged on a haunting, polished UI |
 
-**Our position: Frankenstein.** The entry stitches cryptographic integrity, compliance
-evidence and air-gapped operation into one audit trail. (We originally registered and
-requested credits under Skeleton Crew; see §10 for why that does not matter.)
+**Our position: Skeleton Crew.** One reusable `@anchora/core` evidence skeleton powering two distinct applications (`apps/seal` and `apps/witness` in separate folders), an offline verifier CLI, and an offline Kiro MCP server. (We originally registered and requested credits under Skeleton Crew, briefly explored Frankenstein, and locked in Skeleton Crew for submission; see §10 for why changing before submission is explicitly allowed.)
 
 ## 4. What must be submitted
 
@@ -127,7 +125,7 @@ An entry can win **one** overall or category prize **plus any number of bonuses*
 - **Kiro Crew App:** public repo for the Crew app, GitHub account matching the entry.
 - **Startup / Student / Ghost:** requires the specific proofs listed in the Rules.
 
-**Our position:** eligible for Frankenstein, Best Demo, Blog and Social. Not eligible
+**Our position:** eligible for Skeleton Crew, Best Demo, Blog and Social. Not eligible
 for Startup, Student, Ghost or Crew.
 
 ## 9. Testing, modifications, IP
@@ -178,13 +176,13 @@ These cost us real time. They belong here so we do not relearn them.
 ## 11. Compliance checklist (our entry)
 
 - [x] Built during the submission period
-- [x] Uses Kiro (CLI 3.4.0, plus steering/specs/hooks/journal as evidence)
+- [x] Uses Kiro (CLI 3.5.0, steering, EARS specs, 3 hooks, 2 validated custom agents, offline MCP server, Kiro Power, self-audit bundle)
 - [x] Public GitHub repo with MIT licence visible in About
 - [x] `/.kiro` at root, not gitignored
 - [x] Live URL, no login, free to access
 - [x] Text description and Kiro write-up prepared
 - [ ] Video under 3 minutes, public on YouTube
-- [ ] Devpost submission with category **Frankenstein**
+- [ ] Devpost submission with category **Skeleton Crew**
 - [ ] Blog post URL (bonus)
 - [ ] Social post URL (bonus)
 - [ ] Freeze `main` after submission

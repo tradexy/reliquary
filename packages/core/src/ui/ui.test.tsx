@@ -89,15 +89,23 @@ describe('components', () => {
     expect(onSelect).toHaveBeenCalledTimes(1)
   })
 
-  it('renders the shell footer', () => {
+  it('renders the shell footer and top app switcher', () => {
     render(
-      <AppShell theme={witnessTheme} title="T" footer={{ keyFingerprint: 'abc', events: 5, rejections: 2 }}>
+      <AppShell
+        theme={witnessTheme}
+        title="T"
+        activeApp="witness"
+        status={<Badge variant="ok">PASS</Badge>}
+        footer={{ keyFingerprint: 'abc', events: 5, rejections: 2 }}
+      >
         body
       </AppShell>,
     )
     expect(screen.getByRole('contentinfo')).toHaveTextContent('abc')
     expect(screen.getByRole('contentinfo')).toHaveTextContent('5')
     expect(screen.getByRole('main')).toHaveTextContent('body')
+    expect(screen.getByRole('link', { name: 'Witness' })).toHaveAttribute('aria-current', 'page')
+    expect(screen.getByText('PASS')).toBeInTheDocument()
   })
 })
 

@@ -24,8 +24,9 @@ import type { AppendDraft, Anchor, Seal } from '../packages/core/src/chain/types
 
 const SEED = 'anchora-demo-stream/v1'
 const EVENT_COUNT = 500
-const BASE = Date.parse('2026-11-01T09:00:00.000Z')
 const STEP_MS = 137_000
+// Align seq 217 (index 216) to exact 2026-11-03T09:14:00.000Z from the Northgate Bank story.
+const BASE = Date.parse('2026-11-03T09:14:00.000Z') - 216 * STEP_MS
 
 /** mulberry32 — small, deterministic, good enough for fixtures. */
 function prng(seed: number) {
@@ -73,6 +74,7 @@ const ACTION_WEIGHTS: Array<[string, number]> = [
   ['agents.disable', 2],
   ['agents.guardrail.ceiling.raise', 2],
   ['agents.guardrail.ceiling.lower', 2],
+  ['agents.decision.record', 3],
   ['routing.connector.add', 3],
   ['routing.connector.remove', 2],
   ['settings.feature.enable', 3],
@@ -152,13 +154,40 @@ async function main() {
       draft.action = 'governance.policy.update'
       draft.detail = { change: 'signing-key-rotation', from: 'key-2026-03', to: 'key-2026-11' }
     }
-    if (seq === 212 || seq === 213) {
+    if (seq === 212) {
+      draft.actor = { id: 'dana.okafor', role: 'owner' }
+      draft.action = 'roles.grant'
+      draft.subject = 'contractor.07@northgate.example'
       draft.outcome = 'refused'
-      draft.detail = { reason: 'audit-unavailable', attempted: draft.action }
+      draft.detail = { reason: 'audit-unavailable', attempted: 'roles.grant', requestedRole: 'admin' }
+    }
+    if (seq === 213) {
+      draft.actor = { id: 'dana.okafor', role: 'owner' }
+      draft.action = 'agents.guardrail.ceiling.raise'
+      draft.subject = 'commercial-loan-agent'
+      draft.outcome = 'refused'
+      draft.detail = { reason: 'audit-unavailable', attempted: 'agents.guardrail.ceiling.raise' }
     }
     if (seq === 214) {
+      draft.actor = { id: 'ravi.menon', role: 'security-lead' }
+      draft.action = 'roles.revoke'
+      draft.subject = 'ex-analyst.09@northgate.example'
       draft.outcome = 'queued'
-      draft.detail = { reason: 'audit-store-recovering', queued: 'durable-outbox' }
+      draft.detail = { reason: 'audit-store-recovering', queued: 'durable-outbox', revokedRole: 'loan-approver' }
+    }
+    if (seq === 217) {
+      draft.actor = { id: 'commercial-loan-agent', role: 'agent' }
+      draft.action = 'agents.decision.record'
+      draft.subject = 'loan:NG-2026-4419 (Meridian Holdings)'
+      draft.outcome = 'committed'
+      draft.lawful = 'none'
+      draft.detail = {
+        facilityGBP: 2000000,
+        decision: 'approved',
+        model: 'northgate-credit-v4',
+        region: 'on-prem',
+        requestId: 'req-217',
+      }
     }
 
     await log.append(draft)

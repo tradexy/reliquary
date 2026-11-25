@@ -7,6 +7,7 @@ export default defineConfig({
     include: [
       'packages/*/src/**/*.{test,spec}.{ts,tsx}',
       'apps/*/src/**/*.{test,spec}.{ts,tsx}',
+      'tools/**/*.{test,spec}.{ts,tsx}',
     ],
     environment: 'jsdom',
     globals: true,

@@ -115,3 +115,32 @@ dashboard is green, because the dashboard reads the same table that was just edi
 - Layout failures invisible to tests: bare-ID rows, a picker that looked filled but was
   empty, full-bleed text at 8 px from the edge.
 - The Builder ID / Google identity split that made the CLI refuse every request.
+
+---
+
+## 2026-11-25 — Audit, story alignment, and Kiro ecosystem upgrade
+
+A full competition readiness audit exposed four concrete gaps in the prior build:
+
+1. **Story vs. data mismatch (`seq 217`) and fail-closed rule leak (`seq 214`):** the
+   Northgate narrative promised a £2M loan decision at `2026-11-03 09:14` (`seq 217`),
+   whereas `bundle.json` had `identity.user.invite` on `2026-11-01`, and `seq 214` queued
+   a `fail-closed` action (`settings.feature.enable`). Added `agents.decision.record` to
+   the catalogue (`15` actions total), aligned `seq 212–214` (`roles.grant` refused,
+   `roles.revoke` queued) and `seq 217` (`commercial-loan-agent`, `£2,000,000`, `approved`),
+   and regenerated `bundle.json` deterministically.
+2. **Missing full-chain rewrite proof in the UI:** Seal's tamper simulator lacked an
+   attack that recomputed all downstream hashes. Added **Rewrite chain from here** plus an
+   interactive SVG Chain Visualizer so judges watch recomputed hashes fail at the
+   externally signed Seal & Anchor.
+3. **Stale Reliquary references inside `.kiro/` and `tools/` omitted from Vitest:**
+   rewrote `.kiro/steering/security.md` for Anchora, cleaned `scripts/security-check.mjs`
+   to enforce Requirements 14 & 15 mechanically across all workspaces, and added
+   `tools/**/*.test.ts` to `vitest.config.ts`. (Repository slug `tradexy/reliquary` was
+   intentionally retained from the Nov 13 scaffold to preserve live GitHub Pages URLs.)
+4. **Expanded Kiro primitives & Skeleton Crew alignment:** locked in **Skeleton Crew**
+   (`@anchora/core` + `apps/seal` + `apps/witness` + `docs/skeleton-guide.md`), built an
+   offline stdio MCP server (`tools/mcp/`, `.kiro/settings/mcp.json`), authored and
+   validated two custom agents (`.kiro/agents/{security-auditor,evidence-builder}.json`
+   via `kiro-cli agent validate`), packaged `.kiro/powers/anchora/`, and generated a
+   verifiable Ed25519-sealed Kiro build audit trail (`kiro-audit.bundle.json`).

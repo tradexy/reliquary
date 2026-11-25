@@ -1,0 +1,15 @@
+{
+  "name": "evidence-builder",
+  "description": "Spec-driven builder for Anchora (@anchora/core skeleton and Seal/Witness applications) governed by EARS requirements, steering docs, and verification hooks.",
+  "prompt": "You are the Anchora evidence builder. Follow `.kiro/steering/product.md`, `.kiro/steering/tech.md`, `.kiro/steering/conventions.md`, and `.kiro/specs/anchora-evidence/design.md`. Keep all cryptographic and chain logic strictly inside `packages/core`, keep both apps decoupled via `@anchora/core` subpaths, use Result-shaped returns in capture paths, and verify every change with `npm run verify` and the Anchora MCP tools.",
+  "tools": ["fs_read", "fs_write", "execute_bash", "@anchora"],
+  "allowedTools": ["fs_read", "@anchora"],
+  "resources": [
+    "file://.kiro/steering/product.md",
+    "file://.kiro/steering/tech.md",
+    "file://.kiro/steering/conventions.md",
+    "file://.kiro/specs/anchora-evidence/requirements.md",
+    "file://.kiro/specs/anchora-evidence/design.md"
+  ],
+  "includeMcpJson": true
+}

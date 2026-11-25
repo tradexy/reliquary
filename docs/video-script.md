@@ -1,105 +1,73 @@
 # Demo video — script and shot list
 
-Target **2:50**, hard limit 3:00. Judges are not required to watch past 3:00.
+Target **2:45**, hard limit **3:00**. Judges are not required to watch past 3:00.
 
-Record 1440×900, browser at 100%, no bookmarks bar, no notifications. One take, cuts
-only, no music. Burn in captions; many watch muted.
+Record **1920×1080 (16:9, 60fps)**, browser zoom **115%**, no bookmarks bar, no
+notifications. Cuts only, no copyrighted music. Burn in high-contrast captions positioned
+above the bottom 12% so they never cover controls or divergence callouts.
 
 ---
 
-## 0:00–0:20 — The lie
+## 0:00–0:20 — The Lie (Hook)
 
-**Screen:** landing page, the story timeline.
+**Screen:** Landing page (`site/index.html`) story timeline, then click **Open Seal at seq 217 →**.
 
-**Voice:** "On 3 November, an engineer at a bank changed one row in the audit log. An
-agent run that had approved a two-million-pound loan now read as declined. The dashboard
-stayed green — because the dashboard reads the same table he just edited."
+**Voice:** "Northgate Bank runs AI agents over commercial loan files. At sequence 217, an
+agent approves a two-million-pound loan. Later, an engineer with database access flips
+that row to declined. No alert fires. The dashboard stays green — because the dashboard
+reads the same table he just edited."
 
-## 0:20–0:35 — The claim
+## 0:20–0:58 — Break It Twice (Seal)
 
-**Screen:** scroll to "Two questions, two apps".
+**Screen:** Seal → Chain, `seq 217` selected (`£2,000,000 · approved`), preimage visible, SVG Chain Visualizer green.
+1. Click **Edit this record** → preimage diff flashes `decision: approved → declined`, SVG link fractures crimson, Findings highlights `HASH_MISMATCH at seq 217`.
+2. Click **Rewrite chain from here** → all 500 event links turn consistent, and **SEAL + ANCHOR** explodes red (`SEAL_INVALID`, `ANCHOR_MISSING` at seq 240).
 
-**Voice:** "A record you can rewrite proves nothing. Anchora makes two claims, and
-neither app can make them alone: every action is recorded, and every record is provably
-unchanged."
+**Voice:** "Watch what happens when we edit seq 217. The SVG chain fractures immediately:
+first divergence, 217. Now suppose the engineer is clever and recomputes every hash from
+217 to 500. Every link looks valid — and Seal still catches it at sequence 240, because
+an Ed25519 seal and create-only anchor were already written where nobody here can erase."
 
-## 0:35–1:05 — Seal, and the record itself
+## 0:58–1:35 — Prove Nothing Was Missed (Witness)
 
-**Screen:** Seal → Chain. Open seq 217. Show the canonical preimage.
+**Screen:** Click top bar **Witness** → **Drill**.
+1. Toggle **Audit store available** off (red simulated outage banner).
+2. Click **Grant a role** and **Raise guardrail ceiling** → both **refused (`audit-unavailable`)** in live activity feed.
+3. Click **Revoke a role** → **queued** into durable outbox. Toggle store back on → **Flush outbox** → seq 501 lands.
+4. Click **Evidence** → **EU AI Act Art. 12** → click `seq 217` chip to jump straight back to Seal, or click **Export evidence bundle**.
 
-**Voice:** "Five hundred events, each carrying the hash of the one before it. This is
-entry 217, and this is the exact byte sequence that produced its hash. Anyone can
-recompute it."
+**Voice:** "Integrity isn't enough if an action never left a record. In Witness, when the
+audit store goes down, widening actions like role grants and guardrail raises stop dead.
+Revoking access still completes and queues durably until the store recovers. Every SOC 2,
+ISO 27001, and EU AI Act control links straight back to the verified events — and exports
+to a single offline file."
 
-## 1:05–1:35 — Break it on camera
+## 1:35–2:20 — Kiro Deep-Dive + Self-Audit (45 seconds)
 
-**Screen:** press **Edit this record** → verify.
+**Screen:**
+1. Terminal: `npm run verify:bundle -- packages/core/data/bundle.json` (PASS), then doctor & run → `FAIL, divergence 217, exit 1`.
+2. Quick split-cut: `.kiro/specs/anchora-evidence/requirements.md` + `.kiro/hooks/verify-on-stop.json` + `.kiro/agents/security-auditor.json` + `.kiro/powers/anchora/POWER.md`.
+3. In Seal, click **Kiro Build Trail (24)** pill → `PASS` — and run `npm run verify:bundle -- packages/core/data/kiro-audit.bundle.json`.
 
-**Voice:** "So let's do what he did. One field changes. Verification does not say
-'failed' — it says divergence at 217. Recomputing every later hash would not help: the
-signed head of this chain was already written to storage nobody here can overwrite."
+**Voice:** "Underneath both apps is one reusable Skeleton Crew core built spec-first with
+Kiro: fifteen EARS requirements, three verification hooks, two validated custom agents, a
+Kiro Power, and an offline Anchora MCP server. In fact, Anchora's own Kiro build
+milestones ship as a second Ed25519-sealed bundle you can verify live right here."
 
-Show the anchors panel: 4 anchors, stored, untouched.
+## 2:20–2:45 — Impact & Close
 
-## 1:35–1:50 — The assessor's tool
+**Screen:** Landing page SVG architecture diagram (`@anchora/core` → `Seal` + `Witness` + `CLI & MCP`), highlighting `simulated` honesty badges.
 
-**Screen:** terminal.
-
-```
-npm run verify:bundle -- bundle.json
-→ FAIL, divergence 217, exit 1
-```
-
-**Voice:** "And the auditor's tool, offline, with no access to the bank, says the same
-thing and exits non-zero."
-
-Then restore, verify, PASS.
-
-## 1:50–2:20 — Witness, and the other question
-
-**Screen:** Witness → Drill. Switch the store off. Grant a role → refused. Revoke a role
-→ queued. Restore, flush.
-
-**Voice:** "Capture asks what Seal cannot. The audit store goes down. A grant is refused
-— no record, no grant. A revoke completes and queues its record, because blocking a
-removal would be worse than the outage. When the store returns, the queued row lands."
-
-## 2:20–2:35 — Evidence
-
-**Screen:** Evidence tab → a SOC 2 control → event list → Export → verify in place.
-
-**Voice:** "Every compliance claim points at the events that prove it. Export, and the
-same verifier reads the file."
-
-## 2:35–2:50 — Kiro, and close
-
-**Screen:** `.kiro/specs/anchora-evidence/requirements.md`, then
-`.kiro/hooks/verify-on-stop.json`, then a green test run.
-
-**Voice:** "Built with Kiro, spec first. Fifteen requirements, a design, then one scoped
-run per task. Three hooks gate the work — tests, a security scan, and a verification gate
-that will not let a turn finish until typecheck, the scan and a hundred and eighty tests
-pass. It caught its own mistakes, which is the part worth trusting."
-
-**Screen:** landing page.
-
-**Voice:** "Anchora. Two apps, one audit trail, and a file you can check yourself."
+**Voice:** "Every simulated boundary — KMS custody, object lock, outage drill — is labelled
+plainly. Zero network calls, zero login, one offline file any auditor can check in under
+a second. Anchora: every action is recorded, and every record is provably unchanged."
 
 ---
 
 ## Production checklist
 
-- [ ] Close other tabs; hide the menu bar; mute notifications
-- [ ] Start Seal on the Chain tab with verification already PASS
-- [ ] Rehearse the tamper click — it must land within a second of the line
-- [ ] Record narration separately, then align
-- [ ] Captions must not cover counts or the divergence line
-- [ ] Upload unlisted, watch on a phone, then make public
-- [ ] Title: "Anchora — Kiroween 2026"; description includes the repo URL
-
-## Do not
-
-- No logo intro. First frame is the story.
-- No talking head.
-- Don't explain the stack.
-- Don't say "secure" or "tamper-proof". Say what was tested.
+- [ ] Browser 1920×1080 at 115% zoom, clean incognito window, bookmarks hidden
+- [ ] Rehearse the two Seal clicks (**Edit** → **Rewrite chain from here**) and Witness outage toggle
+- [ ] Verify captions sit clear of the Findings list and SVG visualizer
+- [ ] Upload to YouTube as **Public**, title `"Anchora — Kiroween 2026 (Skeleton Crew)"`
+- [ ] Include GitHub repo URL and live GitHub Pages URL in the video description

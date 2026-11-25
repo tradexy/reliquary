@@ -118,4 +118,33 @@ describe('Witness app', () => {
     expect(within(result).getByText('PASS')).toBeInTheDocument()
     expect(within(result).getByText('500')).toBeInTheDocument()
   }, 30000)
+
+  it('simulates an untested action gap in the coverage matrix and clears it', async () => {
+    render(<App />)
+    await userEvent.click(tab('Coverage'))
+    await userEvent.click(screen.getByRole('button', { name: 'Simulate untested action' }))
+    expect(within(screen.getByTestId('gap-count')).getByText('1')).toBeInTheDocument()
+    expect(screen.getByRole('alert')).toHaveTextContent('roles.escalate')
+    await userEvent.click(screen.getByRole('button', { name: 'Clear simulated gap' }))
+    expect(within(screen.getByTestId('gap-count')).getByText('0')).toBeInTheDocument()
+  })
+
+  it('logs AI agent guardrail refusal and disable queue in the drill activity feed', async () => {
+    render(<App />)
+    await userEvent.click(tab('Drill'))
+    await userEvent.click(screen.getByRole('switch', { name: 'Audit store available' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Raise guardrail ceiling' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Disable agent' }))
+    const feed = screen.getByTestId('drill-feed')
+    expect(feed).toHaveTextContent('agents.guardrail.ceiling.raise')
+    expect(feed).toHaveTextContent('agents.disable')
+  })
+
+  it('renders clickable Seal deep links for supporting compliance events', async () => {
+    render(<App />)
+    await userEvent.click(tab('Evidence'))
+    const detail = screen.getByTestId('control-detail')
+    const link = within(detail).getAllByRole('link')[0]!
+    expect(link.getAttribute('href')).toMatch(/^\.\.\/seal\/#chain\?seq=\d+$/)
+  })
 })

@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "anchora": {
+      "command": "npx",
+      "args": ["vite-node", "tools/mcp/index.ts"],
+      "disabled": false,
+      "autoApprove": [
+        "verify_bundle",
+        "inspect_seq",
+        "check_coverage",
+        "check_compliance"
+      ]
+    }
+  }
+}

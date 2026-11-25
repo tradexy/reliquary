@@ -1,8 +1,8 @@
 import { useCallback, useMemo, useRef, useState } from 'react'
 import { createLog, verifyChain } from '@anchora/core/chain'
-import type { VerificationResult } from '@anchora/core/chain'
+import type { AppendDraft, VerificationResult } from '@anchora/core/chain'
 import { CATALOGUE, createCapture } from '@anchora/core/capture'
-import type { PerformResult } from '@anchora/core/capture'
+import type { CoverageRow, PerformResult } from '@anchora/core/capture'
 import { buildBundle, evaluateControls, summary } from '@anchora/core/evidence'
 import type { ControlResult, EvidenceBundle } from '@anchora/core/evidence'
 import {
@@ -35,20 +35,45 @@ const SCREENS: readonly { id: Screen; label: string }[] = [
 const ACTOR = { id: 'ravi.menon', role: 'security-lead' }
 
 function screenFromHash(): Screen {
-  const id = window.location.hash.replace(/^#/, '')
+  const id = window.location.hash.replace(/^#/, '').split('?')[0] ?? ''
   return SCREENS.find((s) => s.id === id)?.id ?? 'start'
 }
 
 // -- Coverage ----------------------------------------------------------------
 
 function CoverageScreen() {
-  const rows = useMemo(() => loadCoverage(), [])
+  const baseRows = useMemo(() => loadCoverage(), [])
+  const [simulateGap, setSimulateGap] = useState(false)
+
+  const rows: CoverageRow[] = useMemo(() => {
+    if (!simulateGap) return baseRows
+    return [
+      ...baseRows,
+      {
+        id: 'roles.escalate',
+        area: 'roles',
+        failMode: 'fail-closed',
+        testRef: 'capture/catalogue.test.ts#roles.escalate',
+        tested: false,
+        gap: '"capture/catalogue.test.ts" has no entry for capture/catalogue.test.ts#roles.escalate',
+      },
+    ]
+  }, [baseRows, simulateGap])
+
   const closed = rows.filter((r) => r.failMode === 'fail-closed').length
   const queued = rows.length - closed
   const gaps = rows.filter((r) => !r.tested)
+
   return (
     <>
-      <Panel title="Coverage matrix">
+      <Panel
+        title="Coverage matrix"
+        actions={
+          <button type="button" className="ax-btn" onClick={() => setSimulateGap((v) => !v)}>
+            {simulateGap ? 'Clear simulated gap' : 'Simulate untested action'}
+          </button>
+        }
+      >
         <div className="ax-row" style={{ gap: 32 }}>
           <div data-testid="total-actions"><Stat label="Actions" value={rows.length} /></div>
           <div data-testid="fail-closed-count"><Stat label="Fail-closed" value={closed} /></div>
@@ -88,10 +113,10 @@ function CoverageScreen() {
               const entry = CATALOGUE.find((c) => c.id === r.id)
               return (
                 <Tr key={r.id} data={{ 'data-action': r.id }}>
-                  <Td mono>{r.id}</Td>
+                  <Td mono><span className="ax-nowrap">{r.id}</span></Td>
                   <Td>{r.area}</Td>
-                  <Td>{r.failMode === 'fail-closed' ? 'stops' : 'queues'}</Td>
-                  <Td>{entry?.description ?? ''}</Td>
+                  <Td><span className="ax-nowrap">{r.failMode === 'fail-closed' ? 'stops' : 'queues'}</span></Td>
+                  <Td>{entry?.description ?? 'Simulated unverified route (missing testRef)'}</Td>
                   <Td>
                     {r.tested ? <Badge variant="ok">tested</Badge> : <Badge variant="fail">untested</Badge>}
                   </Td>
@@ -107,6 +132,14 @@ function CoverageScreen() {
 
 // -- Drill -------------------------------------------------------------------
 
+interface DrillFeedItem {
+  id: number
+  action: string
+  subject: string
+  status: 'committed' | 'refused' | 'queued' | 'flushed'
+  note: string
+}
+
 interface DrillProps {
   perform: (action: string, subject: string) => Promise<void>
   flush: () => Promise<void>
@@ -116,60 +149,134 @@ interface DrillProps {
   flushNote: string | null
   lastSeq: number | null
   counts: { refused: number; queued: number; applied: number; outbox: number }
+  feed: readonly DrillFeedItem[]
+  outboxItems: readonly AppendDraft[]
 }
 
 function DrillScreen(p: DrillProps) {
   return (
-    <Panel title="Outage drill" actions={<Badge variant="simulated">simulated outage</Badge>}>
-      <p className="ax-empty" style={{ marginBottom: 12 }}>
-        Widening actions stop when the audit store is down. Tightening actions go ahead and queue
-        their record. The outage is a switch in this page, not a real storage fault.
-      </p>
-      <div className="ax-row" style={{ marginBottom: 12 }}>
-        <label>
-          <input
-            type="checkbox"
-            role="switch"
-            checked={p.available}
-            onChange={(e) => p.setAvailable(e.target.checked)}
-          />{' '}
-          Audit store available
-        </label>
-      </div>
-      <div className="ax-row" style={{ marginBottom: 12 }}>
-        <button type="button" className="ax-btn" onClick={() => void p.perform('roles.grant', 'role:auditor')}>
-          Grant a role
-        </button>
-        <button type="button" className="ax-btn" onClick={() => void p.perform('roles.revoke', 'role:auditor')}>
-          Revoke a role
-        </button>
-        <button
-          type="button"
-          className="ax-btn ax-btn--primary"
-          disabled={p.counts.outbox === 0}
-          onClick={() => void p.flush()}
-        >
-          Flush outbox
-        </button>
-      </div>
-      <div className="ax-row" style={{ gap: 32, marginBottom: 12 }}>
-        <div data-testid="counter-refused"><Stat label="Refused" value={p.counts.refused} /></div>
-        <div data-testid="counter-queued"><Stat label="Queued" value={p.counts.queued} /></div>
-        <div data-testid="counter-applied"><Stat label="Applied" value={p.counts.applied} /></div>
-        <div data-testid="counter-outbox"><Stat label="In outbox" value={p.counts.outbox} /></div>
-      </div>
-      <p aria-live="polite" data-testid="outcome" style={{ margin: '0 0 6px' }}>
-        {p.outcome ?? 'No action performed yet.'}
-      </p>
-      {p.flushNote !== null ? (
-        <p aria-live="polite" data-testid="flush-note" style={{ margin: '0 0 6px' }}>{p.flushNote}</p>
-      ) : null}
-      {p.lastSeq !== null ? (
-        <p data-testid="last-seq" style={{ margin: 0 }}>
-          Appended seq <span className="ax-mono">{p.lastSeq}</span>
+    <>
+      <Panel title="Outage drill" actions={<Badge variant="simulated">simulated outage</Badge>}>
+        <div className="ax-alert-banner" data-outage={!p.available ? 'true' : undefined}>
+          <div>
+            <strong>{p.available ? 'Audit store online' : 'Simulated outage active'}</strong>
+            <p className="ax-empty" style={{ marginTop: 2 }}>
+              {p.available
+                ? 'Widening and tightening actions commit atomically to the chain.'
+                : 'Widening actions refuse (audit-unavailable). Tightening actions complete and queue durably.'}
+            </p>
+          </div>
+          <label className="ax-row" style={{ cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              role="switch"
+              checked={p.available}
+              onChange={(e) => p.setAvailable(e.target.checked)}
+            />{' '}
+            <span>Audit store available</span>
+          </label>
+        </div>
+
+        <div className="ax-row" style={{ marginBottom: 14 }}>
+          <button type="button" className="ax-btn" onClick={() => void p.perform('roles.grant', 'role:auditor')}>
+            Grant a role
+          </button>
+          <button
+            type="button"
+            className="ax-btn"
+            onClick={() => void p.perform('agents.guardrail.ceiling.raise', 'commercial-loan-agent')}
+          >
+            Raise guardrail ceiling
+          </button>
+          <button type="button" className="ax-btn" onClick={() => void p.perform('roles.revoke', 'role:auditor')}>
+            Revoke a role
+          </button>
+          <button
+            type="button"
+            className="ax-btn"
+            onClick={() => void p.perform('agents.disable', 'commercial-loan-agent')}
+          >
+            Disable agent
+          </button>
+          <button
+            type="button"
+            className="ax-btn ax-btn--primary"
+            disabled={p.counts.outbox === 0}
+            onClick={() => void p.flush()}
+          >
+            Flush outbox
+          </button>
+        </div>
+
+        <div className="ax-row" style={{ gap: 32, marginBottom: 14 }}>
+          <div data-testid="counter-refused"><Stat label="Refused" value={p.counts.refused} /></div>
+          <div data-testid="counter-queued"><Stat label="Queued" value={p.counts.queued} /></div>
+          <div data-testid="counter-applied"><Stat label="Applied" value={p.counts.applied} /></div>
+          <div data-testid="counter-outbox"><Stat label="In outbox" value={p.counts.outbox} /></div>
+        </div>
+
+        <p aria-live="polite" data-testid="outcome" style={{ margin: '0 0 6px' }}>
+          {p.outcome ?? 'No action performed yet.'}
         </p>
-      ) : null}
-    </Panel>
+        {p.flushNote !== null ? (
+          <p aria-live="polite" data-testid="flush-note" style={{ margin: '0 0 6px' }}>{p.flushNote}</p>
+        ) : null}
+        {p.lastSeq !== null ? (
+          <p data-testid="last-seq" style={{ margin: 0 }}>
+            Appended seq <span className="ax-mono">{p.lastSeq}</span>
+          </p>
+        ) : null}
+      </Panel>
+
+      <div className="ax-grid">
+        <Panel title="Drill activity log">
+          {p.feed.length === 0 ? (
+            <p className="ax-empty">Toggle the audit store switch or trigger an action above to observe fail-closed vs queue behaviour.</p>
+          ) : (
+            <ul className="ax-feed" data-testid="drill-feed">
+              {p.feed.map((item) => (
+                <li key={item.id} className="ax-feed-item">
+                  <div>
+                    <span className="ax-mono">{item.action}</span>{' '}
+                    <span style={{ color: 'var(--color-muted)' }}>({item.subject})</span>
+                    <div style={{ color: 'var(--color-muted)', fontSize: 12 }}>{item.note}</div>
+                  </div>
+                  <Badge
+                    variant={
+                      item.status === 'refused'
+                        ? 'fail'
+                        : item.status === 'queued'
+                          ? 'warn'
+                          : 'ok'
+                    }
+                  >
+                    {item.status}
+                  </Badge>
+                </li>
+              ))}
+            </ul>
+          )}
+        </Panel>
+
+        <Panel title={`Durable outbox (${p.outboxItems.length})`}>
+          {p.outboxItems.length === 0 ? (
+            <p className="ax-empty">Outbox is empty. Tightening actions performed during an outage queue here until flushed.</p>
+          ) : (
+            <ul className="ax-feed">
+              {p.outboxItems.map((draft, idx) => (
+                <li key={`${draft.action}-${idx}`} className="ax-feed-item">
+                  <div>
+                    <span className="ax-mono">{draft.action}</span>
+                    <div style={{ color: 'var(--color-muted)', fontSize: 12 }}>{draft.subject}</div>
+                  </div>
+                  <Badge variant="warn">pending flush</Badge>
+                </li>
+              ))}
+            </ul>
+          )}
+        </Panel>
+      </div>
+    </>
   )
 }
 
@@ -212,7 +319,11 @@ interface EvidenceProps {
 }
 
 function EvidenceScreen({ controls, bundle }: EvidenceProps) {
-  const [selected, setSelected] = useState<string | null>(null)
+  const [selected, setSelected] = useState<string | null>(() => {
+    const first = controls[0]
+    return first ? `${first.standard}|${first.control}` : null
+  })
+  const [showAllSeqs, setShowAllSeqs] = useState(false)
   const [exported, setExported] = useState<EvidenceBundle | null>(null)
   const [result, setResult] = useState<VerificationResult | null>(null)
   const [verifying, setVerifying] = useState(false)
@@ -244,6 +355,13 @@ function EvidenceScreen({ controls, bundle }: EvidenceProps) {
     setVerifying(false)
   }
 
+  const visibleSeqs =
+    current === null
+      ? []
+      : showAllSeqs
+        ? current.eventSeqs
+        : current.eventSeqs.slice(0, 24)
+
   return (
     <div className="ax-grid">
       <Panel title="Controls">
@@ -257,7 +375,10 @@ function EvidenceScreen({ controls, bundle }: EvidenceProps) {
                     type="button"
                     className={`ax-btn${key(c) === selected ? ' ax-btn--primary' : ''}`}
                     aria-pressed={key(c) === selected}
-                    onClick={() => setSelected(key(c))}
+                    onClick={() => {
+                      setSelected(key(c))
+                      setShowAllSeqs(false)
+                    }}
                     style={{ width: '100%', textAlign: 'left' }}
                   >
                     {c.control}
@@ -285,7 +406,21 @@ function EvidenceScreen({ controls, bundle }: EvidenceProps) {
                   Events: <span className="ax-mono" data-testid="event-count">{current.eventSeqs.length}</span>
                 </span>
               </div>
-              <pre className="ax-pre" data-testid="event-seqs">{current.eventSeqs.join(', ')}</pre>
+              <span className="ax-visually-hidden" data-testid="event-seqs">
+                {current.eventSeqs.join(', ')}
+              </span>
+              <div className="ax-seq-chips" aria-label="Supporting event links">
+                {visibleSeqs.map((seq) => (
+                  <a key={seq} className="ax-seq-chip" href={`../seal/#chain?seq=${seq}`}>
+                    seq {seq}
+                  </a>
+                ))}
+                {current.eventSeqs.length > 24 && !showAllSeqs ? (
+                  <button type="button" className="ax-pill" onClick={() => setShowAllSeqs(true)}>
+                    +{current.eventSeqs.length - 24} more
+                  </button>
+                ) : null}
+              </div>
             </div>
           )}
         </Panel>
@@ -298,10 +433,13 @@ function EvidenceScreen({ controls, bundle }: EvidenceProps) {
               Verify this export
             </button>
           </div>
+          <p className="ax-empty" style={{ marginBottom: 8 }}>
+            Verify offline with <span className="ax-mono">npm run verify:bundle</span>, or drop the downloaded{' '}
+            <span className="ax-mono">.json</span> into Seal.
+          </p>
           {exported !== null ? (
             <p className="ax-empty" style={{ marginBottom: 8 }}>
               Exported {summary(exported).events} events with {exported.controls.length} controls.
-              Check it offline with <span className="ax-mono">npm run verify:bundle</span>.
             </p>
           ) : null}
           {result !== null && exported !== null ? (
@@ -330,9 +468,11 @@ export function App() {
   const [available, setAvailable] = useState(true)
   const availableRef = useRef(true)
   const appliedRef = useRef(0)
+  const feedSeqRef = useRef(0)
   const [outcome, setOutcome] = useState<string | null>(null)
   const [flushNote, setFlushNote] = useState<string | null>(null)
   const [lastSeq, setLastSeq] = useState<number | null>(null)
+  const [feed, setFeed] = useState<DrillFeedItem[]>([])
   const [version, setVersion] = useState(0)
 
   // One log and one capture for the life of the page, seeded with the bundle.
@@ -368,13 +508,17 @@ export function App() {
         note = `The change was applied (${action} on ${subject}).`
       },
     )
+    const id = ++feedSeqRef.current
     if (r.outcome === 'committed') {
       setLastSeq(r.event.seq)
       setOutcome(`${action}: committed. ${note}`)
+      setFeed((prev) => [{ id, action, subject, status: 'committed', note: `Appended seq ${r.event.seq}` }, ...prev])
     } else if (r.outcome === 'queued') {
       setOutcome(`${action}: queued. ${note} The record waits in the outbox.`)
+      setFeed((prev) => [{ id, action, subject, status: 'queued', note: 'Applied and queued durably' }, ...prev])
     } else {
       setOutcome(`${action}: refused (${r.reason}). The change was not applied.`)
+      setFeed((prev) => [{ id, action, subject, status: 'refused', note: `Stopped (${r.reason})` }, ...prev])
     }
     setVersion((v) => v + 1)
   }, [])
@@ -382,19 +526,23 @@ export function App() {
   const flush = useCallback(async () => {
     const before = log.current.events().length
     const r = await capture.current.flush()
-    setFlushNote(`Flushed ${r.flushed} queued event${r.flushed === 1 ? '' : 's'}; ${r.remaining} remaining.`)
+    const note = `Flushed ${r.flushed} queued event${r.flushed === 1 ? '' : 's'}; ${r.remaining} remaining.`
+    setFlushNote(note)
     const head = log.current.head()
     if (r.flushed > 0 && head !== null && log.current.events().length > before) setLastSeq(head.seq)
+    const id = ++feedSeqRef.current
+    setFeed((prev) => [{ id, action: 'outbox.flush', subject: 'durable-outbox', status: 'flushed', note }, ...prev])
     setVersion((v) => v + 1)
   }, [])
 
   void version
   const c = capture.current.counters()
+  const outboxItems = capture.current.outbox()
   const counts = {
     refused: c.refusedCount,
     queued: c.queuedCount,
     applied: appliedRef.current,
-    outbox: capture.current.outbox().length,
+    outbox: outboxItems.length,
   }
 
   const events = log.current.events()
@@ -410,9 +558,17 @@ export function App() {
       exportedAt: new Date().toISOString(),
     })
 
+  const headerStatus = !available ? (
+    <Badge variant="fail">outage active · {counts.outbox} queued</Badge>
+  ) : (
+    <Badge variant="ok">{CATALOGUE.length} actions · 0 gaps</Badge>
+  )
+
   return (
     <AppShell
       theme={witnessTheme}
+      activeApp="witness"
+      status={headerStatus}
       title="Witness"
       subtitle="Proves nothing was missed. Every catalogued action is recorded, or it does not happen."
       nav={
@@ -449,6 +605,8 @@ export function App() {
           flushNote={flushNote}
           lastSeq={lastSeq}
           counts={counts}
+          feed={feed}
+          outboxItems={outboxItems}
         />
       ) : null}
       {screen === 'lawful' ? <LawfulScreen /> : null}

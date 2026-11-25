@@ -27,16 +27,18 @@ jobs:
 
       - run: npm ci
 
-      - name: Test
-        run: npx vitest run
+      - name: Verify (typecheck, security scan, 200+ tests)
+        run: npm run verify
 
       - name: Build both apps
         run: |
           npm run build -w apps/seal
           npm run build -w apps/witness
 
-      - name: Verify the demo bundle offline
-        run: npm run verify:bundle -- packages/core/data/bundle.json
+      - name: Verify both demo bundles offline
+        run: |
+          npm run verify:bundle -- packages/core/data/bundle.json
+          npm run verify:bundle -- packages/core/data/kiro-audit.bundle.json
 
       - name: Assemble site
         run: |

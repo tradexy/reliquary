@@ -1,0 +1,504 @@
+{
+  "formatVersion": "anchora/1",
+  "generatedAt": "2026-11-13T18:00:00.000Z",
+  "seed": "anchora-kiro-build-audit/v1",
+  "publicKeyPem": "-----BEGIN ED25519 PUBLIC KEY-----\nLu6h1kJRq2IPVFsxlUcZUt4wjVlUIayoqSU9wxV+Jkk=\n-----END ED25519 PUBLIC KEY-----",
+  "keyFingerprint": "cc43bb0e7789b34a62f28015b79e9972",
+  "events": [
+    {
+      "seq": 1,
+      "at": "2026-11-13T18:00:00.000Z",
+      "actor": {
+        "id": "tradexy",
+        "role": "owner"
+      },
+      "action": "governance.policy.update",
+      "subject": ".kiro/steering/product.md",
+      "outcome": "committed",
+      "lawful": "none",
+      "detail": {
+        "milestone": "steering-initialised",
+        "rule": "verifier-is-the-product"
+      },
+      "prevHash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "hash": "a49b7a1fa33314fb1a36a9530e0e430091b13eae8cb0868c90984f0ec3898e8c"
+    },
+    {
+      "seq": 2,
+      "at": "2026-11-16T19:04:18.000Z",
+      "actor": {
+        "id": "kiro-cli",
+        "role": "agent"
+      },
+      "action": "settings.feature.enable",
+      "subject": ".kiro/hooks/security-on-write.json",
+      "outcome": "committed",
+      "lawful": "none",
+      "detail": {
+        "commit": "7005bb7",
+        "trigger": "PostToolUse",
+        "target": "write"
+      },
+      "prevHash": "a49b7a1fa33314fb1a36a9530e0e430091b13eae8cb0868c90984f0ec3898e8c",
+      "hash": "253f1212abb221253e3a47a5e3907beffdfd1a4f6534174395aa1bff28041078"
+    },
+    {
+      "seq": 3,
+      "at": "2026-11-16T19:05:00.000Z",
+      "actor": {
+        "id": "kiro-cli",
+        "role": "agent"
+      },
+      "action": "settings.feature.enable",
+      "subject": ".kiro/hooks/verify-on-stop.json",
+      "outcome": "committed",
+      "lawful": "none",
+      "detail": {
+        "commit": "7005bb7",
+        "trigger": "Stop",
+        "gate": "npm run verify"
+      },
+      "prevHash": "253f1212abb221253e3a47a5e3907beffdfd1a4f6534174395aa1bff28041078",
+      "hash": "6868cd302873221f0c07b1af4e6e8e679122a226e2a19dee1e37a2e1c115e803"
+    },
+    {
+      "seq": 4,
+      "at": "2026-11-18T18:14:57.000Z",
+      "actor": {
+        "id": "tradexy",
+        "role": "owner"
+      },
+      "action": "governance.policy.update",
+      "subject": ".kiro/specs/anchora-evidence/requirements.md",
+      "outcome": "committed",
+      "lawful": "none",
+      "detail": {
+        "commit": "e1c4df9",
+        "earsRequirements": 15,
+        "coreSkeleton": "anchora/1"
+      },
+      "prevHash": "6868cd302873221f0c07b1af4e6e8e679122a226e2a19dee1e37a2e1c115e803",
+      "hash": "d4f284594e43b2bb7dbe669d70b669c3e8dd5f3bd3fb371d275f1794f9d48346"
+    },
+    {
+      "seq": 5,
+      "at": "2026-11-18T18:21:49.000Z",
+      "actor": {
+        "id": "tradexy",
+        "role": "owner"
+      },
+      "action": "governance.policy.update",
+      "subject": "docs/demo-plan.md",
+      "outcome": "committed",
+      "lawful": "none",
+      "detail": {
+        "commit": "8ad99b7",
+        "fixtureTarget": 500,
+        "storyBeatSeq": 217
+      },
+      "prevHash": "d4f284594e43b2bb7dbe669d70b669c3e8dd5f3bd3fb371d275f1794f9d48346",
+      "hash": "7ef154906ff88bf992bf501afd5f06b547cf36dedbbaf0b88187ea1a00836da0"
+    },
+    {
+      "seq": 6,
+      "at": "2026-11-18T18:25:23.000Z",
+      "actor": {
+        "id": "kiro-cli",
+        "role": "agent"
+      },
+      "action": "agents.deploy",
+      "subject": "packages/core/src/crypto",
+      "outcome": "committed",
+      "lawful": "none",
+      "detail": {
+        "commit": "e3dd8dc",
+        "tasks": "1-3",
+        "testsPassed": 44
+      },
+      "prevHash": "7ef154906ff88bf992bf501afd5f06b547cf36dedbbaf0b88187ea1a00836da0",
+      "hash": "fc0fb58702a691dd6e03651c0f16b391f48e581e588e5586b774e46aa0cfb89b"
+    },
+    {
+      "seq": 7,
+      "at": "2026-11-18T18:29:00.000Z",
+      "actor": {
+        "id": "kiro-cli",
+        "role": "agent"
+      },
+      "action": "agents.decision.record",
+      "subject": "packages/core/src/crypto/canonical.test.ts",
+      "outcome": "committed",
+      "lawful": "none",
+      "detail": {
+        "finding": "fast-check-v3-api",
+        "selfHealedByHook": true
+      },
+      "prevHash": "fc0fb58702a691dd6e03651c0f16b391f48e581e588e5586b774e46aa0cfb89b",
+      "hash": "aa3b143c77eaa22f524f3dbb5d8a5b2a20e5033fc3c0b22a26be7ac814ac5e6a"
+    },
+    {
+      "seq": 8,
+      "at": "2026-11-18T18:32:48.000Z",
+      "actor": {
+        "id": "kiro-cli",
+        "role": "agent"
+      },
+      "action": "agents.deploy",
+      "subject": "packages/core/src/chain",
+      "outcome": "committed",
+      "lawful": "none",
+      "detail": {
+        "commit": "929b562",
+        "tasks": "4-5",
+        "invariants": "edit-delete-insert-reorder"
+      },
+      "prevHash": "aa3b143c77eaa22f524f3dbb5d8a5b2a20e5033fc3c0b22a26be7ac814ac5e6a",
+      "hash": "4f4c6391b1349fcd22e529a68dcef11c90eeacf9f58b159ec2800f6e470fac77"
+    },
+    {
+      "seq": 9,
+      "at": "2026-11-18T18:35:00.000Z",
+      "actor": {
+        "id": "tradexy",
+        "role": "security-lead"
+      },
+      "action": "governance.policy.update",
+      "subject": "packages/core/src/chain/verify.ts",
+      "outcome": "committed",
+      "lawful": "none",
+      "detail": {
+        "fix": "report-declared-lawful-changes-independently",
+        "caughtBy": "human-review"
+      },
+      "prevHash": "4f4c6391b1349fcd22e529a68dcef11c90eeacf9f58b159ec2800f6e470fac77",
+      "hash": "fb6f5c1a3130cd485c972b9af4c89ad4cc7221bd07befdc614fec8482dd9986f"
+    },
+    {
+      "seq": 10,
+      "at": "2026-11-19T06:35:28.000Z",
+      "actor": {
+        "id": "kiro-cli",
+        "role": "agent"
+      },
+      "action": "agents.deploy",
+      "subject": "tools/verify/verify.ts",
+      "outcome": "committed",
+      "lawful": "none",
+      "detail": {
+        "commit": "b87fdbd",
+        "tasks": "6-8",
+        "offlineCli": true,
+        "seals": 9,
+        "anchors": 4
+      },
+      "prevHash": "fb6f5c1a3130cd485c972b9af4c89ad4cc7221bd07befdc614fec8482dd9986f",
+      "hash": "1372d8ed65344bb077cfc4ae1264b2dd4562461c7da6c8eaf8c54cc2a4780cd6"
+    },
+    {
+      "seq": 11,
+      "at": "2026-11-19T07:36:55.000Z",
+      "actor": {
+        "id": "kiro-cli",
+        "role": "agent"
+      },
+      "action": "agents.deploy",
+      "subject": "packages/core/src/capture + evidence",
+      "outcome": "committed",
+      "lawful": "none",
+      "detail": {
+        "commit": "19d8584",
+        "tasks": "9-10",
+        "standards": 3,
+        "coverageGuard": true
+      },
+      "prevHash": "1372d8ed65344bb077cfc4ae1264b2dd4562461c7da6c8eaf8c54cc2a4780cd6",
+      "hash": "d1a1ae36ee019003539106700e5b98d0721c8d0761482a27aba65bbfdf8c4a4b"
+    },
+    {
+      "seq": 12,
+      "at": "2026-11-19T07:48:20.000Z",
+      "actor": {
+        "id": "kiro-cli",
+        "role": "agent"
+      },
+      "action": "agents.deploy",
+      "subject": "apps/seal + apps/witness",
+      "outcome": "committed",
+      "lawful": "none",
+      "detail": {
+        "commit": "d91e5d3",
+        "tasks": "11-14",
+        "appsCount": 2,
+        "sharedCore": "@anchora/core"
+      },
+      "prevHash": "d1a1ae36ee019003539106700e5b98d0721c8d0761482a27aba65bbfdf8c4a4b",
+      "hash": "09f341bc40e9955eb5d086dbd68997de2a14fc7fdd9878c397f38032eb17f4ca"
+    },
+    {
+      "seq": 13,
+      "at": "2026-11-19T07:49:36.000Z",
+      "actor": {
+        "id": "kiro-cli",
+        "role": "agent"
+      },
+      "action": "routing.connector.add",
+      "subject": ".github/workflows/deploy.yml",
+      "outcome": "committed",
+      "lawful": "none",
+      "detail": {
+        "commit": "012b4b4",
+        "node": 22,
+        "webCryptoPolyfill": true
+      },
+      "prevHash": "09f341bc40e9955eb5d086dbd68997de2a14fc7fdd9878c397f38032eb17f4ca",
+      "hash": "b1665d1d2a28223eaa0d683d6143348223e632f9c815e7ebeb2d1b5cb79bc8a9"
+    },
+    {
+      "seq": 14,
+      "at": "2026-11-19T07:57:46.000Z",
+      "actor": {
+        "id": "kiro-cli",
+        "role": "agent"
+      },
+      "action": "settings.feature.enable",
+      "subject": "apps/seal/src/App.test.tsx",
+      "outcome": "committed",
+      "lawful": "none",
+      "detail": {
+        "commit": "f7bfe33",
+        "suiteMs": 1810,
+        "tests": 180
+      },
+      "prevHash": "b1665d1d2a28223eaa0d683d6143348223e632f9c815e7ebeb2d1b5cb79bc8a9",
+      "hash": "c799dad8f1b988378deadd74a56edf70dcfd3de2772bcfa8400052d4a9c0da77"
+    },
+    {
+      "seq": 15,
+      "at": "2026-11-20T12:20:30.000Z",
+      "actor": {
+        "id": "kiro-cli",
+        "role": "agent"
+      },
+      "action": "agents.deploy",
+      "subject": "packages/core/src/ui/Intro.tsx",
+      "outcome": "committed",
+      "lawful": "none",
+      "detail": {
+        "commit": "4f4b4a4",
+        "addition": "plain-english-start-here"
+      },
+      "prevHash": "c799dad8f1b988378deadd74a56edf70dcfd3de2772bcfa8400052d4a9c0da77",
+      "hash": "95188d04e80a97896b93b472ed819be89f4a60d9f1ccd1d1061a28088bca2239"
+    },
+    {
+      "seq": 16,
+      "at": "2026-11-20T12:38:01.000Z",
+      "actor": {
+        "id": "kiro-cli",
+        "role": "agent"
+      },
+      "action": "agents.deploy",
+      "subject": "site/index.html",
+      "outcome": "committed",
+      "lawful": "none",
+      "detail": {
+        "commit": "7147dfa",
+        "hero": "northgate-bank-story"
+      },
+      "prevHash": "95188d04e80a97896b93b472ed819be89f4a60d9f1ccd1d1061a28088bca2239",
+      "hash": "96edbdd532193fd551b7e4c93309e83ec39dfa1501a880407014b5b0ad2d9a4a"
+    },
+    {
+      "seq": 17,
+      "at": "2026-11-24T07:49:53.000Z",
+      "actor": {
+        "id": "tradexy",
+        "role": "owner"
+      },
+      "action": "governance.policy.update",
+      "subject": "RULES.md",
+      "outcome": "committed",
+      "lawful": "none",
+      "detail": {
+        "commit": "1d0b74c",
+        "purpose": "single-source-of-truth-compliance"
+      },
+      "prevHash": "96edbdd532193fd551b7e4c93309e83ec39dfa1501a880407014b5b0ad2d9a4a",
+      "hash": "e7983f3af924e16e53ea294947fa4815704a90b0bd0de57e2429261d5eafef4f"
+    },
+    {
+      "seq": 18,
+      "at": "2026-11-24T08:14:33.000Z",
+      "actor": {
+        "id": "kiro-cli",
+        "role": "agent"
+      },
+      "action": "settings.feature.enable",
+      "subject": ".kiro/hooks/contract-on-core-change.json",
+      "outcome": "committed",
+      "lawful": "none",
+      "detail": {
+        "commit": "c693d2b",
+        "trigger": "PostFileSave"
+      },
+      "prevHash": "e7983f3af924e16e53ea294947fa4815704a90b0bd0de57e2429261d5eafef4f",
+      "hash": "4405247ddb3ed5f8288debe8404679746503947e3bc172504786ab921ee3501f"
+    },
+    {
+      "seq": 19,
+      "at": "2026-11-24T08:15:00.000Z",
+      "actor": {
+        "id": "tradexy",
+        "role": "security-lead"
+      },
+      "action": "governance.policy.update",
+      "subject": "exports/pre-publish-redaction",
+      "outcome": "committed",
+      "lawful": "payload-stripped",
+      "detail": {
+        "authority": "tradexy",
+        "reason": "strip-local-workstation-paths",
+        "fields": "hostPath"
+      },
+      "prevHash": "4405247ddb3ed5f8288debe8404679746503947e3bc172504786ab921ee3501f",
+      "hash": "6039721879bd90628c4e9d3cee3b499d7cd176e3bd4c6824cee03b783ae2be3c"
+    },
+    {
+      "seq": 20,
+      "at": "2026-11-25T00:52:00.000Z",
+      "actor": {
+        "id": "kiro-agent",
+        "role": "agent"
+      },
+      "action": "routing.connector.add",
+      "subject": "tools/mcp/server.ts",
+      "outcome": "committed",
+      "lawful": "none",
+      "detail": {
+        "transport": "stdio-jsonrpc",
+        "tools": 4,
+        "offline": true
+      },
+      "prevHash": "6039721879bd90628c4e9d3cee3b499d7cd176e3bd4c6824cee03b783ae2be3c",
+      "hash": "d0ea45268d49b93fa779bb9651f8ed3fb686bd74026195db21e1ef82ef0d4b29"
+    },
+    {
+      "seq": 21,
+      "at": "2026-11-25T00:54:00.000Z",
+      "actor": {
+        "id": "kiro-agent",
+        "role": "agent"
+      },
+      "action": "roles.grant",
+      "subject": ".kiro/agents/security-auditor.json",
+      "outcome": "committed",
+      "lawful": "none",
+      "detail": {
+        "customAgents": 2,
+        "validatedByKiroCli": true
+      },
+      "prevHash": "d0ea45268d49b93fa779bb9651f8ed3fb686bd74026195db21e1ef82ef0d4b29",
+      "hash": "32ccf03c39e01184e477f6c06ae996f6eee550eaec3955c80865c60d28ddfbfe"
+    },
+    {
+      "seq": 22,
+      "at": "2026-11-25T00:56:00.000Z",
+      "actor": {
+        "id": "kiro-agent",
+        "role": "agent"
+      },
+      "action": "agents.deploy",
+      "subject": ".kiro/powers/anchora/POWER.md",
+      "outcome": "committed",
+      "lawful": "none",
+      "detail": {
+        "powerName": "anchora-evidence",
+        "category": "Skeleton Crew"
+      },
+      "prevHash": "32ccf03c39e01184e477f6c06ae996f6eee550eaec3955c80865c60d28ddfbfe",
+      "hash": "d6662c415211de90070d2ebbeb0d337f0f8c482cb99150e79b4a2a25c0433744"
+    },
+    {
+      "seq": 23,
+      "at": "2026-11-25T01:05:00.000Z",
+      "actor": {
+        "id": "kiro-agent",
+        "role": "agent"
+      },
+      "action": "agents.deploy",
+      "subject": "apps/seal/src/ChainVisualizer.tsx",
+      "outcome": "committed",
+      "lawful": "none",
+      "detail": {
+        "feature": "svg-chain-fracture-plus-rewrite-attack"
+      },
+      "prevHash": "d6662c415211de90070d2ebbeb0d337f0f8c482cb99150e79b4a2a25c0433744",
+      "hash": "cf303cccbac796fe8d8966446f1c836d3d4ab147204b4fd7634899702709b55c"
+    },
+    {
+      "seq": 24,
+      "at": "2026-11-25T01:10:00.000Z",
+      "actor": {
+        "id": "system",
+        "role": "scheduler"
+      },
+      "action": "agents.decision.record",
+      "subject": "release:kiroween-2026-rc1",
+      "outcome": "committed",
+      "lawful": "none",
+      "detail": {
+        "decision": "verified",
+        "suitesPassing": true,
+        "zeroNetwork": true
+      },
+      "prevHash": "cf303cccbac796fe8d8966446f1c836d3d4ab147204b4fd7634899702709b55c",
+      "hash": "8f492103620599e57582a17c18b6b727d974cccb09a6114cdb9f4975af8ed295"
+    }
+  ],
+  "seals": [
+    {
+      "seq": 6,
+      "hash": "fc0fb58702a691dd6e03651c0f16b391f48e581e588e5586b774e46aa0cfb89b",
+      "at": "2026-11-18T18:25:23.000Z",
+      "keyId": "cc43bb0e7789b34a62f28015b79e9972",
+      "signature": "XYJHadtZCQXsDXtU/n+VoyEsUdQjmwdYqY56J/5MRHYuoby+yiu0izVQHjB+CEaImKOHleSc7dn0Fz2DHbh0Dw=="
+    },
+    {
+      "seq": 12,
+      "hash": "09f341bc40e9955eb5d086dbd68997de2a14fc7fdd9878c397f38032eb17f4ca",
+      "at": "2026-11-19T07:48:20.000Z",
+      "keyId": "cc43bb0e7789b34a62f28015b79e9972",
+      "signature": "XeC+axAAxrK5FddtuuJImRjJphMYh51OPk/ux2gJnTctAPRsvdHl37T1m099T5/Gf8oa1iD7mE8zasKUUq6aCA=="
+    },
+    {
+      "seq": 18,
+      "hash": "4405247ddb3ed5f8288debe8404679746503947e3bc172504786ab921ee3501f",
+      "at": "2026-11-24T08:14:33.000Z",
+      "keyId": "cc43bb0e7789b34a62f28015b79e9972",
+      "signature": "8lu7FvoXCAwAox3jh2YlWKCBEWyjZz4c9dwUL/iXEBa/bYbE48JDKZ5dl/fyhAanyz4o+sleZ6nSZFjAtinFDg=="
+    },
+    {
+      "seq": 24,
+      "hash": "8f492103620599e57582a17c18b6b727d974cccb09a6114cdb9f4975af8ed295",
+      "at": "2026-11-25T01:10:00.000Z",
+      "keyId": "cc43bb0e7789b34a62f28015b79e9972",
+      "signature": "SgDFFQYQsalBxVBrL83MG6H3TDBR3gI9FT9WmQPzmbo6kJmjDd/JRTVy/ymO90i81ve9rO014V6r3OnpKxAzBQ=="
+    }
+  ],
+  "anchors": [
+    {
+      "seq": 12,
+      "headHash": "09f341bc40e9955eb5d086dbd68997de2a14fc7fdd9878c397f38032eb17f4ca",
+      "sealSignature": "XeC+axAAxrK5FddtuuJImRjJphMYh51OPk/ux2gJnTctAPRsvdHl37T1m099T5/Gf8oa1iD7mE8zasKUUq6aCA==",
+      "anchorDigest": "c75cdda9c8f202f733d2449a27e0047a27b92d5813e461f8c5f8451d7d03fe91",
+      "at": "2026-11-19T07:48:20.000Z"
+    },
+    {
+      "seq": 24,
+      "headHash": "8f492103620599e57582a17c18b6b727d974cccb09a6114cdb9f4975af8ed295",
+      "sealSignature": "SgDFFQYQsalBxVBrL83MG6H3TDBR3gI9FT9WmQPzmbo6kJmjDd/JRTVy/ymO90i81ve9rO014V6r3OnpKxAzBQ==",
+      "anchorDigest": "a13ed9a4797b430035088be82847726ed5b42f5b87e77625c5347b8c477f70ff",
+      "at": "2026-11-25T01:10:00.000Z"
+    }
+  ]
+}

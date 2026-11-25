@@ -13,13 +13,17 @@ export interface AppShellProps {
   theme: Theme;
   title: string;
   subtitle?: string;
+  /** Which app is active in the top switcher bar. */
+  activeApp?: 'seal' | 'witness';
+  /** Optional right-aligned live status badge in the top bar. */
+  status?: ReactNode;
   /** Navigation slot, rendered inside a labelled <nav>. */
   nav?: ReactNode;
   footer: AppShellFooter;
   children: ReactNode;
 }
 
-export function AppShell({ theme, title, subtitle, nav, footer, children }: AppShellProps) {
+export function AppShell({ theme, title, subtitle, activeApp, status, nav, footer, children }: AppShellProps) {
   const style = themeToProperties(theme) as CSSProperties;
   return (
     <div className="ax-root" style={style} data-theme={theme.name}>
@@ -29,13 +33,42 @@ export function AppShell({ theme, title, subtitle, nav, footer, children }: AppS
       </a>
       <header className="ax-header" role="banner">
         <div className="ax-container">
-          <h1>{title}</h1>
-          {subtitle !== undefined ? <p className="ax-subtitle">{subtitle}</p> : null}
-          {nav !== undefined ? (
-            <nav className="ax-nav" aria-label="Primary">
-              {nav}
-            </nav>
-          ) : null}
+          <div className="ax-topbar">
+            <div className="ax-row" style={{ gap: 14 }}>
+              <a className="ax-brand" href="../">
+                Anchora
+              </a>
+              <span className="ax-topbar-sep" aria-hidden="true">/</span>
+              <nav className="ax-switcher" aria-label="Applications">
+                <a
+                  href="../seal/#chain?seq=217"
+                  className={activeApp === 'seal' ? 'is-active' : undefined}
+                  aria-current={activeApp === 'seal' ? 'page' : undefined}
+                >
+                  Seal
+                </a>
+                <a
+                  href="../witness/#drill"
+                  className={activeApp === 'witness' ? 'is-active' : undefined}
+                  aria-current={activeApp === 'witness' ? 'page' : undefined}
+                >
+                  Witness
+                </a>
+              </nav>
+            </div>
+            {status !== undefined ? <div className="ax-row">{status}</div> : null}
+          </div>
+          <div className="ax-header-main">
+            <div>
+              <h1>{title}</h1>
+              {subtitle !== undefined ? <p className="ax-subtitle">{subtitle}</p> : null}
+            </div>
+            {nav !== undefined ? (
+              <nav className="ax-nav" aria-label="Primary">
+                {nav}
+              </nav>
+            ) : null}
+          </div>
         </div>
       </header>
       <main id="ax-main" className="ax-main" tabIndex={-1}>

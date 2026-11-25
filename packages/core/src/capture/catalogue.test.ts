@@ -16,6 +16,7 @@ const EXPECTED: Record<string, 'widening' | 'tightening'> = {
   'agents.disable': 'tightening',
   'agents.guardrail.ceiling.raise': 'widening',
   'agents.guardrail.ceiling.lower': 'tightening',
+  'agents.decision.record': 'widening',
   'routing.connector.add': 'widening',
   'routing.connector.remove': 'tightening',
   'settings.feature.enable': 'widening',

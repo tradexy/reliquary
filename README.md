@@ -2,16 +2,21 @@
 
 **Every action is recorded, and every record is provably unchanged.**
 
-Built for [Kiroween 2026](https://kiroween.devpost.com/) in the **Frankenstein**
-category: cryptographic integrity and compliance capture, stitched into one audit
-trail that an outsider can verify without trusting the operator.
+Built for [Kiroween 2026](https://kiroween.devpost.com/) in the **Skeleton Crew**
+category: one reusable cryptographic audit-evidence skeleton (`@anchora/core`) powering
+two distinct applications (**Seal** and **Witness**), an offline verifier CLI, and an
+offline Kiro MCP server.
 
 | | |
 | --- | --- |
 | Live | https://tradexy.github.io/reliquary/ |
-| Seal (integrity) | https://tradexy.github.io/reliquary/seal/ |
-| Witness (capture) | https://tradexy.github.io/reliquary/witness/ |
+| Seal (integrity) | https://tradexy.github.io/reliquary/seal/#chain?seq=217 |
+| Witness (capture) | https://tradexy.github.io/reliquary/witness/#drill |
 | Licence | MIT |
+
+> *Repository slug note:* the GitHub repository keeps the initial Nov 13 scaffold slug
+> (`tradexy/reliquary`) to preserve live GitHub Pages URLs; the project was pivoted and
+> built from scratch as **Anchora** from Nov 18 onward (see [`docs/kiro-journal.md`](docs/kiro-journal.md)).
 
 ---
 
@@ -28,101 +33,91 @@ Integrity without capture proves that an incomplete record is unchanged. Capture
 without integrity gives a complete record that anyone with database access can
 rewrite. Both are needed for the claim above, and neither app can make it alone.
 
-## The two apps
+## The Skeleton + Two Apps
 
-**Seal — proves nothing changed.** 500 events, hash-chained, sealed with Ed25519,
-anchored to create-only storage. Press *Edit this record* and verification reports
-`HASH_MISMATCH` at that exact seq, with a first-divergence index. Recomputing every
-hash afterwards does not help: the anchored head was already written.
+- **`packages/core` (`@anchora/core`)** — shared evidence skeleton: canonical
+  serialisation (`anchora/1`), WebCrypto SHA-256 chain, `@noble/ed25519` seals,
+  create-only `wx` anchors, fail-closed/queue capture engine, compliance predicates,
+  and themed UI primitives. See [`docs/skeleton-guide.md`](docs/skeleton-guide.md).
+- **`apps/seal` (Integrity Vault)** — 500 events, interactive SVG chain-fracture
+  visualizer, canonical preimage inspection, tamper simulator (**Edit**, **Delete**,
+  **Insert**, and **Rewrite chain from here** — proving that recomputing all downstream
+  hashes still fails at the externally signed seal & anchor), plus an offline browser
+  `.json` dropzone verifier and preset **Kiro Build Trail** bundle.
+- **`apps/witness` (Capture Registry)** — 15 auditable actions classified `fail-closed`
+  or `queue`, live outage drill with activity feed & durable outbox (widening grants and
+  guardrail raises refuse; revokes and disables queue), coverage matrix with build guard
+  and simulated-gap toggle, and SOC 2 / ISO 27001 / EU AI Act evidence deep-linking back
+  to Seal.
 
-**Witness — proves nothing was missed.** 14 auditable actions, each classified as
-fail-closed or queue. Flip the store to unavailable and a role grant is refused
-(`audit-unavailable`) while a revoke completes and queues its record durably. The
-coverage matrix carries a build guard: a catalogued action without a test is a gap.
-
-## Verify it yourself
+## Verify it yourself (zero network, offline CLI)
 
 ```bash
 npm ci
 npm run verify:bundle -- packages/core/data/bundle.json
+npm run verify:bundle -- packages/core/data/kiro-audit.bundle.json
 ```
 
 ```
+Anchora bundle verification
+  format      anchora/1
   events      500
   seals       9
   anchors     4
   key         7f2d0c75f3608e2d2f9743ca688960c5
-  INFO  seq  144  LAWFUL_CHANGE  lawful erasure authorised by dpo@northgate.example
-  INFO  seq  288  LAWFUL_CHANGE  lawful retention authorised by retention-scheduler
-  INFO  seq  401  LAWFUL_CHANGE  lawful payload-stripped authorised by ravi.menon
+
+  INFO  seq  144  LAWFUL_CHANGE      seq 144: lawful erasure authorised by dpo@northgate.example
+  INFO  seq  288  LAWFUL_CHANGE      seq 288: lawful retention authorised by retention-scheduler
+  INFO  seq  401  LAWFUL_CHANGE      seq 401: lawful payload-stripped authorised by ravi.menon
+
   result      PASS
   divergence  none
 ```
 
-Edit one field of the bundle and the same command exits 1 with `divergence 217`.
-That is the whole product in two lines.
-
-## How it works
-
-```
-action ──same transaction──► AuditEvent { seq, prevHash, hash } ──► chain
-                                        │
-                                        ├── seal  = Ed25519({seq, hash, at, keyId})
-                                        └── anchor = create-only write of the seal digest
-
-verify(bundle, publicKey) → hashes, links, sequence, seal signatures, anchor digests
-                          → classification: lawful change or tampering
-                          → first divergence index
-```
-
-- `hash = sha256(canonical(event without hash))`, and `prevHash` is inside the
-  preimage, so deletions and reorderings break the chain rather than merely looking odd.
-- Canonical serialisation is one function with a format version. Change it and every
-  hash changes, so bundles refuse to mix versions instead of passing falsely.
-- Lawful change — erasure, retention, payload stripping — is recorded and reported as
-  lawful, not hidden. The verifier distinguishes it from tampering by the marker and
-  its authority.
+Edit one field of `bundle.json` (e.g. flipping `seq 217` from `approved` to `declined`)
+and the same command exits `1` with `divergence 217`.
 
 ## Layout
 
 ```
-packages/core        evidence core: crypto, chain, capture, evidence, ui
-apps/seal            integrity console
-apps/witness         capture and compliance console
+packages/core        evidence core skeleton: crypto, chain, capture, evidence, ui
+apps/seal            integrity console + SVG chain visualizer + browser dropzone
+apps/witness         capture coverage, outage drill, and compliance console
 tools/verify         offline verifier CLI (no React, no network)
-scripts              seeded evidence generator
-.kiro                steering, specs, hooks
-docs                 threat model, limits, traceability, demo plan, submission copy
+tools/mcp            offline Kiro MCP server (stdio JSON-RPC, 4 tools)
+scripts              deterministic seeded bundle + Kiro self-audit generators
+.kiro                steering, EARS specs, 3 hooks, 2 custom agents, MCP config, Power
+docs                 kiro-evidence, skeleton-guide, threat model, limits, traceability
 ```
 
 ## Run it
 
 ```bash
 npm ci
-npm run dev:seal        # http://localhost:5180
-npm run dev:witness     # http://localhost:5181
-npm run verify          # typecheck + security scan + tests
-npm run generate:stream # regenerate the 500-event bundle (deterministic)
+npm run dev:seal            # http://localhost:5180
+npm run dev:witness         # http://localhost:5181
+npm run verify              # typecheck + security scan + all Vitest suites
+npm run test:pbt            # property-based suite at 1,000 runs
+npm run generate:stream     # regenerate the 500-event Northgate bundle (deterministic)
+npm run generate:kiro-audit # regenerate the 24-event Kiro build trail bundle
+npm run mcp                 # start the offline Anchora stdio MCP server
 ```
 
 ## How Kiro was used
 
-Spec-first with **Kiro**: steering, then 15 EARS requirements, then design, then
-tasks, then one scoped implementation run per task group.
+Spec-first with **Kiro** across the full lifecycle — documented in [`docs/kiro-evidence.md`](docs/kiro-evidence.md) and [`docs/kiro-journal.md`](docs/kiro-journal.md):
 
-- **Steering** fixed the promises before any code: "the verifier is the product",
-  "never overstate", "lawful change is classified, not concealed".
-- **Specs** (`.kiro/specs/anchora-evidence/`) carry the hash preimage, the anchor
-  semantics, the verification algorithm and a traceability table.
-- **Hooks** gate the work: `verify-on-stop` (typecheck + security scan + tests),
-  `security-on-write`, and contract tests on adapter edits.
-- **Kiro wrote** the canonical serialiser, hashing, keys, signing, the append log,
-  the verifier, the capture writers, the evidence mapping, the shared UI and both
-  apps. It also caught its own fast-check API error by running the suite.
-
-What the human did: the static checks, the screenshots, and one semantic fix Kiro
-left behind — a lawful erasure that re-hashes in place leaves a matching hash, so the
-verifier had to report declared lawful changes independently of the mismatch loop.
+- **Steering** (`.kiro/steering/`) fixed the promises before any code: *"the verifier is
+  the product"*, *"never overstate"*, *"lawful change is classified, not concealed"*.
+- **Specs** (`.kiro/specs/anchora-evidence/`) carry 15 EARS requirements, canonical
+  preimage rules, verification algorithm, and task breakdown.
+- **3 Hooks** (`.kiro/hooks/`) gate every change: `verify-on-stop`, `security-on-write`,
+  and contract tests on core edits.
+- **2 Custom Agents** (`.kiro/agents/`): `security-auditor` and `evidence-builder`,
+  validated with `kiro-cli agent validate`.
+- **Offline MCP Server + Kiro Power** (`.kiro/settings/mcp.json`, `.kiro/powers/anchora/`):
+  exposes `verify_bundle`, `inspect_seq`, `check_coverage`, and `check_compliance` directly
+  to Kiro agents, plus a verifiable **Kiro Build Trail** (`kiro-audit.bundle.json`).
 
 ## What this does not guarantee
 

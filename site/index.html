@@ -3,7 +3,14 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="Anchora — every action recorded, every record provably unchanged. Two apps, one audit trail you can verify offline." />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'none'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none';"
+    />
+    <meta
+      name="description"
+      content="Anchora — every action recorded, every record provably unchanged. A reusable audit-evidence skeleton powering Seal, Witness, an offline CLI, and a Kiro MCP server."
+    />
     <title>Anchora — every action recorded, every record provably unchanged</title>
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <style>
@@ -16,7 +23,7 @@
         --bone: #cfd6df;
         --slate: #6f8fb3;
         --ledger: #7aa87a;
-        --danger: #b4634a;
+        --danger: #d97c6c;
       }
       * { box-sizing: border-box; }
       html { scroll-behavior: smooth; }
@@ -33,28 +40,43 @@
           rgba(207, 214, 223, 0.012) 3px, rgba(207, 214, 223, 0.012) 4px
         );
       }
-      .wrap { max-width: 1000px; margin: 0 auto; padding: 4rem 1.5rem 5rem; }
+      .wrap { max-width: 1040px; margin: 0 auto; padding: 3.5rem 1.5rem 5rem; }
       .eyebrow {
         font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
         font-size: 0.68rem; letter-spacing: 0.16em; text-transform: uppercase;
-        color: var(--muted); margin: 0 0 0.75rem;
+        color: var(--slate); margin: 0 0 0.75rem;
       }
       h1 {
-        font-weight: 400; font-size: clamp(2.6rem, 6vw, 4rem);
+        font-weight: 400; font-size: clamp(2.6rem, 6vw, 4.1rem);
         margin: 0 0 1rem; letter-spacing: -0.015em; line-height: 1.05;
       }
-      .claim { font-size: 1.35rem; line-height: 1.5; max-width: 40ch; margin: 0 0 0.75rem; }
-      .sub { color: var(--muted); max-width: 62ch; margin: 0 0 3rem; }
+      .claim { font-size: 1.35rem; line-height: 1.48; max-width: 44ch; margin: 0 0 0.75rem; color: var(--bone); }
+      .sub { color: var(--muted); max-width: 66ch; margin: 0 0 2rem; }
+      .hero-actions { display: flex; flex-wrap: wrap; gap: 0.85rem; margin: 0 0 2.5rem; }
+      .btn {
+        display: inline-flex; align-items: center; gap: 0.45rem;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 0.8rem; letter-spacing: 0.04em; text-decoration: none;
+        padding: 0.62rem 1.1rem; border-radius: 4px;
+        border: 1px solid rgba(207, 214, 223, 0.3); color: var(--ink); background: var(--surface);
+      }
+      .btn:hover, .btn:focus-visible { border-color: var(--bone); outline: none; }
+      .btn-seal { border-color: var(--slate); color: #b7d0ec; }
+      .btn-witness { border-color: var(--ledger); color: #a7d9a7; }
       h2 {
-        font-weight: 400; font-size: 1.6rem; margin: 3.5rem 0 1rem;
+        font-weight: 400; font-size: 1.6rem; margin: 3.25rem 0 1rem;
         padding-top: 1.5rem; border-top: 1px solid rgba(207, 214, 223, 0.15);
       }
       h3 { font-weight: 400; font-size: 1.1rem; margin: 2rem 0 0.4rem; }
-      p { max-width: 66ch; margin: 0 0 1rem; }
+      p { max-width: 68ch; margin: 0 0 1rem; }
+      .arch {
+        background: var(--surface); border: 1px solid rgba(207, 214, 223, 0.18);
+        border-radius: 4px; padding: 1.1rem 1.25rem; margin: 1.5rem 0 0; overflow-x: auto;
+      }
       .story p { font-size: 1.05rem; }
       .beat {
-        display: grid; grid-template-columns: 3.5rem 1fr; gap: 0.5rem;
-        margin: 0 0 1.4rem; align-items: start;
+        display: grid; grid-template-columns: 4rem 1fr; gap: 0.5rem;
+        margin: 0 0 1.35rem; align-items: start;
       }
       .beat .when {
         font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -66,30 +88,50 @@
         border-left: 2px solid var(--slate);
         padding: 0.35rem 0 0.35rem 1.1rem;
         margin: 2rem 0;
-        font-size: 1.2rem;
-        max-width: 52ch;
+        font-size: 1.18rem;
+        max-width: 56ch;
       }
       .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr)); gap: 1.25rem; margin: 1.5rem 0 0; }
-      a.card {
-        display: block; text-decoration: none; color: var(--ink);
-        border: 1px solid rgba(207, 214, 223, 0.22);
-        background: var(--surface); padding: 1.5rem 1.5rem 1.7rem;
-        transition: border-color 160ms ease, transform 160ms ease;
+      .card {
+        border: 1px solid rgba(207, 214, 223, 0.22); border-radius: 4px;
+        background: var(--surface); padding: 1.45rem 1.5rem 1.55rem;
+        display: flex; flex-direction: column; justify-content: space-between;
       }
-      a.card:hover, a.card:focus-visible { border-color: var(--bone); transform: translateY(-2px); outline: none; }
-      a.card.witness { border-color: rgba(122, 168, 122, 0.28); }
-      a.card.witness:hover, a.card.witness:focus-visible { border-color: var(--ledger); }
+      .card.witness { border-color: rgba(122, 168, 122, 0.3); }
       .card h3 { margin: 0.15rem 0 0.45rem; font-size: 1.5rem; }
       .card p { margin: 0 0 1rem; font-size: 0.98rem; }
+      .card-links { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; }
+      .card-links a {
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase;
+        text-decoration: none; color: var(--slate);
+      }
+      .card.witness .card-links a { color: var(--ledger); }
+      .card-links a.secondary { color: var(--muted); }
+      .card-links a:hover { text-decoration: underline; }
       .meta {
         font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
         font-size: 0.68rem; letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted);
       }
+      .kiro-grid {
+        display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+        gap: 0.9rem; margin: 1.25rem 0 0;
+      }
+      .kiro-cell {
+        background: var(--surface); border: 1px solid rgba(207, 214, 223, 0.16);
+        border-radius: 4px; padding: 0.9rem 1rem;
+      }
+      .kiro-cell strong {
+        display: block; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 0.76rem; letter-spacing: 0.06em; text-transform: uppercase;
+        color: var(--bone); margin-bottom: 0.3rem;
+      }
+      .kiro-cell p { margin: 0; font-size: 0.9rem; color: var(--muted); }
       pre {
-        background: var(--surface); border: 1px solid rgba(207, 214, 223, 0.15);
-        padding: 1rem 1.1rem; overflow-x: auto; font-size: 0.8rem; line-height: 1.7;
+        background: var(--surface); border: 1px solid rgba(207, 214, 223, 0.16);
+        border-radius: 4px; padding: 1rem 1.1rem; overflow-x: auto; font-size: 0.8rem; line-height: 1.7;
         font-family: ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--bone);
-        max-width: 72ch;
+        max-width: 74ch;
       }
       code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
       .foot {
@@ -105,22 +147,68 @@
   </head>
   <body>
     <main class="wrap">
-      <p class="eyebrow">Kiroween 2026 · Frankenstein</p>
+      <p class="eyebrow">Kiroween 2026 · Skeleton Crew</p>
       <h1>Anchora</h1>
       <p class="claim">Every action is recorded, and every record is provably unchanged.</p>
       <p class="sub">
-        An audit trail for systems that run AI agents over other people's money, patients
-        and secrets. Two apps, one file an outsider can check without trusting you.
+        A reusable cryptographic audit-evidence skeleton (<code>@anchora/core</code>) powering two
+        distinct applications — <strong>Seal</strong> and <strong>Witness</strong> — plus an
+        offline verifier CLI and Kiro MCP server. Zero runtime network calls.
       </p>
+
+      <div class="hero-actions">
+        <a class="btn btn-seal" href="./seal/#chain?seq=217">Open Seal at seq 217 →</a>
+        <a class="btn btn-witness" href="./witness/#drill">Run Witness outage drill →</a>
+        <a class="btn" href="./seal/#start">Plain-English walkthrough</a>
+      </div>
+
+      <figure class="arch" aria-label="Anchora Skeleton Crew architecture diagram">
+        <svg viewBox="0 0 920 170" width="100%" height="170" style="display: block; min-width: 680px">
+          <rect x="8" y="14" width="276" height="142" rx="4" fill="#0f1419" stroke="#6f8fb3" stroke-width="1.5" />
+          <text x="24" y="38" fill="#8eb4da" font-size="11" font-family="ui-monospace, monospace" letter-spacing="1.2">SKELETON CORE</text>
+          <text x="24" y="60" fill="#e6e9ef" font-size="16" font-family="ui-serif, Georgia, serif">@anchora/core</text>
+          <text x="24" y="84" fill="#8b97a6" font-size="11.5" font-family="ui-monospace, monospace">· canonical + SHA-256 chain</text>
+          <text x="24" y="104" fill="#8b97a6" font-size="11.5" font-family="ui-monospace, monospace">· Ed25519 seals + wx anchors</text>
+          <text x="24" y="124" fill="#8b97a6" font-size="11.5" font-family="ui-monospace, monospace">· fail-closed / queue capture</text>
+          <text x="24" y="144" fill="#8b97a6" font-size="11.5" font-family="ui-monospace, monospace">· themed UI primitives</text>
+
+          <line x1="284" y1="45" x2="348" y2="38" stroke="#6f8fb3" stroke-width="1.5" />
+          <line x1="284" y1="85" x2="348" y2="85" stroke="#7aa87a" stroke-width="1.5" />
+          <line x1="284" y1="125" x2="348" y2="132" stroke="#8b97a6" stroke-width="1.5" />
+
+          <rect x="348" y="14" width="274" height="44" rx="4" fill="#0f1419" stroke="#6f8fb3" stroke-width="1.5" />
+          <text x="364" y="34" fill="#b7d0ec" font-size="12" font-family="ui-monospace, monospace">apps/seal · Integrity Vault</text>
+          <text x="364" y="49" fill="#8b97a6" font-size="11" font-family="ui-serif, Georgia, serif">Chain fracture visualizer + offline verifier</text>
+
+          <rect x="348" y="64" width="274" height="44" rx="4" fill="#0f1419" stroke="#7aa87a" stroke-width="1.5" />
+          <text x="364" y="84" fill="#a7d9a7" font-size="12" font-family="ui-monospace, monospace">apps/witness · Capture Registry</text>
+          <text x="364" y="99" fill="#8b97a6" font-size="11" font-family="ui-serif, Georgia, serif">15 actions · outage drill · SOC 2 / EU AI Act</text>
+
+          <rect x="348" y="114" width="274" height="42" rx="4" fill="#0f1419" stroke="#8b97a6" stroke-width="1" />
+          <text x="364" y="133" fill="#cfd6df" font-size="12" font-family="ui-monospace, monospace">tools/verify + tools/mcp</text>
+          <text x="364" y="147" fill="#8b97a6" font-size="11" font-family="ui-serif, Georgia, serif">Offline CLI + Kiro MCP server (zero React)</text>
+
+          <line x1="622" y1="36" x2="672" y2="85" stroke="#6f8fb3" stroke-width="1.2" stroke-dasharray="4 3" />
+          <line x1="622" y1="86" x2="672" y2="85" stroke="#7aa87a" stroke-width="1.2" stroke-dasharray="4 3" />
+          <line x1="622" y1="135" x2="672" y2="85" stroke="#8b97a6" stroke-width="1.2" stroke-dasharray="4 3" />
+
+          <rect x="672" y="38" width="236" height="94" rx="4" fill="#0f1419" stroke="#cfd6df" stroke-width="1.2" />
+          <text x="688" y="60" fill="#cfd6df" font-size="11" font-family="ui-monospace, monospace" letter-spacing="1">PORTABLE EVIDENCE</text>
+          <text x="688" y="82" fill="#e6e9ef" font-size="13.5" font-family="ui-monospace, monospace">anchora/1 bundle.json</text>
+          <text x="688" y="102" fill="#8b97a6" font-size="11" font-family="ui-serif, Georgia, serif">Checked independently by any</text>
+          <text x="688" y="117" fill="#8b97a6" font-size="11" font-family="ui-serif, Georgia, serif">auditor with one public key.</text>
+        </svg>
+      </figure>
 
       <h2>The story</h2>
       <div class="story">
         <div class="beat">
           <span class="when">09:14</span>
           <p>
-            Northgate Bank runs AI agents over commercial loan files. An engineer with
-            database access opens the audit table and changes one row. An agent run that
-            had approved a two-million-pound facility now reads as declined.
+            Northgate Bank runs AI agents over commercial loan files. At <code>seq 217</code>
+            (<code>2026-11-03 09:14</code>), <code>commercial-loan-agent</code> approves a
+            £2,000,000 facility for Meridian Holdings. Later, an engineer with database access
+            opens the table and flips <code>decision</code> to <code>declined</code>.
           </p>
         </div>
         <div class="beat">
@@ -133,27 +221,25 @@
         <div class="beat">
           <span class="when">09:31</span>
           <p>
-            The audit store goes down for forty minutes. A contractor asks for
-            administrator rights. The platform refuses: no record, no grant. A departing
-            employee's access is revoked in the same window — that completes, and its
-            record waits in a queue, because blocking a removal during an outage would be
-            worse than the outage.
+            Earlier, the audit store went down. A contractor asked for administrator rights
+            (<code>seq 212</code>): the platform refused — no record, no grant. A departing
+            employee's role was revoked in the same window (<code>seq 214</code>): that completed
+            and waited in a durable queue, because blocking a removal would be worse than the outage.
           </p>
         </div>
         <div class="beat">
           <span class="when">D+1</span>
           <p>
             The auditor runs one command. It prints <strong>divergence at 217</strong>.
-            She does not ask the bank for anything, and she does not need their
-            cooperation to check the rest.
+            She does not ask the bank for anything, and she does not need their cooperation to check the rest.
           </p>
         </div>
       </div>
 
       <p class="pull">
-        The engineer could recompute every hash in the table afterwards. It would not
-        help: a signed copy of the end of the chain was already written somewhere the
-        bank's own administrators cannot delete.
+        The engineer could recompute every hash from 217 to 500 afterwards. It still would not
+        help: a signed Ed25519 seal and create-only anchor were already written somewhere the
+        bank's administrators cannot delete.
       </p>
 
       <h2>Two questions, two apps</h2>
@@ -164,25 +250,60 @@
       </p>
 
       <div class="cards">
-        <a class="card" href="./seal/">
-          <p class="meta">Integrity · 500 events · 9 seals · 4 anchors</p>
-          <h3>Seal</h3>
-          <p>
-            <strong>Did anything change?</strong> Edit a row on camera and see the exact
-            entry come back broken — with the first-divergence index, not a green tick.
-          </p>
-          <p class="meta">Inspect the chain →</p>
-        </a>
-        <a class="card witness" href="./witness/">
-          <p class="meta">Capture · 14 auditable actions · 0 gaps</p>
-          <h3>Witness</h3>
-          <p>
-            <strong>Did the action leave a record?</strong> Run the outage drill: a grant
-            is refused, a revoke queues, and every compliance claim points at the events
-            that prove it.
-          </p>
-          <p class="meta">Run the outage drill →</p>
-        </a>
+        <div class="card">
+          <div>
+            <p class="meta">Integrity · 500 events · 9 seals · 4 anchors</p>
+            <h3>Seal</h3>
+            <p>
+              <strong>Did anything change?</strong> Edit <code>seq 217</code> or rewrite the entire
+              downstream chain on camera — watch the SVG link fracture or slam into the external
+              anchor, or drop any <code>.json</code> bundle to verify it offline in your browser.
+            </p>
+          </div>
+          <div class="card-links">
+            <a href="./seal/#chain?seq=217">Inspect seq 217 →</a>
+            <a class="secondary" href="./seal/#start">Start here</a>
+          </div>
+        </div>
+        <div class="card witness">
+          <div>
+            <p class="meta">Capture · 15 auditable actions · 0 gaps</p>
+            <h3>Witness</h3>
+            <p>
+              <strong>Did the action leave a record?</strong> Run the outage drill: widening grants
+              and guardrail raises refuse; revokes and disables queue. Inspect SOC 2, ISO 27001,
+              and EU AI Act controls with direct links back into Seal.
+            </p>
+          </div>
+          <div class="card-links">
+            <a href="./witness/#drill">Run the outage drill →</a>
+            <a class="secondary" href="./witness/#start">Start here</a>
+          </div>
+        </div>
+      </div>
+
+      <h2>Built with Kiro — and self-audited</h2>
+      <p>
+        Every phase was driven through Kiro primitives, and Anchora's own build milestones are
+        exported as a second Ed25519-sealed bundle you can inspect live inside Seal.
+      </p>
+      <div class="kiro-grid">
+        <div class="kiro-cell">
+          <strong>Steering &amp; EARS Specs</strong>
+          <p>4 steering docs + 15 EARS requirements and design invariants in <code>.kiro/specs/</code>.</p>
+        </div>
+        <div class="kiro-cell">
+          <strong>3 Automated Hooks</strong>
+          <p><code>verify-on-stop</code>, <code>security-on-write</code>, and core contract tests on save.</p>
+        </div>
+        <div class="kiro-cell">
+          <strong>Custom Agents &amp; Power</strong>
+          <p>2 validated agents in <code>.kiro/agents/</code> plus an installable Kiro Power.</p>
+        </div>
+        <div class="kiro-cell">
+          <strong>Offline MCP + Self-Audit</strong>
+          <p>4 MCP tools in <code>tools/mcp/</code> plus <code>kiro-audit.bundle.json</code> verified in CI.</p>
+        </div>
       </div>
 
       <h2>Check it yourself</h2>
@@ -191,6 +312,7 @@
         is needed, and it exits non-zero if a single byte has moved.
       </p>
       <pre><code>npm run verify:bundle -- packages/core/data/bundle.json
+npm run verify:bundle -- packages/core/data/kiro-audit.bundle.json
 
   events      500
   seals       9

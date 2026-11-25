@@ -17,6 +17,8 @@
     "verify": "npm run typecheck && npm run security:check && npx vitest run",
     "verify:bundle": "vite-node tools/verify/index.ts --",
     "generate:stream": "vite-node scripts/generate-stream.ts",
+    "generate:kiro-audit": "vite-node scripts/generate-kiro-audit.ts",
+    "mcp": "vite-node tools/mcp/index.ts",
     "typecheck": "tsc -p packages/core && tsc -p apps/seal && tsc -p apps/witness && tsc -p tools",
     "build": "npm run build -w apps/seal && npm run build -w apps/witness"
   },
